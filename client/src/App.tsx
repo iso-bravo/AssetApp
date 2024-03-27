@@ -1,14 +1,18 @@
-import { useState } from 'react'
-import './App.css'
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import './App.css';
+import Login from './pages/Login';
+import MainPage from './pages/MainPage';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-      <div>
-        <h1 className=' text-blue-800'>test</h1>
-      </div>
-  )
+    <Router>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<MainPage />} />
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;
+

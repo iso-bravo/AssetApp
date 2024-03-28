@@ -1,5 +1,6 @@
-import { Box, Container } from "@mui/material";
+import { Box, Container, Typography } from "@mui/material";
 import { DataGrid, GridRowsProp, GridColDef } from "@mui/x-data-grid";
+import NavegatorDrawer from "../components/Drawer";
 
 const rows: GridRowsProp = [
   {
@@ -10,7 +11,7 @@ const rows: GridRowsProp = [
     employee: "Manuel Martinez",
     supplier: "LOGITEC",
     mexico: true,
-    deparment: "Recursos Humanos",
+    department: "Recursos Humanos",
     category: "Equipo de Cómputo",
     date: "12/10/23",
     action1: "",
@@ -26,7 +27,7 @@ const rows: GridRowsProp = [
     employee: "María Magdalena",
     supplier: "CELL",
     mexico: false,
-    deparment: "Informática",
+    department: "Informática",
     category: "Equipo de Cómputo",
     date: "20/02/24",
     action1: "",
@@ -42,7 +43,7 @@ const rows: GridRowsProp = [
     employee: "George R.R. Martin",
     supplier: "PLAZA JÁNES",
     mexico: true,
-    deparment: "Recursos Humanos",
+    department: "Recursos Humanos",
     category: "Equipo de Cómputo",
     date: "10/01/24",
     action1: "",
@@ -58,7 +59,7 @@ const rows: GridRowsProp = [
     employee: "Waffle Encinas",
     supplier: "DOG PILE ORG",
     mexico: false,
-    deparment: "Marketing",
+    department: "Marketing",
     category: "MARKETING",
     date: "28/02/24",
     action1: "",
@@ -87,10 +88,20 @@ const columns: GridColDef[] = [
 
 export default function Assets() {
   return (
-    <Box marginTop={10}>
+    <>
+      <NavegatorDrawer />
       <Container>
-        <DataGrid rows={rows} columns={columns} />
+        <Box
+          maxHeight={800}
+          minHeight={300}
+          marginTop={10}
+          marginLeft={30}
+          minWidth={100}
+        >
+          <Typography variant="h4" margin={4}>Assets</Typography>
+          <DataGrid rows={rows} columns={columns} />
+        </Box>
       </Container>
-    </Box>
+    </>
   );
 }

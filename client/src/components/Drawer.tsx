@@ -8,19 +8,53 @@ import {
   ListItemText,
   Toolbar,
 } from "@mui/material";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
-import LogoutIcon from "@mui/icons-material/Logout";
 
-const Pages: {title: string, href: string}[] = [
+// Íconos
+import LogoutIcon from "@mui/icons-material/Logout";
+import HomeIcon from "@mui/icons-material/Home";
+import AssetsIcon from "@mui/icons-material/TableChart";
+import UsersIcon from "@mui/icons-material/Person";
+import CatalogIcon from "@mui/icons-material/List";
+import TagIcon from "@mui/icons-material/Tag";
+
+
+// Lista de enlaces del drawer
+const Pages: { title: string; href: string }[] = [
   { title: "Inicio", href: "/" },
   { title: "Assets", href: "/assets" },
   { title: "Usuarios", href: "/users" },
-  { title: "Catálogos", href: "/catalog"},
-  { title: "Etiquetas", href: "/tags"}
+  { title: "Catálogos", href: "/catalog" },
+  { title: "Etiquetas", href: "/tags" },
 ];
 
 export default function NavegatorDrawer() {
+
+  // Función para asignar los íconos según el index del elemento
+  function iconAsigment(i: number) { 
+    switch (i) {
+      case 0: // Inicio
+        return <HomeIcon />;
+
+      case 1: // Assets
+        return <AssetsIcon />;
+
+      case 2: // Usuarios
+        return <UsersIcon />;
+
+      case 3: // Catálogos
+        return <CatalogIcon />;
+
+      case 4: // Etiquetas
+        return <TagIcon />;
+
+      case 5:
+        break;
+
+      default:
+        break;
+    }
+  }
+
   return (
     <>
       <Drawer
@@ -32,18 +66,17 @@ export default function NavegatorDrawer() {
           "& .MuiDrawer-paper": {
             width: 250,
             boxSizing: "border-box",
+            backgroundColor: "teal",
+            color: "white"
           },
         }}
-        
       >
         <Toolbar />
-        <List>
+        <List> 
           {Pages.map((page, index) => (
             <ListItem key={page.title} disablePadding>
               <ListItemButton component="a" href={page.href}>
-                <ListItemIcon>
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
+                <ListItemIcon>{iconAsigment(index)}</ListItemIcon>
                 <ListItemText primary={page.title} />
               </ListItemButton>
             </ListItem>

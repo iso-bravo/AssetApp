@@ -1,7 +1,7 @@
 import { Box, Container, Typography } from "@mui/material";
 import NavegatorDrawer from "../components/Drawer";
 
-export default function UsersPage() {
+export default function TagsPage() {
   return (
     <>
       <NavegatorDrawer />
@@ -15,7 +15,7 @@ export default function UsersPage() {
           minWidth={100}
         >
           <Typography variant="h4" margin={4}>
-            Página principal
+            Etiquetas
           </Typography>
         </Box>
       </Container>

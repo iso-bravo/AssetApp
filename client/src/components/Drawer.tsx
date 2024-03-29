@@ -23,7 +23,7 @@ const Pages: { title: string; href: string }[] = [
   { title: "Inicio", href: "/" },
   { title: "Assets", href: "/assets" },
   { title: "Usuarios", href: "/users" },
-  { title: "Catálogos", href: "/catalog" },
+  { title: "Catálogos", href: "/catalogs" },
   { title: "Etiquetas", href: "/tags" },
 ];
 

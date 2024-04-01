@@ -1,7 +1,10 @@
-import { Box, Container, Typography } from "@mui/material";
+import { Box, Container, Typography, ButtonGroup, FormControl, TextField, Stack } from "@mui/material";
 import { DataGrid, GridRowsProp, GridColDef } from "@mui/x-data-grid";
-import NavegatorDrawer from "../components/Drawer";
+import NavegatorDrawer from "../components/NavegatorDrawer";
+import DialogForm from "../components/DialogForm";
+import { NumberInput } from "../components/NumberInput";
 
+// Datos de prueba
 const rows: GridRowsProp = [
   {
     id: 1,
@@ -149,6 +152,7 @@ const rows: GridRowsProp = [
   },
 ];
 
+// Definir columnas
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 150 },
   { field: "Number_Serie", headerName: "Número de serie", width: 150 },
@@ -172,13 +176,14 @@ const columns: GridColDef[] = [
   { field: "boton4", headerName: "Acción 4", width: 150 },
 ];
 
+// Vista Assets
 export default function Assets() {
   return (
     <>
-      <NavegatorDrawer />
-      <Container>
+      <NavegatorDrawer /> {/* Drawer para navegar entre vistas */}
+      <Container> {/* Contenido de la Vista va dentro del Box */}
         <Box
-          maxHeight={0}
+          maxHeight={2000}
           minHeight={0}
           marginTop={4}
           marginBottom={10}
@@ -186,9 +191,27 @@ export default function Assets() {
           minWidth={50}
           maxWidth={2000}
         >
-          <Typography variant="h4" margin={2}>
+          <Typography variant="h4" margin={2}> {/* Título de la Vista */}
             Assets
           </Typography>
+          <ButtonGroup> {/* Grupo de Acciones */}
+            <DialogForm butttonTitle="Agregar" title="Agregar un Asset">
+              <FormControl>
+                <Stack spacing={4}>
+                  <NumberInput placeholder="Número de serie..."></NumberInput>
+                  <TextField label="" fullWidth></TextField>
+                  <TextField label="" fullWidth></TextField>
+                  <TextField label="" fullWidth></TextField>
+                  <TextField label="" fullWidth></TextField>
+                  <TextField label="" fullWidth></TextField>
+                  <TextField label="" fullWidth></TextField>
+                  <TextField label="" fullWidth></TextField>
+                  <TextField label="" fullWidth></TextField>
+                  <TextField label="" fullWidth></TextField>
+                </Stack>
+              </FormControl>
+            </DialogForm>
+          </ButtonGroup>
           <DataGrid rows={rows} columns={columns} />
         </Box>
       </Container>

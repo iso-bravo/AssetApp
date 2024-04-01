@@ -27,6 +27,7 @@ const Pages: { title: string; href: string }[] = [
   { title: "Etiquetas", href: "/tags" },
 ];
 
+// Componente principal
 export default function NavegatorDrawer() {
 
   // Función para asignar los íconos según el index del elemento
@@ -66,7 +67,7 @@ export default function NavegatorDrawer() {
           "& .MuiDrawer-paper": {
             width: 250,
             boxSizing: "border-box",
-            backgroundColor: "teal",
+            backgroundColor: "steelblue",
             color: "white"
           },
         }}

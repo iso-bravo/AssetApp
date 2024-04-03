@@ -20,10 +20,10 @@ import TagIcon from "@mui/icons-material/Tag";
 
 // Lista de enlaces del drawer
 const Pages: { title: string; href: string }[] = [
-  { title: "Inicio", href: "/" },
+  { title: "Inicio", href: "/home" },
   { title: "Assets", href: "/assets" },
   { title: "Usuarios", href: "/users" },
-  { title: "Catálogos", href: "/catalog" },
+  { title: "Catálogos", href: "/catalogs" },
   { title: "Etiquetas", href: "/tags" },
 ];
 
@@ -85,7 +85,7 @@ export default function NavegatorDrawer() {
         <Divider />
         <List>
           <ListItem key="1" disablePadding>
-            <ListItemButton component="a" href="/login">
+            <ListItemButton component="a" href="/">
               <ListItemIcon>
                 <LogoutIcon />
               </ListItemIcon>

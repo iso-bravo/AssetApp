@@ -65,7 +65,7 @@ export default function NavegatorDrawer() {
           width: 250,
           flexShrink: 0,
           "& .MuiDrawer-paper": {
-            width: 250,
+            width: 230,
             boxSizing: "border-box",
             backgroundColor: "steelblue",
             color: "white"

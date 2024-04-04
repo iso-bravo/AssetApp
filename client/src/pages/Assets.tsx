@@ -4,182 +4,58 @@ import {
   Typography,
   ButtonGroup,
   TextField,
+  InputLabel,
+  Button,
+  Dialog,
+  IconButton,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import { DataGrid, GridRowsProp, GridColDef } from "@mui/x-data-grid";
 import NavegatorDrawer from "../components/NavegatorDrawer";
 import DialogForm from "../components/DialogForm";
+import CloseIcon from "@mui/icons-material/Close";
+import React from "react";
 // import { NumberInput } from "../components/NumberInput";
 
 // Datos de prueba
 const rows: GridRowsProp = [
   {
     id: 1,
-    Number_Serie: 3125435,
-    Modelo: "S24 ULTRA",
-    Descripcion: "Algo muy nuevo y caro.",
-    Marca: "Samsung",
-    ID_Categoria: 3,
-    Imagen: "Imagen",
-    Fecha_Registro: "12/1/24",
-    ID_Estatus: 4,
-    Tipo_Compra: "Equipo electrónico",
-    No_Factura_Pedimento: 4536546,
-    Factura_Pedimento: "Factura aquí",
-    boton1: null,
-    boton2: null,
-    boton3: null,
-    boton4: null,
+    Number_Serie: 3465437,
+    Modelo: "Chocolate",
+    Marca: "Waffles roll",
+    ID_Categoria: "Categoria",
+    ID_Estatus: "Activo",
   },
   {
     id: 2,
-    Number_Serie: 3125435,
-    Modelo: "S24 ULTRA",
-    Descripcion: "Algo muy nuevo y caro.",
-    Marca: "Samsung",
-    ID_Categoria: 3,
-    Imagen: "Imagen",
-    Fecha_Registro: "12/1/24",
-    ID_Estatus: 4,
-    Tipo_Compra: "Equipo electrónico",
-    No_Factura_Pedimento: 4536546,
-    Factura_Pedimento: "Factura aquí",
-    boton1: null,
-    boton2: null,
-    boton3: null,
-    boton4: null,
+    Number_Serie: 3454672,
+    Modelo: "Dog Pile",
+    Marca: "Puzzle Car",
+    ID_Categoria: "Juego",
+    ID_Estatus: "Activo",
   },
   {
     id: 3,
-    Number_Serie: 3125435,
-    Modelo: "S24 ULTRA",
-    Descripcion: "Algo muy nuevo y caro.",
-    Marca: "Samsung",
-    ID_Categoria: 3,
-    Imagen: "Imagen",
-    Fecha_Registro: "12/1/24",
-    ID_Estatus: 4,
-    Tipo_Compra: "Equipo electrónico",
-    No_Factura_Pedimento: 4536546,
-    Factura_Pedimento: "Factura aquí",
-    boton1: null,
-    boton2: null,
-    boton3: null,
-    boton4: null,
-  },
-  {
-    id: 4,
-    Number_Serie: 3125435,
-    Modelo: "S24 ULTRA",
-    Descripcion: "Algo muy nuevo y caro.",
-    Marca: "Samsung",
-    ID_Categoria: 3,
-    Imagen: "Imagen",
-    Fecha_Registro: "12/1/24",
-    ID_Estatus: 4,
-    Tipo_Compra: "Equipo electrónico",
-    No_Factura_Pedimento: 4536546,
-    Factura_Pedimento: "Factura aquí",
-    boton1: null,
-    boton2: null,
-    boton3: null,
-    boton4: null,
-  },
-  {
-    id: 5,
-    Number_Serie: 3125435,
-    Modelo: "S24 ULTRA",
-    Descripcion: "Algo muy nuevo y caro.",
-    Marca: "Samsung",
-    ID_Categoria: 3,
-    Imagen: "Imagen",
-    Fecha_Registro: "12/1/24",
-    ID_Estatus: 4,
-    Tipo_Compra: "Equipo electrónico",
-    No_Factura_Pedimento: 4536546,
-    Factura_Pedimento: "Factura aquí",
-    boton1: null,
-    boton2: null,
-    boton3: null,
-    boton4: null,
-  },
-  {
-    id: 6,
-    Number_Serie: 3125435,
-    Modelo: "S24 ULTRA",
-    Descripcion: "Algo muy nuevo y caro.",
-    Marca: "Samsung",
-    ID_Categoria: 3,
-    Imagen: "Imagen",
-    Fecha_Registro: "12/1/24",
-    ID_Estatus: 4,
-    Tipo_Compra: "Equipo electrónico",
-    No_Factura_Pedimento: 4536546,
-    Factura_Pedimento: "Factura aquí",
-    boton1: null,
-    boton2: null,
-    boton3: null,
-    boton4: null,
-  },
-  {
-    id: 7,
-    Number_Serie: 3125435,
-    Modelo: "S24 ULTRA",
-    Descripcion: "Algo muy nuevo y caro.",
-    Marca: "Samsung",
-    ID_Categoria: 3,
-    Imagen: "Imagen",
-    Fecha_Registro: "12/1/24",
-    ID_Estatus: 4,
-    Tipo_Compra: "Equipo electrónico",
-    No_Factura_Pedimento: 4536546,
-    Factura_Pedimento: "Factura aquí",
-    boton1: null,
-    boton2: null,
-    boton3: null,
-    boton4: null,
-  },
-  {
-    id: 8,
-    Number_Serie: 3125435,
-    Modelo: "S24 ULTRA",
-    Descripcion: "Algo muy nuevo y caro.",
-    Marca: "Samsung",
-    ID_Categoria: 3,
-    Imagen: "Imagen",
-    Fecha_Registro: "12/1/24",
-    ID_Estatus: 4,
-    Tipo_Compra: "Equipo electrónico",
-    No_Factura_Pedimento: 4536546,
-    Factura_Pedimento: "Factura aquí",
-    boton1: null,
-    boton2: null,
-    boton3: null,
-    boton4: null,
-  },
+    Number_Serie: 1484839,
+    Modelo: "Pulpo",
+    Marca: "Cubo de Magma",
+    ID_Categoria: "Cubik",
+    ID_Estatus: "Activo",
+  }
 ];
 
 // Definir columnas
 const columns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 150 },
+  { field: "id", headerName: "ID", width: 100 },
   { field: "Number_Serie", headerName: "Número de serie", width: 150 },
   { field: "Modelo", headerName: "Modelo", width: 150 },
-  { field: "Descripcion", headerName: "Descripción", width: 150 },
   { field: "Marca", headerName: "Marca", width: 150 },
   { field: "ID_Categoria", headerName: "Categoría", width: 150 },
-  { field: "Imagen", headerName: "Imagen", width: 150 },
-  { field: "Fecha_Registro", headerName: "Fecha de registro", width: 150 },
   { field: "ID_Estatus", headerName: "Estatus", width: 150 },
-  { field: "Tipo_Compra", headerName: "Tipo de compra", width: 150 },
-  {
-    field: "No_Factura_Pedimento",
-    headerName: "No. de factura/pedimento",
-    width: 150,
-  },
-  { field: "Factura_Pedimento", headerName: "Factura/Pedimento", width: 150 },
-  { field: "boton1", headerName: "Acción 1", width: 150 },
-  { field: "boton2", headerName: "Acción 2", width: 150 },
-  { field: "boton3", headerName: "Acción 3", width: 150 },
-  { field: "boton4", headerName: "Acción 4", width: 150 },
+
 ];
 
 // Vista Assets
@@ -188,7 +64,6 @@ export default function Assets() {
     <>
       <NavegatorDrawer /> {/* Drawer para navegar entre vistas */}
       <Container>
-        {" "}
         {/* Contenido de la Vista va dentro del Box */}
         <Box
           maxHeight={2000}
@@ -200,7 +75,6 @@ export default function Assets() {
           maxWidth={2000}
         >
           <Typography variant="h4" margin={2} align="center">
-            {" "}
             {/* Título de la Vista */}
             Assets
           </Typography>
@@ -208,6 +82,7 @@ export default function Assets() {
             <ButtonGroup>
               {/* Grupo de Acciones */}
               <AddAssetDialogButton />
+              <EditAssetDialogButton />
             </ButtonGroup>
           </Box>
           <DataGrid rows={rows} columns={columns} />
@@ -274,16 +149,6 @@ function AddAssetDialogButton() {
           name="categoria"
         />
         <TextField
-          label="Imagen"
-          type="file"
-          fullWidth
-          required
-          helperText="Adjunta una imagen."
-          margin="normal"
-          aria-labelledby="Modelo"
-          name="imagen"
-        />
-        <TextField
           label="Estatus"
           fullWidth
           required
@@ -323,7 +188,100 @@ function AddAssetDialogButton() {
           aria-labelledby="Modelo"
           name="factura"
         />
+        <TextField
+          label="Usuario"
+          fullWidth
+          required
+          helperText="Indica el usuario relacionado."
+          multiline
+          margin="normal"
+          aria-labelledby="Usuario"
+          name="usuario"
+        />
+        <TextField
+          label="Área"
+          fullWidth
+          required
+          helperText="Indica el área relacionada."
+          multiline
+          margin="normal"
+          aria-labelledby="Áerea"
+          name="area"
+        />
+        <InputLabel>Imagen: </InputLabel>
+        <TextField
+          type="file"
+          fullWidth
+          required
+          helperText="Adjunta una imagen."
+          margin="normal"
+          aria-labelledby="Modelo"
+          name="imagen"
+        />
       </Box>
     </DialogForm>
   );
 }
+
+function EditAssetDialogButton() {
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  return (
+    <>
+      <Button variant="contained" onClick={handleClickOpen} style={{backgroundColor: "tomato"}}>
+        Editar
+      </Button>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        scroll="paper"
+        fullWidth
+        PaperProps={{
+          component: "form",
+          onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
+            event.preventDefault();
+            const formData = new FormData(event.currentTarget);
+            const formJson = Object.fromEntries((formData as any).entries());
+            const test = formJson;
+            console.log(test);
+            handleClose();
+          },
+        }}
+      >
+        <IconButton
+          aria-label="close"
+          onClick={handleClose}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: "white",
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+        <DialogTitle style={{backgroundColor: "steelblue"}} color="white">Editar Asset</DialogTitle>
+        <DialogContent draggable>
+
+        </DialogContent>
+        <DialogActions style={{marginBottom: 3, marginRight: 5}}>
+          <Button type="submit" title="Editar" variant="contained">
+            Editar
+          </Button>
+          <Button title="Cancelar" onClick={handleClose} variant="contained" color="error">
+            Cancelar
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
+}
+

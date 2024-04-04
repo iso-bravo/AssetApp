@@ -10,10 +10,10 @@ import CloseIcon from "@mui/icons-material/Close";
 import React from "react";
 
 export interface DialogProps {
-  butttonTitle: string;
-  title: string;
-  endButtonText: string;
-  children: React.ReactNode;
+  butttonTitle?: string;
+  title?: string;
+  endButtonText?: string;
+  children?: React.ReactNode;
 }
 
 export default function DialogForm(props: DialogProps) {
@@ -29,7 +29,7 @@ export default function DialogForm(props: DialogProps) {
 
   return (
     <>
-      <Button variant="outlined" onClick={handleClickOpen} color="primary">
+      <Button variant="contained" onClick={handleClickOpen} color="primary">
         {props.butttonTitle}
       </Button>
       <Dialog

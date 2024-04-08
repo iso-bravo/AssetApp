@@ -24,7 +24,6 @@ const Pages: { title: string; href: string }[] = [
   { title: "Assets", href: "/assets" },
   { title: "Usuarios", href: "/users" },
   { title: "Catálogos", href: "/catalogs" },
-  { title: "Etiquetas", href: "/tags" },
 ];
 
 // Componente principal

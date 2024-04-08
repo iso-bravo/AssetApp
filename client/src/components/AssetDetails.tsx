@@ -74,24 +74,24 @@ export default function AssetDetails(props: PropsDetail) {
             <Paper elevation={12}>
               <Box paddingLeft={12} paddingTop={4} paddingBottom={4}>
                 <List>
-                  <ListItem>ID: {props.asset.id}</ListItem>
+                  <ListItem><b>ID:&nbsp;</b> {props.asset.id}</ListItem>
                   <ListItem>
-                    Número de serie: {props.asset.Number_Serie}
+                  <b>Número de serie:&nbsp;</b> {props.asset.Number_Serie}
                   </ListItem>
-                  <ListItem>Modelo: {props.asset.Modelo}</ListItem>
-                  <ListItem>Descripción: {props.asset.Description}</ListItem>
-                  <ListItem>Marca: {props.asset.Marca}</ListItem>
-                  <ListItem>Categoría: {props.asset.ID_Categoria}</ListItem>
+                  <ListItem><b>Modelo:&nbsp;</b>{props.asset.Modelo}</ListItem>
+                  <ListItem><b>Descripción:&nbsp;</b> {props.asset.Description}</ListItem>
+                  <ListItem><b>Marca:&nbsp;</b> {props.asset.Marca}</ListItem>
+                  <ListItem><b>Categoría:&nbsp;</b> {props.asset.ID_Categoria}</ListItem>
                   <ListItem>
-                    Fecha de registro: {props.asset.Fecha_Registro}
+                  <b>Fecha de registro:&nbsp;</b> {props.asset.Fecha_Registro}
                   </ListItem>
-                  <ListItem>Tipo de compra: {props.asset.Tipo_Compra}</ListItem>
-                  <ListItem>No. de factura: {props.asset.No_Factura}</ListItem>
-                  <ListItem>Factura: {props.asset.Factura}</ListItem>
-                  <ListItem>Usuario: {props.asset.ID_Usuario}</ListItem>
-                  <ListItem>Área: {props.asset.ID_Area}</ListItem>
-                  <ListItem>Estatus: {props.asset.ID_Estatus}</ListItem>
-                  <ListItem>Imagen: {props.asset.Imagen}</ListItem>
+                  <ListItem><b>Tipo de compra:&nbsp;</b> {props.asset.Tipo_Compra}</ListItem>
+                  <ListItem><b>No. de factura:&nbsp;</b> {props.asset.No_Factura}</ListItem>
+                  <ListItem><b>Factura:&nbsp;</b> {props.asset.Factura}</ListItem>
+                  <ListItem><b>Usuario:&nbsp;</b> {props.asset.ID_Usuario}</ListItem>
+                  <ListItem><b>Área:&nbsp;</b> {props.asset.ID_Area}</ListItem>
+                  <ListItem><b>Estatus:&nbsp;</b> {props.asset.ID_Estatus}</ListItem>
+                  <ListItem><b>Imagen:&nbsp;</b> {props.asset.Imagen}</ListItem>
                 </List>
               </Box>
             </Paper>

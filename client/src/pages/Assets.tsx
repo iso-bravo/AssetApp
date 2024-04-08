@@ -18,6 +18,7 @@ import DialogForm from "../components/DialogForm";
 import CloseIcon from "@mui/icons-material/Close";
 import React from "react";
 import AssetDetails from "../components/AssetDetails";
+import ExportIcon from "@mui/icons-material/Download";
 // import { NumberInput } from "../components/NumberInput";
 
 // Datos de prueba
@@ -45,7 +46,7 @@ const rows: GridRowsProp = [
     Marca: "Cubo de Magma",
     ID_Categoria: "Cubik",
     ID_Estatus: "Activo",
-  }
+  },
 ];
 
 // Definir columnas
@@ -56,7 +57,6 @@ const columns: GridColDef[] = [
   { field: "Marca", headerName: "Marca", width: 150 },
   { field: "ID_Categoria", headerName: "Categoría", width: 150 },
   { field: "ID_Estatus", headerName: "Estatus", width: 150 },
-
 ];
 
 const AssetTest = {
@@ -102,9 +102,24 @@ export default function Assets() {
               <AddAssetDialogButton />
               <EditAssetDialogButton />
               <AssetDetails asset={AssetTest} />
+              <Button endIcon={<ExportIcon />} variant="outlined">
+                Exportar
+              </Button>
             </ButtonGroup>
           </Box>
-          <DataGrid rows={rows} columns={columns} />
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            checkboxSelection
+            initialState={{
+              pagination: {
+                paginationModel: {
+                  pageSize: 5,
+                },
+              },
+            }}
+            pageSizeOptions={[6]}
+          />
         </Box>
       </Container>
     </>
@@ -255,7 +270,11 @@ function EditAssetDialogButton() {
 
   return (
     <>
-      <Button variant="contained" onClick={handleClickOpen} style={{backgroundColor: "tomato"}}>
+      <Button
+        variant="contained"
+        onClick={handleClickOpen}
+        style={{ backgroundColor: "tomato" }}
+      >
         Editar
       </Button>
       <Dialog
@@ -287,21 +306,24 @@ function EditAssetDialogButton() {
         >
           <CloseIcon />
         </IconButton>
-        <DialogTitle style={{backgroundColor: "steelblue"}} color="white">Editar Asset</DialogTitle>
-        <DialogContent draggable>
-
-        </DialogContent>
-        <DialogActions style={{marginBottom: 3, marginRight: 5}}>
+        <DialogTitle style={{ backgroundColor: "steelblue" }} color="white">
+          Editar Asset
+        </DialogTitle>
+        <DialogContent draggable></DialogContent>
+        <DialogActions style={{ marginBottom: 3, marginRight: 5 }}>
           <Button type="submit" title="Editar" variant="contained">
             Editar
           </Button>
-          <Button title="Cancelar" onClick={handleClose} variant="contained" color="error">
+          <Button
+            title="Cancelar"
+            onClick={handleClose}
+            variant="contained"
+            color="error"
+          >
             Cancelar
           </Button>
         </DialogActions>
       </Dialog>
-      
     </>
   );
 }
-

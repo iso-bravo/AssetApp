@@ -1,5 +1,5 @@
 import { Box, Container, Typography } from "@mui/material";
-import NavegatorDrawer from "../components/Drawer";
+import NavegatorDrawer from "../components/NavegatorDrawer";
 
 export default function CatalogsPage() {
   return (

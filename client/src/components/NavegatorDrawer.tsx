@@ -24,9 +24,9 @@ const Pages: { title: string; href: string }[] = [
   { title: "Assets", href: "/assets" },
   { title: "Usuarios", href: "/users" },
   { title: "Catálogos", href: "/catalogs" },
-  { title: "Etiquetas", href: "/tags" },
 ];
 
+// Componente principal
 export default function NavegatorDrawer() {
 
   // Función para asignar los íconos según el index del elemento
@@ -64,9 +64,9 @@ export default function NavegatorDrawer() {
           width: 250,
           flexShrink: 0,
           "& .MuiDrawer-paper": {
-            width: 250,
+            width: 230,
             boxSizing: "border-box",
-            backgroundColor: "teal",
+            backgroundColor: "steelblue",
             color: "white"
           },
         }}

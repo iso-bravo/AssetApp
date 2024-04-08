@@ -17,6 +17,7 @@ import NavegatorDrawer from "../components/NavegatorDrawer";
 import DialogForm from "../components/DialogForm";
 import CloseIcon from "@mui/icons-material/Close";
 import React from "react";
+import AssetDetails from "../components/AssetDetails";
 // import { NumberInput } from "../components/NumberInput";
 
 // Datos de prueba
@@ -58,6 +59,23 @@ const columns: GridColDef[] = [
 
 ];
 
+const AssetTest = {
+  id: 1,
+  Number_Serie: 3464566,
+  Modelo: "S24 ULTRA",
+  Description: "Una descripción de esto",
+  Marca: "PATITO",
+  ID_Categoria: 2,
+  Fecha_Registro: "12/02/24",
+  Tipo_Compra: "Tipo de compra",
+  No_Factura: 545343,
+  Factura: "PDF",
+  ID_Usuario: 1,
+  ID_Area: 2,
+  ID_Estatus: 1,
+  Imagen: "Imagen",
+};
+
 // Vista Assets
 export default function Assets() {
   return (
@@ -83,6 +101,7 @@ export default function Assets() {
               {/* Grupo de Acciones */}
               <AddAssetDialogButton />
               <EditAssetDialogButton />
+              <AssetDetails asset={AssetTest} />
             </ButtonGroup>
           </Box>
           <DataGrid rows={rows} columns={columns} />
@@ -281,6 +300,7 @@ function EditAssetDialogButton() {
           </Button>
         </DialogActions>
       </Dialog>
+      
     </>
   );
 }

@@ -1,6 +1,6 @@
 import { Box, Container, Typography } from "@mui/material";
 import { DataGrid, GridRowsProp, GridColDef } from "@mui/x-data-grid";
-import NavegatorDrawer from "../components/Drawer";
+import NavegatorDrawer from "../components/NavegatorDrawer";
 
 const rows: GridRowsProp = [
   {

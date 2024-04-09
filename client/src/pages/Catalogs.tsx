@@ -1,6 +1,6 @@
 import { Box, Container, Typography } from "@mui/material";
+import NavegatorDrawer from "../components/NavegatorDrawer";
 import { DataGrid, GridRowsProp, GridColDef } from "@mui/x-data-grid";
-import NavegatorDrawer from "../components/Drawer";
 import { useEffect, useState } from "react";
 import axios from "axios";
 

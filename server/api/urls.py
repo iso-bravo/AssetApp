@@ -13,5 +13,5 @@ urlpatterns = [
     path('categories/', views.GetCategoriesAllView.as_view(), name='categories'),
     path('states/', views.GetStatesAllView.as_view(), name='states'),
     path('areas/', views.GetAreasAllView.as_view(), name='areas'),
-    path('status_categories/', views.GetStatusCategoriesView, name='status_categories'),
+    path('status_categories/', views.GetStatusCategoriesView.as_view(), name='status_categories'),
 ]

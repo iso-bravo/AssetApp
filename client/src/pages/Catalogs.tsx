@@ -47,12 +47,12 @@ export default function CatalogsPage() {
 
   const estadosCols: GridColDef[] = [
     { field: "id", headerName: "ID", width: 150 },
-    { field: "estados", headerName: "Estados", width: 150 },
+    { field: "estatus", headerName: "Estados", width: 150 },
   ];
 
   const areasCols: GridColDef[] = [
     { field: "id", headerName: "ID", width: 150 },
-    { field: "areas", headerName: "Areas", width: 150 },
+    { field: "area", headerName: "Areas", width: 150 },
   ];
 
   return (

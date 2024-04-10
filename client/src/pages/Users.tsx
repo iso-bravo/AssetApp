@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 // Datos de prueba
-const rows: GridRowsProp = [
+/* const user: GridRowsProp = [
   {
     id: 1,
     Nombre: "Miguel A.",
@@ -24,7 +24,7 @@ const rows: GridRowsProp = [
     Departamento: "Mantenimiento",
     Permisos: "Abrir permisos",
   },
-];
+];*/
 
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 150 },

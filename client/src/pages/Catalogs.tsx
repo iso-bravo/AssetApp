@@ -4,6 +4,7 @@ import { DataGrid, GridRowsProp, GridColDef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+//Componente de la vista de Catálogos
 export default function CatalogsPage() {
   const [categorias, setCategorias] = useState<GridRowsProp>([]);
   const [estados, setEstados] = useState<GridRowsProp>([]);

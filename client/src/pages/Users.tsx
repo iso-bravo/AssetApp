@@ -53,9 +53,36 @@ const columns: GridColDef[] = [
 ];
 
 export default function UsersPage() {
+  //const [department, setDepartment] = useState<GridRowsProp>([]);
+  //const [permissions, setPermissions] = useState<GridRowsProp>([]);
   const [user, setUser] = useState<GridRowsProp>([]);
-  const [department, setDepartment] = useState<GridRowsProp>([]);
-  const [permissions, setPermissions] = useState<GridRowsProp>([]);
+
+  // Aquí falta poner bien la vista
+  /*
+  useEffect(() => {
+    axios
+      .get("http://127.0.0.1:8000/api/departamentos/") // Aquí
+      .then((response) => {
+        setDepartment(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching departments:", error);
+      });
+  }, []);
+  */
+
+  // Falta poner bien la vista
+  /*useEffect(() => {
+    axios
+      .get("http://127.0.0.1:8000/api/permisos/")
+      .then((response) => {
+        setPermissions(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching permissions:", error);
+      });
+  }, []);
+  */
 
   useEffect(() => {
     axios
@@ -65,30 +92,6 @@ export default function UsersPage() {
       })
       .catch((error) => {
         console.error("Error fetching users:", error);
-      });
-  }, []);
-
-  // Aquí falta poner bien la vista
-  useEffect(() => {
-    axios
-      .get("http://127.0.0.1:8000/api/departamentos/")
-      .then((response) => {
-        setDepartment(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching departments:", error);
-      });
-  }, []);
-
-  // Falta poner bien la vista
-  useEffect(() => {
-    axios
-      .get("http://127.0.0.1:8000/api/permisos/")
-      .then((response) => {
-        setPermissions(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching permissions:", error);
       });
   }, []);
 
@@ -133,10 +136,35 @@ export default function UsersPage() {
 
 function AddUserButton() {
   const [open, setOpen] = React.useState(false);
-  const [department, setDepartment] = useState<GridRowsProp>([]);
-  const [permissions, setPermissions] = useState<GridRowsProp>([]);
+  // const [department, setDepartment] = useState<GridRowsProp>([]);
+  const department = [
+    {
+      id: 1,
+      departamento: "Informática",
+    },
+    {
+      id: 2,
+      departamento: "Recursos Humanos",
+    },
+  ];
+  // const [permissions, setPermissions] = useState<GridRowsProp>([]);
+  const permissions = [
+    {
+      id: 1,
+      permiso: "lectura",
+    },
+    {
+      id: 2,
+      permiso: "escritura",
+    },
+    {
+      id: 3,
+      permiso: "ejecución",
+    },
+  ];
 
   // Falta poner bien la vista
+  /*
   useEffect(() => {
     axios
       .get("http://127.0.0.1:8000/api/departamentos/") // Aquí falta
@@ -147,8 +175,10 @@ function AddUserButton() {
         console.error("Error fetching departments:", error);
       });
   }, []);
+  */
 
   // Falta poner bien la vista
+  /*
   useEffect(() => {
     axios
       .get("http://127.0.0.1:8000/api/permisos/")
@@ -159,6 +189,7 @@ function AddUserButton() {
         console.error("Error fetching permissions:", error);
       });
   }, []);
+  */
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -191,6 +222,15 @@ function AddUserButton() {
             const formJson = Object.fromEntries((formData as any).entries());
             const test = formJson;
             console.log(test);
+
+            axios
+              .post("https://reqres.in/api/login", {
+                
+              })
+              .then((response) => {
+                console.log(response);
+              });
+
             handleClose();
           },
         }}
@@ -219,7 +259,16 @@ function AddUserButton() {
               required
               helperText="Escribe el nombre."
               margin="normal"
-              name="name"
+              name="nombre"
+            />
+            <TextField
+              label="Constraseña"
+              fullWidth
+              required
+              type="password"
+              helperText="Escribe el nombre."
+              margin="normal"
+              name="constraseña"
             />
             <TextField
               select
@@ -228,11 +277,12 @@ function AddUserButton() {
               required
               helperText="Indica el departamento al que pertenece."
               margin="normal"
-              name="categoria"
+              name="id_departamento"
+              defaultValue={""}
             >
               {department.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
+                <MenuItem key={option.id} value={option.id}>
+                  {option.departamento}
                 </MenuItem>
               ))}
             </TextField>
@@ -243,11 +293,12 @@ function AddUserButton() {
               required
               helperText="Indica los permisos."
               margin="normal"
-              name="categoria"
+              name="id_permiso"
+              defaultValue={""}
             >
               {permissions.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
+                <MenuItem key={option.id} value={option.id}>
+                  {option.permiso}
                 </MenuItem>
               ))}
             </TextField>

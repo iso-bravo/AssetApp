@@ -82,6 +82,7 @@ export default function Assets() {
             columns={columns}
             checkboxSelection
             pageSizeOptions={[6]}
+            disableMultipleRowSelection
           />
         </Box>
       </Container>

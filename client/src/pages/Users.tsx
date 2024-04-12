@@ -53,46 +53,50 @@ const columns: GridColDef[] = [
 ];
 
 export default function UsersPage() {
-  //const [department, setDepartment] = useState<GridRowsProp>([]);
-  //const [permissions, setPermissions] = useState<GridRowsProp>([]);
+  const [department, setDepartment] = useState<GridRowsProp>([]);
+  const [permissions, setPermissions] = useState<GridRowsProp>([]);
   const [user, setUser] = useState<GridRowsProp>([]);
 
-  // Aquí falta poner bien la vista
-  /*
-  useEffect(() => {
-    axios
-      .get("http://127.0.0.1:8000/api/departamentos/") // Aquí
-      .then((response) => {
-        setDepartment(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching departments:", error);
-      });
-  }, []);
-  */
+  function getDepartamentos() {
+    useEffect(() => {
+      API.get("/api/departments/")
+        .then((response) => {
+          setDepartment(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching departments:", error);
+        });
+    }, []);
+  }
 
-  // Falta poner bien la vista
-  /*useEffect(() => {
-    axios
-      .get("http://127.0.0.1:8000/api/permisos/")
-      .then((response) => {
-        setPermissions(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching permissions:", error);
-      });
-  }, []);
-  */
+  function getPermisos() {
+    useEffect(() => {
+      API.get("/api/permissions/")
+        .then((response) => {
+          setPermissions(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching permissions:", error);
+        });
+    }, []);
+  }
 
-  useEffect(() => {
-    API.get("/api/users/")
-      .then((response) => {
-        setUser(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching users:", error);
-      });
-  }, []);
+  function getUsuarios() {
+    useEffect(() => {
+      API.get("/api/users/")
+        .then((response) => {
+          setUser(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching users:", error);
+        });
+    }, []);
+  }
+
+  getDepartamentos();
+  console.log(department);
+  getPermisos();
+  getUsuarios();
 
   return (
     <>
@@ -135,60 +139,35 @@ export default function UsersPage() {
 
 function AddUserButton() {
   const [open, setOpen] = React.useState(false);
-  // const [department, setDepartment] = useState<GridRowsProp>([]);
-  const department = [
-    {
-      id: 1,
-      departamento: "Informática",
-    },
-    {
-      id: 2,
-      departamento: "Recursos Humanos",
-    },
-  ];
-  // const [permissions, setPermissions] = useState<GridRowsProp>([]);
-  const permissions = [
-    {
-      id: 1,
-      permiso: "lectura",
-    },
-    {
-      id: 2,
-      permiso: "escritura",
-    },
-    {
-      id: 3,
-      permiso: "ejecución",
-    },
-  ];
+  const [department, setDepartment] = useState<GridRowsProp>([]);
+  const [permissions, setPermissions] = useState<GridRowsProp>([]);
+  
+  function getDepartamentos() {
+    useEffect(() => {
+      API.get("/api/departments/")
+        .then((response) => {
+          setDepartment(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching departments:", error);
+        });
+    }, []);
+  }
 
-  // Falta poner bien la vista
-  /*
-  useEffect(() => {
-    axios
-      .get("http://127.0.0.1:8000/api/departamentos/") // Aquí falta
-      .then((response) => {
-        setDepartment(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching departments:", error);
-      });
-  }, []);
-  */
+  function getPermisos() {
+    useEffect(() => {
+      API.get("/api/permissions/")
+        .then((response) => {
+          setPermissions(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching permissions:", error);
+        });
+    }, []);
+  }
 
-  // Falta poner bien la vista
-  /*
-  useEffect(() => {
-    axios
-      .get("http://127.0.0.1:8000/api/permisos/")
-      .then((response) => {
-        setPermissions(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching permissions:", error);
-      });
-  }, []);
-  */
+  getDepartamentos();
+  getPermisos();
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -222,12 +201,6 @@ function AddUserButton() {
             const idDepa: number = +formJson.id_departamento;
             const idPer: number = +formJson.id_permiso;
 
-            // TEST
-            console.log(formJson.nombre);
-            console.log(formJson.contraseña);
-            console.log(idDepa);
-            console.log(idPer);
-
             const dataPost = {
               nombre: formJson.nombre,
               contraseña: formJson.contraseña,
@@ -236,7 +209,7 @@ function AddUserButton() {
             };
             console.log(dataPost);
 
-            API.post("/api/create_user/", dataPost).then((response) => {
+            API.post("/api/create_user/", formJson).then((response) => {
               console.log(response);
             });
 
@@ -360,7 +333,7 @@ function EditUserButton() {
         PaperProps={{
           component: "form",
           onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
-            event.preventDefault();
+            event.preventDefault(); // Ultima opcion quitar prevent default para recargar info de tabla
             const formData = new FormData(event.currentTarget);
             const formJson = Object.fromEntries((formData as any).entries());
             const test = formJson;

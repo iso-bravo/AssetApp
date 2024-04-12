@@ -22,6 +22,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import axios from "axios";
 import React from "react";
+import { API } from "./MainPage";
 
 // Datos de prueba
 /* const user: GridRowsProp = [
@@ -85,8 +86,7 @@ export default function UsersPage() {
   */
 
   useEffect(() => {
-    axios
-      .get("http://127.0.0.1:8000/api/users/")
+    API.get("/api/users/")
       .then((response) => {
         setUser(response.data);
       })
@@ -220,16 +220,26 @@ function AddUserButton() {
             event.preventDefault();
             const formData = new FormData(event.currentTarget);
             const formJson = Object.fromEntries((formData as any).entries());
-            const test = formJson;
-            console.log(test);
+            const idDepa: number = +formJson.id_departamento;
+            const idPer: number = +formJson.id_permiso;
 
-            axios
-              .post("https://reqres.in/api/login", {
-                
-              })
-              .then((response) => {
-                console.log(response);
-              });
+            // TEST
+            console.log(formJson.nombre);
+            console.log(formJson.contraseña);
+            console.log(idDepa);
+            console.log(idPer);
+
+            const dataPost = {
+              nombre: formJson.nombre,
+              contraseña: formJson.contraseña,
+              id_departamento: idDepa,
+              id_permiso: idPer,
+            };
+            console.log(dataPost);
+
+            API.post("/api/create_user/", dataPost).then((response) => {
+              console.log(response);
+            });
 
             handleClose();
           },
@@ -268,7 +278,7 @@ function AddUserButton() {
               type="password"
               helperText="Escribe el nombre."
               margin="normal"
-              name="constraseña"
+              name="contraseña"
             />
             <TextField
               select

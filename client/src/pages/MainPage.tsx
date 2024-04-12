@@ -1,5 +1,8 @@
 import { Box, Container, Typography } from "@mui/material";
 import NavegatorDrawer from "../components/NavegatorDrawer";
+import axios from "axios";
+
+export const API = axios.create({baseURL:'http://localhost:8000'})
 
 export default function UsersPage() {
   return (

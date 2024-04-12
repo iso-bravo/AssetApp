@@ -5,6 +5,8 @@ import AssetIcon from "../assets/asset_icon.png";
 import { Box, Container } from "@mui/material";
 import NavegatorDrawer from "../components/NavegatorDrawer";
 
+export const API = axios.create({baseURL:'http://localhost:8000'})
+
 function Home() {
     const [assetCount, setAssetCount] = useState(0);
     const [employeeCount, setEmployeeCount] = useState(0);

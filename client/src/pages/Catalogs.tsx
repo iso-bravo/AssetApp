@@ -8,7 +8,6 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
-  MenuItem,
   TextField,
   Typography,
 } from "@mui/material";
@@ -20,9 +19,10 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
+import ReloadIcon from "@mui/icons-material/Refresh";
 import axios from "axios";
 import React from "react";
-import { API } from "./MainPage";
+import { API } from "./Home";
 
 //Componente de la vista de Catálogos
 export default function CatalogsPage() {
@@ -30,16 +30,20 @@ export default function CatalogsPage() {
   const [estados, setEstados] = useState<GridRowsProp>([]);
   const [areas, setAreas] = useState<GridRowsProp>([]);
 
-  useEffect(() => {
-    axios
-      .get("http://127.0.0.1:8000/api/categories/")
-      .then((response) => {
-        setCategorias(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching categories:", error);
-      });
-  }, []);
+  function getCategoria() {
+    useEffect(() => {
+      axios
+        .get("http://127.0.0.1:8000/api/categories/")
+        .then((response) => {
+          setCategorias(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching categories:", error);
+        });
+    }, []);
+  }
+
+  getCategoria();
 
   useEffect(() => {
     axios
@@ -114,6 +118,7 @@ export default function CatalogsPage() {
               </Button>
             </ButtonGroup>
           </Box>
+          <IconButton onClick={() => getCategoria()}><ReloadIcon/></IconButton>
           <DataGrid rows={categorias} columns={categoria} />
 
           <Typography variant="h4" className=" py-4">

@@ -7,6 +7,7 @@ import {
   DialogActions,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import AddIcon from "@mui/icons-material/Add";
 import React from "react";
 
 export interface DialogProps {
@@ -29,7 +30,7 @@ export default function DialogForm(props: DialogProps) {
 
   return (
     <>
-      <Button variant="contained" onClick={handleClickOpen} color="primary">
+      <Button variant="contained" onClick={handleClickOpen} color="success" endIcon={<AddIcon/>}>
         {props.butttonTitle}
       </Button>
       <Dialog

@@ -20,6 +20,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import React from "react";
 import AssetDetails from "../components/AssetDetails";
 import ExportIcon from "@mui/icons-material/Download";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 // import { NumberInput } from "../components/NumberInput";
 
 // Datos de prueba
@@ -116,6 +118,9 @@ export default function Assets() {
               <AddAssetDialogButton />
               <EditAssetDialogButton />
               <AssetDetails asset={AssetTest} />
+              <Button endIcon={<DeleteIcon/>} color="error" variant="contained">
+                Eliminar
+              </Button>
               <Button endIcon={<ExportIcon />} variant="outlined">
                 Exportar
               </Button>
@@ -294,7 +299,8 @@ function EditAssetDialogButton() {
       <Button
         variant="contained"
         onClick={handleClickOpen}
-        style={{ backgroundColor: "tomato" }}
+        color="primary"
+        endIcon={<EditIcon/>}
       >
         Editar
       </Button>

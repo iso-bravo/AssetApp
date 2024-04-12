@@ -1,8 +1,27 @@
-import { Box, Container, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  MenuItem,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { DataGrid, GridRowsProp, GridColDef } from "@mui/x-data-grid";
 import NavegatorDrawer from "../components/NavegatorDrawer";
 import { useEffect, useState } from "react";
+import ExportIcon from "@mui/icons-material/Download";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
+import EditIcon from "@mui/icons-material/Edit";
 import axios from "axios";
+import React from "react";
 
 // Datos de prueba
 /* const user: GridRowsProp = [
@@ -35,6 +54,8 @@ const columns: GridColDef[] = [
 
 export default function UsersPage() {
   const [user, setUser] = useState<GridRowsProp>([]);
+  const [department, setDepartment] = useState<GridRowsProp>([]);
+  const [permissions, setPermissions] = useState<GridRowsProp>([]);
 
   useEffect(() => {
     axios
@@ -44,6 +65,30 @@ export default function UsersPage() {
       })
       .catch((error) => {
         console.error("Error fetching users:", error);
+      });
+  }, []);
+
+  // Aquí falta poner bien la vista
+  useEffect(() => {
+    axios
+      .get("http://127.0.0.1:8000/api/departamentos/")
+      .then((response) => {
+        setDepartment(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching departments:", error);
+      });
+  }, []);
+
+  // Falta poner bien la vista
+  useEffect(() => {
+    axios
+      .get("http://127.0.0.1:8000/api/permisos/")
+      .then((response) => {
+        setPermissions(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching permissions:", error);
       });
   }, []);
 
@@ -62,9 +107,238 @@ export default function UsersPage() {
           <Typography variant="h4" margin={4}>
             Usuarios
           </Typography>
+          <Box marginBottom={2}>
+            <ButtonGroup>
+              {/* Grupo de Acciones */}
+              <AddUserButton />
+              <EditUserButton />
+              <Button
+                endIcon={<DeleteIcon />}
+                color="error"
+                variant="contained"
+              >
+                Eliminar
+              </Button>
+              <Button endIcon={<ExportIcon />} variant="outlined">
+                Exportar
+              </Button>
+            </ButtonGroup>
+          </Box>
           <DataGrid rows={user} columns={columns} />
         </Box>
       </Container>
+    </>
+  );
+}
+
+function AddUserButton() {
+  const [open, setOpen] = React.useState(false);
+  const [department, setDepartment] = useState<GridRowsProp>([]);
+  const [permissions, setPermissions] = useState<GridRowsProp>([]);
+
+  // Falta poner bien la vista
+  useEffect(() => {
+    axios
+      .get("http://127.0.0.1:8000/api/departamentos/") // Aquí falta
+      .then((response) => {
+        setDepartment(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching departments:", error);
+      });
+  }, []);
+
+  // Falta poner bien la vista
+  useEffect(() => {
+    axios
+      .get("http://127.0.0.1:8000/api/permisos/")
+      .then((response) => {
+        setPermissions(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching permissions:", error);
+      });
+  }, []);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  return (
+    <>
+      <Button
+        variant="contained"
+        onClick={handleClickOpen}
+        color="success"
+        endIcon={<AddIcon />}
+      >
+        Añadir
+      </Button>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        scroll="paper"
+        fullWidth
+        PaperProps={{
+          component: "form",
+          onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
+            event.preventDefault();
+            const formData = new FormData(event.currentTarget);
+            const formJson = Object.fromEntries((formData as any).entries());
+            const test = formJson;
+            console.log(test);
+            handleClose();
+          },
+        }}
+      >
+        <IconButton
+          aria-label="close"
+          onClick={handleClose}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: "white",
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+        <DialogTitle style={{ backgroundColor: "steelblue" }} color="white">
+          Añadir Usuario
+        </DialogTitle>
+        <DialogContent draggable>
+          {/* Contenido */}
+          <Box sx={{ display: "flex", flexWrap: "wrap" }}>
+            <TextField
+              label="Nombre"
+              fullWidth
+              required
+              helperText="Escribe el nombre."
+              margin="normal"
+              name="name"
+            />
+            <TextField
+              select
+              label="Departamento"
+              fullWidth
+              required
+              helperText="Indica el departamento al que pertenece."
+              margin="normal"
+              name="categoria"
+            >
+              {department.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </TextField>
+            <TextField
+              select
+              label="Permisos"
+              fullWidth
+              required
+              helperText="Indica los permisos."
+              margin="normal"
+              name="categoria"
+            >
+              {permissions.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Box>
+        </DialogContent>
+        <DialogActions style={{ marginBottom: 3, marginRight: 5 }}>
+          <Button type="submit" title="Enviar" variant="contained">
+            Enviar
+          </Button>
+          <Button
+            title="Cancelar"
+            onClick={handleClose}
+            variant="contained"
+            color="error"
+          >
+            Cancelar
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
+}
+
+function EditUserButton() {
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  return (
+    <>
+      <Button
+        variant="contained"
+        onClick={handleClickOpen}
+        color="primary"
+        endIcon={<EditIcon />}
+      >
+        Editar
+      </Button>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        scroll="paper"
+        fullWidth
+        PaperProps={{
+          component: "form",
+          onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
+            event.preventDefault();
+            const formData = new FormData(event.currentTarget);
+            const formJson = Object.fromEntries((formData as any).entries());
+            const test = formJson;
+            console.log(test);
+            handleClose();
+          },
+        }}
+      >
+        <IconButton
+          aria-label="close"
+          onClick={handleClose}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: "white",
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+        <DialogTitle style={{ backgroundColor: "steelblue" }} color="white">
+          Editar Usuario
+        </DialogTitle>
+        <DialogContent draggable>{/* Contenido */}</DialogContent>
+        <DialogActions style={{ marginBottom: 3, marginRight: 5 }}>
+          <Button type="submit" title="Enviar" variant="contained">
+            Enviar
+          </Button>
+          <Button
+            title="Cancelar"
+            onClick={handleClose}
+            variant="contained"
+            color="error"
+          >
+            Cancelar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }

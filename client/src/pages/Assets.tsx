@@ -18,6 +18,7 @@ import {
 import { DataGrid, GridRowsProp, GridColDef } from "@mui/x-data-grid";
 import NavegatorDrawer from "../components/NavegatorDrawer";
 import DialogForm from "../components/DialogForm";
+import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import ExportIcon from "@mui/icons-material/Download";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -203,13 +204,67 @@ function AddAssetDialogButton() {
     }
   };
 
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   return (
-    <DialogForm
-    butttonTitle="Agregar"
-    title="Agregar un Asset"
-    endButtonText="Enviar"
-    onSubmit={handleSubmit}
+  <>
+    <Button
+        variant="contained"
+        onClick={handleClickOpen}
+        color="success"
+        endIcon={<AddIcon />}
+      >
+        Añadir
+      </Button>
+    <Dialog
+        open={open}
+        onClose={handleClose}
+        scroll="paper"
+        fullWidth
+        PaperProps={{
+          component: "form",
+          onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
+            event.preventDefault();
+            const formData = new FormData(event.currentTarget);
+            const formJson = Object.fromEntries((formData as any).entries());
+
+            // TEST
+            console.log(formJson);
+
+            API.post("/api/create_asset/", formJson).then((response) => {
+              console.log(response);
+              //reset.ClickHandler; // Nop
+            });
+            //reset.ClickHandler; // Aún no se actualizan las categorías automáticamente => Investigar
+            // Probablemente es porq el reset se hace antes de que la petición POST se termine
+            handleClose();
+          },
+        }}
     >
+      <IconButton
+          aria-label="close"
+          onClick={handleClose}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: "white",
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+        <DialogTitle style={{ backgroundColor: "steelblue" }} color="white">
+          Añadir Asset
+        </DialogTitle>
+        <DialogContent draggable>
       <Box sx={{ display: "flex", flexWrap: "wrap" }}>
         <TextField
           label="Número de serie"
@@ -265,7 +320,7 @@ function AddAssetDialogButton() {
         </TextField>
         <TextField
           select
-          label="Categoria"
+          label="Categoría"
           fullWidth
           required
           helperText="Indica ;a categoria."
@@ -355,7 +410,9 @@ function AddAssetDialogButton() {
           Enviar
         </Button>
       </Box>
-      </DialogForm>
+      </DialogContent>
+      </Dialog>
+      </>
   );
 }
 

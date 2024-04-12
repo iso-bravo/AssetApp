@@ -101,35 +101,16 @@ class AssetInformationByIDView(APIView):
         
 class CreateAssetView(APIView):
     def post(self, request):
+        logger = logging.getLogger(__name__)
         data = request.data
+        logger.error(f'data: {data}')
         new_asset_data = {}
         
         for field in Asset._meta.fields:
             if field.name in data:
-                if field.name == 'id_categoria':
-                    category = data[field.name]
-                    category_id = Categorias.objects.get(categoria=category).id
-                    new_asset_data[field.name] = category_id
-                    
-                elif field.name == 'id_estatus':
-                    status = data[field.name]
-                    status_id = Estados.objects.get(estatus=status).id
-                    new_asset_data[field.name] = status_id
-                    
-                elif field.name == 'id_usuario':
-                    user = data[field.name]
-                    user_id = Usuario.objects.get(nombre=user).id
-                    new_asset_data[field.name] = user_id
-                    
-                elif field.name == 'id_area':
-                    area = data[field.name]
-                    area_id = Areas.objects.get(area=area).id
-                    new_asset_data[field.name] = area_id
-                    
-                elif field.name == 'fecha_registro':
-                    new_asset_data[field.name] = datetime.now().date()
-                else:
                     new_asset_data[field.name] = data[field.name]
+
+        new_asset_data['fecha_registro'] = datetime.now().date()
                 
         new_asset = Asset(**new_asset_data)
         new_asset.save()

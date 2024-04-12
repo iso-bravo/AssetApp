@@ -17,7 +17,6 @@ import {
 } from "@mui/material";
 import { DataGrid, GridRowsProp, GridColDef } from "@mui/x-data-grid";
 import NavegatorDrawer from "../components/NavegatorDrawer";
-import DialogForm from "../components/DialogForm";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import ExportIcon from "@mui/icons-material/Download";
@@ -49,6 +48,17 @@ export default function Assets() {
       });
   }, []);
 
+  const exportCSV = () => {
+    API.get("/api/export_csv/", { responseType: 'blob' }).then((response) => {
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'assets.csv');
+        document.body.appendChild(link);
+        link.click();
+    });
+}
+
   return (
     <>
       <NavegatorDrawer />
@@ -73,7 +83,8 @@ export default function Assets() {
               <Button endIcon={<DeleteIcon/>} color="error" variant="contained">
                 Eliminar
               </Button>
-              <Button endIcon={<ExportIcon />} variant="outlined">
+              <Button endIcon={<ExportIcon />} variant="outlined" onClick={exportCSV}
+              >
                 Exportar
               </Button>
             </ButtonGroup>
@@ -179,31 +190,6 @@ function AddAssetDialogButton() {
       });
   }, []);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-  
-    const form = event.currentTarget as HTMLFormElement;
-    const formData = new FormData(form);
-  
-    const formObject: any = {};
-  
-    formData.forEach((value, key) => {
-      formObject[key] = value;
-    });
-    console.log(formObject);
-  
-    try {
-      const response = await axios.post("http://127.0.0.1:8000/api/create_asset/", formObject, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      console.log("Respuesta del servidor:", response.data);
-    } catch (error) {
-      console.error("Error al enviar el formulario:", error);
-    }
-  };
-
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -236,15 +222,9 @@ function AddAssetDialogButton() {
             const formData = new FormData(event.currentTarget);
             const formJson = Object.fromEntries((formData as any).entries());
 
-            // TEST
-            console.log(formJson);
-
             API.post("/api/create_asset/", formJson).then((response) => {
               console.log(response);
-              //reset.ClickHandler; // Nop
             });
-            //reset.ClickHandler; // Aún no se actualizan las categorías automáticamente => Investigar
-            // Probablemente es porq el reset se hace antes de que la petición POST se termine
             handleClose();
           },
         }}

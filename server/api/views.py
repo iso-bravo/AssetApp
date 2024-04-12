@@ -215,17 +215,6 @@ class CreateUserView(APIView):
         
         for field in Usuario._meta.fields:
             if field.name in data:
-                if field.name == 'id_departamento':
-                    department = data[field.name]
-                    department_id = Departamento.objects.get(departamento=department).id
-                    new_user_data[field.name] = department_id
-                    
-                elif field.name == 'id_permiso':
-                    permiso = data[field.name]
-                    permiso_id = Permiso.objects.get(permiso=permiso).id
-                    new_user_data[field.name] = permiso_id
-                    
-                else:
                     new_user_data[field.name] = data[field.name]
                 
         new_user = Usuario(**new_user_data)

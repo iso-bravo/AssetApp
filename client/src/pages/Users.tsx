@@ -222,12 +222,6 @@ function AddUserButton() {
             const idDepa: number = +formJson.id_departamento;
             const idPer: number = +formJson.id_permiso;
 
-            // TEST
-            console.log(formJson.nombre);
-            console.log(formJson.contraseña);
-            console.log(idDepa);
-            console.log(idPer);
-
             const dataPost = {
               nombre: formJson.nombre,
               contraseña: formJson.contraseña,
@@ -236,7 +230,7 @@ function AddUserButton() {
             };
             console.log(dataPost);
 
-            API.post("/api/create_user/", dataPost).then((response) => {
+            API.post("/api/create_user/", formJson).then((response) => {
               console.log(response);
             });
 
@@ -360,7 +354,7 @@ function EditUserButton() {
         PaperProps={{
           component: "form",
           onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
-            event.preventDefault();
+            event.preventDefault(); // Ultima opcion quitar prevent default para recargar info de tabla
             const formData = new FormData(event.currentTarget);
             const formJson = Object.fromEntries((formData as any).entries());
             const test = formJson;

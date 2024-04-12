@@ -138,6 +138,7 @@ export default function Assets() {
               },
             }}
             pageSizeOptions={[6]}
+            disableMultipleRowSelection
           />
         </Box>
       </Container>

@@ -20,9 +20,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
-import axios from "axios";
 import React from "react";
-import { API } from "./MainPage";
+import { API } from "./Home";
 
 // Datos de prueba
 /* const user: GridRowsProp = [

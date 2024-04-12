@@ -4,6 +4,7 @@ import { DataGrid, GridRowsProp, GridColDef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+//Componente de la vista de Catálogos
 export default function CatalogsPage() {
   const [categorias, setCategorias] = useState<GridRowsProp>([]);
   const [estados, setEstados] = useState<GridRowsProp>([]);
@@ -46,12 +47,12 @@ export default function CatalogsPage() {
 
   const estadosCols: GridColDef[] = [
     { field: "id", headerName: "ID", width: 150 },
-    { field: "estados", headerName: "Estados", width: 150 },
+    { field: "estatus", headerName: "Estados", width: 150 },
   ];
 
   const areasCols: GridColDef[] = [
     { field: "id", headerName: "ID", width: 150 },
-    { field: "areas", headerName: "Areas", width: 150 },
+    { field: "area", headerName: "Areas", width: 150 },
   ];
 
   return (

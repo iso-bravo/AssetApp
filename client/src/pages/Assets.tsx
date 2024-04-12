@@ -11,6 +11,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  MenuItem,
 } from "@mui/material";
 import { DataGrid, GridRowsProp, GridColDef } from "@mui/x-data-grid";
 import NavegatorDrawer from "../components/NavegatorDrawer";
@@ -19,6 +20,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import React from "react";
 import AssetDetails from "../components/AssetDetails";
 import ExportIcon from "@mui/icons-material/Download";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 // import { NumberInput } from "../components/NumberInput";
 
 // Datos de prueba
@@ -49,6 +52,18 @@ const rows: GridRowsProp = [
   },
 ];
 
+// Select de prueba
+const categoria = [
+  {
+    label: "categoria 1",
+    value: "1",
+  },
+  {
+    label: "categoria 2",
+    value: "2",
+  },
+];
+
 // Definir columnas
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 100 },
@@ -59,6 +74,7 @@ const columns: GridColDef[] = [
   { field: "ID_Estatus", headerName: "Estatus", width: 150 },
 ];
 
+// Datos de prueba
 const AssetTest = {
   id: 1,
   Number_Serie: 3464566,
@@ -102,6 +118,9 @@ export default function Assets() {
               <AddAssetDialogButton />
               <EditAssetDialogButton />
               <AssetDetails asset={AssetTest} />
+              <Button endIcon={<DeleteIcon/>} color="error" variant="contained">
+                Eliminar
+              </Button>
               <Button endIcon={<ExportIcon />} variant="outlined">
                 Exportar
               </Button>
@@ -174,6 +193,7 @@ function AddAssetDialogButton() {
           name="marca"
         />
         <TextField
+          select
           label="Categoría"
           fullWidth
           required
@@ -181,7 +201,13 @@ function AddAssetDialogButton() {
           multiline
           margin="normal"
           name="categoria"
-        />
+        >
+          {categoria.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </TextField>
         <TextField
           label="Estatus"
           fullWidth
@@ -273,7 +299,8 @@ function EditAssetDialogButton() {
       <Button
         variant="contained"
         onClick={handleClickOpen}
-        style={{ backgroundColor: "tomato" }}
+        color="primary"
+        endIcon={<EditIcon/>}
       >
         Editar
       </Button>

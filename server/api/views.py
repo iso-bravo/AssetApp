@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 from django.core.exceptions import ObjectDoesNotExist
 
 from .models import (Areas, Asset, Categorias, Departamento, Estados, Permiso, Usuario)
-from .serializers import (AreasSerializer, AssetSerializer, CategoriasSerializer, EstadosSerializer, UsuarioSerializer)
+from .serializers import (AreasSerializer, AssetSerializer, CategoriasSerializer, EstadosSerializer, UsuarioSerializer, DepartamentoSerializer, PermisoSerializer)
 
 #Login
 class LoginView(APIView):
@@ -255,6 +255,22 @@ class DeleteUserByIDView(APIView):
         user.delete()
         
         return Response({'mensaje': 'Eliminado correctamente'}, status=200)
+    
+# Departments
+class GetDepartmentsAllView(APIView):
+    def get(self, request):
+        departments = Departamento.objects.all()
+        
+        serializer = DepartamentoSerializer(departments, many=True)
+        return Response(serializer.data, status=200)
+    
+# Permissions
+class GetPermissionsAllView(APIView):
+    def get(self, request):
+        permissions = Permiso.objects.all()
+        
+        serializer = PermisoSerializer(permissions, many=True)
+        return Response(serializer.data, status=200)
 
 # Categories
 class GetCategoriesAllView(APIView):

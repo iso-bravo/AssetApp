@@ -17,6 +17,10 @@ urlpatterns = [
     path('edit_user/', views.EditUserByIDView.as_view(), name='edit_user'),
     path('delete_user/', views.DeleteUserByIDView.as_view(), name='delete_user'),
     
+    path('departments/', views.GetDepartmentsAllView.as_view(), name='departments'),
+    
+    path('permissions/', views.GetPermissionsAllView.as_view(), name='permissions'),
+    
     path('categories/', views.GetCategoriesAllView.as_view(), name='categories'),
     path('create_category/', views.CreateCategoryView.as_view(), name='create_category'),
     path('edit_category/', views.EditCategoryByIDView.as_view(), name='edit_category'),

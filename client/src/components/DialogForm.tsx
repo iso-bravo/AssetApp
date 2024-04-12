@@ -15,6 +15,7 @@ export interface DialogProps {
   title?: string;
   endButtonText?: string;
   children?: React.ReactNode;
+  onSubmit: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
 }
 
 export default function DialogForm(props: DialogProps) {

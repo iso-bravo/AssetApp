@@ -1,3 +1,5 @@
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Box,
   Container,
@@ -17,88 +19,39 @@ import { DataGrid, GridRowsProp, GridColDef } from "@mui/x-data-grid";
 import NavegatorDrawer from "../components/NavegatorDrawer";
 import DialogForm from "../components/DialogForm";
 import CloseIcon from "@mui/icons-material/Close";
-import React from "react";
-import AssetDetails from "../components/AssetDetails";
 import ExportIcon from "@mui/icons-material/Download";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-// import { NumberInput } from "../components/NumberInput";
-
-// Datos de prueba
-const rows: GridRowsProp = [
-  {
-    id: 1,
-    Number_Serie: 3465437,
-    Modelo: "Chocolate",
-    Marca: "Waffles roll",
-    ID_Categoria: "Categoria",
-    ID_Estatus: "Activo",
-  },
-  {
-    id: 2,
-    Number_Serie: 3454672,
-    Modelo: "Dog Pile",
-    Marca: "Puzzle Car",
-    ID_Categoria: "Juego",
-    ID_Estatus: "Activo",
-  },
-  {
-    id: 3,
-    Number_Serie: 1484839,
-    Modelo: "Pulpo",
-    Marca: "Cubo de Magma",
-    ID_Categoria: "Cubik",
-    ID_Estatus: "Activo",
-  },
-];
-
-// Select de prueba
-const categoria = [
-  {
-    label: "categoria 1",
-    value: "1",
-  },
-  {
-    label: "categoria 2",
-    value: "2",
-  },
-];
+import { API } from "./Home";
 
 // Definir columnas
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 100 },
-  { field: "Number_Serie", headerName: "Número de serie", width: 150 },
-  { field: "Modelo", headerName: "Modelo", width: 150 },
-  { field: "Marca", headerName: "Marca", width: 150 },
-  { field: "ID_Categoria", headerName: "Categoría", width: 150 },
-  { field: "ID_Estatus", headerName: "Estatus", width: 150 },
+  { field: "numero_serie", headerName: "Número de serie", width: 150 },
+  { field: "modelo", headerName: "Modelo", width: 150 },
+  { field: "marca", headerName: "Marca", width: 150 },
+  { field: "id_categoria", headerName: "Categoría", width: 150 },
+  { field: "id_estatus", headerName: "Estatus", width: 150 },
 ];
-
-// Datos de prueba
-const AssetTest = {
-  id: 1,
-  Number_Serie: 3464566,
-  Modelo: "S24 ULTRA",
-  Description: "Una descripción de esto",
-  Marca: "PATITO",
-  ID_Categoria: 2,
-  Fecha_Registro: "12/02/24",
-  Tipo_Compra: "Tipo de compra",
-  No_Factura: 545343,
-  Factura: "PDF",
-  ID_Usuario: 1,
-  ID_Area: 2,
-  ID_Estatus: 1,
-  Imagen: "Imagen",
-};
 
 // Vista Assets
 export default function Assets() {
+  const [rows, setRows] = useState<GridRowsProp>([]);
+
+  useEffect(() => {
+    axios.get("http://127.0.0.1:8000/api/asset_all/")
+      .then(response => {
+        setRows(response.data);
+      })
+      .catch(error => {
+        console.error("Error al obtener datos del servidor:", error);
+      });
+  }, []);
+
   return (
     <>
-      <NavegatorDrawer /> {/* Drawer para navegar entre vistas */}
+      <NavegatorDrawer />
       <Container>
-        {/* Contenido de la Vista va dentro del Box */}
         <Box
           maxHeight={2000}
           minHeight={0}
@@ -109,7 +62,6 @@ export default function Assets() {
           maxWidth={2000}
         >
           <Typography variant="h4" margin={2} align="center">
-            {/* Título de la Vista */}
             Assets
           </Typography>
           <Box marginBottom={2}>
@@ -117,7 +69,6 @@ export default function Assets() {
               {/* Grupo de Acciones */}
               <AddAssetDialogButton />
               <EditAssetDialogButton />
-              <AssetDetails asset={AssetTest} />
               <Button endIcon={<DeleteIcon/>} color="error" variant="contained">
                 Eliminar
               </Button>
@@ -130,13 +81,6 @@ export default function Assets() {
             rows={rows}
             columns={columns}
             checkboxSelection
-            initialState={{
-              pagination: {
-                paginationModel: {
-                  pageSize: 5,
-                },
-              },
-            }}
             pageSizeOptions={[6]}
             disableMultipleRowSelection
           />
@@ -146,17 +90,127 @@ export default function Assets() {
   );
 }
 
+type Options = {
+  value: string;
+  label: string;
+};
+
+type ServerCategory = {
+  id: number;
+  categoria: string;
+};
+
+type ServerStatus = {
+  id: number;
+  estatus: string;
+};
+
+type ServerUser = {
+  id: number;
+  nombre: string;
+};
+
+type ServerArea = {
+  id: number;
+  area: string;
+};
+
 function AddAssetDialogButton() {
+  const [categories, setCategories] = useState<Options[]>([]);
+  const [status, setStatus] = useState<Options[]>([]);
+  const [users, setUsers] = useState<Options[]>([]);
+  const [areas, setAreas] = useState<Options[]>([]);
+
+
+  useEffect(() => {
+    axios.get("http://127.0.0.1:8000/api/categories/")
+      .then(response => {
+        const mappedCategories = response.data.map((item: ServerCategory) => ({
+          value: item.id.toString(),
+          label: item.categoria,
+        }));
+        setCategories(mappedCategories);
+      })
+      .catch(error => {
+        console.error("Error al obtener categorías del servidor:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    axios.get("http://127.0.0.1:8000/api/states/")
+      .then(response => {
+        const mappedStates = response.data.map((item: ServerStatus) => ({
+          value: item.id.toString(),
+          label: item.estatus,
+        }));
+        setStatus(mappedStates);
+      })
+      .catch(error => {
+        console.error("Error al obtener estados del servidor:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    axios.get("http://127.0.0.1:8000/api/users/")
+      .then(response => {
+        const mappedUsers = response.data.map((item: ServerUser) => ({
+          value: item.id.toString(),
+          label: item.nombre,
+        }));
+        setUsers(mappedUsers);
+      })
+      .catch(error => {
+        console.error("Error al obtener usuarios del servidor:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    axios.get("http://127.0.0.1:8000/api/areas/")
+      .then(response => {
+        const mappedAreas = response.data.map((item: ServerArea) => ({
+          value: item.id.toString(),
+          label: item.area,
+        }));
+        setAreas(mappedAreas);
+      })
+      .catch(error => {
+        console.error("Error al obtener areas del servidor:", error);
+      });
+  }, []);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+  
+    const form = event.currentTarget as HTMLFormElement;
+    const formData = new FormData(form);
+  
+    const formObject: any = {};
+  
+    formData.forEach((value, key) => {
+      formObject[key] = value;
+    });
+    console.log(formObject);
+  
+    try {
+      const response = await axios.post("http://127.0.0.1:8000/api/create_asset/", formObject, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      console.log("Respuesta del servidor:", response.data);
+    } catch (error) {
+      console.error("Error al enviar el formulario:", error);
+    }
+  };
+
   return (
     <DialogForm
-      butttonTitle="Agregar"
-      title="Agregar un Asset"
-      endButtonText="Enviar"
+    butttonTitle="Agregar"
+    title="Agregar un Asset"
+    endButtonText="Enviar"
+    onSubmit={handleSubmit}
     >
-      {" "}
-      {/* Botón Agregar */}
       <Box sx={{ display: "flex", flexWrap: "wrap" }}>
-        {/*<NumberInput placeholder="Número de serie..." required />*/}
         <TextField
           label="Número de serie"
           type="number"
@@ -164,123 +218,144 @@ function AddAssetDialogButton() {
           required
           helperText="Escribe el número de serie."
           margin="normal"
-          name="modelo"
+          name="numero_serie"
         />
         <TextField
-          label="Modelo"
-          fullWidth
-          required
-          helperText="Escribe el modelo del producto."
-          multiline
-          margin="normal"
-          name="modelo"
-        />
-        <TextField
-          label="Descripción"
-          fullWidth
-          required
-          helperText="Agrega una descripción."
-          multiline
-          margin="normal"
-          name="descripcion"
-        />
-        <TextField
-          label="Marca"
-          fullWidth
-          required
-          helperText="Indica la marca."
-          multiline
-          margin="normal"
-          name="marca"
-        />
-        <TextField
+        label="Modelo"
+        fullWidth
+        required
+        helperText="Escribe el modelo del producto."
+        multiline
+        margin="normal"
+        name="modelo"
+      />
+      <TextField
+        label="Descripción"
+        fullWidth
+        required
+        helperText="Agrega una descripción."
+        multiline
+        margin="normal"
+        name="descripcion"
+      />
+      <TextField
+        label="Marca"
+        fullWidth
+        required
+        helperText="Indica la marca."
+        multiline
+        margin="normal"
+        name="marca"
+      />
+      <TextField
           select
-          label="Categoría"
-          fullWidth
-          required
-          helperText="Indica la categoría."
-          multiline
-          margin="normal"
-          name="categoria"
-        >
-          {categoria.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
-              {option.label}
-            </MenuItem>
-          ))}
-        </TextField>
-        <TextField
           label="Estatus"
           fullWidth
           required
           helperText="Indica el estatus."
           multiline
           margin="normal"
-          aria-labelledby="Modelo"
-          name="estatus"
-        />
+          name="id_estatus"
+        >
+          {status.map((stat) => (
+            <MenuItem key={stat.value} value={stat.value}>
+              {stat.label}
+            </MenuItem>
+          ))}
+        </TextField>
         <TextField
-          label="Tipo de compra"
+          select
+          label="Categoria"
           fullWidth
           required
-          helperText="Selecciona el tipo de compra."
+          helperText="Indica ;a categoria."
           multiline
           margin="normal"
-          aria-labelledby="Modelo"
-          name="tipo"
-        />
-        <TextField
-          label="No. de factura/pedimento"
-          fullWidth
-          required
-          helperText="Escribe el número de factura."
-          multiline
-          margin="normal"
-          aria-labelledby="Modelo"
-          name="nofactura"
-        />
-        <TextField
-          label="Factura/Pedimento"
-          fullWidth
-          required
-          helperText="Indica la factura."
-          multiline
-          margin="normal"
-          aria-labelledby="Modelo"
-          name="factura"
-        />
-        <TextField
+          name="id_categoria"
+        >
+          {categories.map((category) => (
+            <MenuItem key={category.value} value={category.value}>
+              {category.label}
+            </MenuItem>
+          ))}
+        </TextField>
+      <TextField
+        label="Tipo de compra"
+        fullWidth
+        required
+        helperText="Selecciona el tipo de compra."
+        multiline
+        margin="normal"
+        aria-labelledby="Modelo"
+        name="tipo_compra"
+      />
+      <TextField
+        label="No. de factura/pedimento"
+        fullWidth
+        required
+        helperText="Escribe el número de factura."
+        multiline
+        margin="normal"
+        aria-labelledby="Modelo"
+        name="noFactura_pedimiento"
+      />
+      <TextField
+        label="Factura/Pedimento"
+        fullWidth
+        required
+        helperText="Indica la factura."
+        multiline
+        margin="normal"
+        aria-labelledby="Modelo"
+        name="factura_pedimientoPDF"
+      />
+      <TextField
+          select
           label="Usuario"
           fullWidth
           required
-          helperText="Indica el usuario relacionado."
+          helperText="Indica el usuario."
           multiline
           margin="normal"
-          aria-labelledby="Usuario"
-          name="usuario"
-        />
+          name="id_usuario"
+        >
+          {users.map((user) => (
+            <MenuItem key={user.value} value={user.value}>
+              {user.label}
+            </MenuItem>
+          ))}
+        </TextField>
         <TextField
-          label="Área"
+          select
+          label="Area"
           fullWidth
           required
-          helperText="Indica el área relacionada."
+          helperText="Indica el area."
           multiline
           margin="normal"
-          aria-labelledby="Áerea"
-          name="area"
-        />
-        <InputLabel>Imagen: </InputLabel>
-        <TextField
-          type="file"
-          fullWidth
-          required
-          helperText="Adjunta una imagen."
-          margin="normal"
-          aria-labelledby="Modelo"
-          name="imagen"
-        />
+          name="id_area"
+        >
+          {areas.map((area) => (
+            <MenuItem key={area.value} value={area.value}>
+              {area.label}
+            </MenuItem>
+          ))}
+        </TextField>
+      <InputLabel>Imagen: </InputLabel>
+      <TextField
+        type="file"
+        fullWidth
+        required
+        helperText="Adjunta una imagen."
+        margin="normal"
+        aria-labelledby="Modelo"
+        name="imagen"
+      />
+        <Button type="submit" variant="contained" color="primary">
+          Enviar
+        </Button>
       </Box>
-    </DialogForm>
+      </DialogForm>
   );
 }
 

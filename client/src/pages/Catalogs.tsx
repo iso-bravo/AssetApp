@@ -74,6 +74,7 @@ export default function CatalogsPage() {
   const [IDArea, setIDArea] = useState(0);
 
   console.log(IDCategoria);
+  console.log(IDEstado);
 
   const categoria: GridColDef[] = [
     { field: "id", headerName: "ID", width: 150 },

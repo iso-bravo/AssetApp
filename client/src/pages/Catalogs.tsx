@@ -69,9 +69,10 @@ export default function CatalogsPage() {
   getEstados();
   getAreas();
 
-  const [IDCategoria, setIDCategoria] = useState();
-  const [IDEstado, setIDEstado] = useState();
-  const [IDArea, setIDArea] = useState();
+  const [IDCategoria, setIDCategoria] = useState<number>(0);
+  const [IDEstado, setIDEstado] = useState<number>(0);
+  const [IDArea, setIDArea] = useState<number>(0);
+
 
   console.log(IDCategoria);
 
@@ -122,7 +123,7 @@ export default function CatalogsPage() {
             disableMultipleRowSelection
             onRowSelectionModelChange={(id) => {
               // console.log(id);
-              setCategorias(id.toString());
+              setCategorias(id);
             }}
           />
 

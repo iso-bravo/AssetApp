@@ -94,7 +94,6 @@ export default function UsersPage() {
   }
 
   getDepartamentos();
-  console.log(department);
   getPermisos();
   getUsuarios();
 

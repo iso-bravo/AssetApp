@@ -12,7 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import NavegatorDrawer from "../components/NavegatorDrawer";
-import { DataGrid, GridRowsProp, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridRowsProp, GridColDef, GridValidRowModel, GridRowSelectionModel } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import ExportIcon from "@mui/icons-material/Download";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -69,12 +69,11 @@ export default function CatalogsPage() {
   getEstados();
   getAreas();
 
-  const [IDCategoria, setIDCategoria] = useState(0);
-  const [IDEstado, setIDEstado] = useState(0);
-  const [IDArea, setIDArea] = useState(0);
+  const [IDCategoria, setIDCategoria] = useState();
+  const [IDEstado, setIDEstado] = useState();
+  const [IDArea, setIDArea] = useState();
 
   console.log(IDCategoria);
-  console.log(IDEstado);
 
   const categoria: GridColDef[] = [
     { field: "id", headerName: "ID", width: 150 },
@@ -88,7 +87,7 @@ export default function CatalogsPage() {
 
   const areasCols: GridColDef[] = [
     { field: "id", headerName: "ID", width: 150 },
-    { field: "area", headerName: "Areas", width: 150 },
+    { field: "area", headerName: "Áreas", width: 150 },
   ];
 
   return (
@@ -111,9 +110,6 @@ export default function CatalogsPage() {
               >
                 Eliminar
               </Button>
-              <Button endIcon={<ExportIcon />} variant="outlined">
-                Exportar
-              </Button>
             </ButtonGroup>
           </Box>
           <IconButton onClick={() => getCategoria()}>
@@ -124,8 +120,9 @@ export default function CatalogsPage() {
             columns={categoria}
             checkboxSelection
             disableMultipleRowSelection
-            onRowSelectionModelChange={(data) => {
-              console.log(data);
+            onRowSelectionModelChange={(id) => {
+              // console.log(id);
+              setCategorias(id.toString());
             }}
           />
 
@@ -143,9 +140,6 @@ export default function CatalogsPage() {
                 variant="contained"
               >
                 Eliminar
-              </Button>
-              <Button endIcon={<ExportIcon />} variant="outlined">
-                Exportar
               </Button>
             </ButtonGroup>
           </Box>
@@ -173,9 +167,6 @@ export default function CatalogsPage() {
                 variant="contained"
               >
                 Eliminar
-              </Button>
-              <Button endIcon={<ExportIcon />} variant="outlined">
-                Exportar
               </Button>
             </ButtonGroup>
           </Box>

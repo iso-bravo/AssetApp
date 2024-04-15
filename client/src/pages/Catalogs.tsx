@@ -16,9 +16,7 @@ import {
   DataGrid,
   GridRowsProp,
   GridColDef,
-  GridValidRowModel,
   GridRowSelectionModel,
-  GridRowId,
 } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -79,7 +77,7 @@ export default function CatalogsPage() {
   const [IDEstado, setIDEstado] = useState<GridRowSelectionModel>([-1]);
   const [IDArea, setIDArea] = useState<GridRowSelectionModel>([-1]);
 
-  const categoria: GridColDef[] = [
+  const categoriaCols: GridColDef[] = [
     { field: "id", headerName: "ID", width: 150 },
     { field: "categoria", headerName: "Categoría", width: 150 },
   ];
@@ -106,16 +104,21 @@ export default function CatalogsPage() {
             <ButtonGroup>
               {/* Grupo de Acciones Categoria*/}
               <AddCategoryButton />
-              <EditCategoryButton ids={IDCategoria} />
+              <EditCategoryButton ids={IDCategoria} data={categorias} />
               <DeleteCategoryButton ids={IDCategoria} />
             </ButtonGroup>
           </Box>
-          <IconButton onClick={() => getCategoria() /* Sale error aquí -> Ver como actualizar tablas */}>
+          <IconButton
+            onClick={
+              () =>
+                getCategoria() /* Sale error aquí -> Ver como actualizar tablas */
+            }
+          >
             <ReloadIcon />
           </IconButton>
           <DataGrid
             rows={categorias}
-            columns={categoria}
+            columns={categoriaCols}
             checkboxSelection
             disableMultipleRowSelection
             onRowSelectionModelChange={(id) => {
@@ -131,7 +134,7 @@ export default function CatalogsPage() {
             <ButtonGroup>
               {/* Grupo de Acciones Estados*/}
               <AddStateButton />
-              <EditStateButton />
+              <EditStateButton ids={IDEstado} data={estados} />
               <DeleteStateButton ids={IDEstado} />
             </ButtonGroup>
           </Box>
@@ -156,8 +159,8 @@ export default function CatalogsPage() {
             <ButtonGroup>
               {/* Grupo de Acciones Areas*/}
               <AddAreaButton />
-              <EditAreaButton />
-              < DeleteAreaButton ids={IDArea}/>
+              <EditAreaButton ids={IDArea} data={areas} />
+              <DeleteAreaButton ids={IDArea} />
             </ButtonGroup>
           </Box>
           <IconButton onClick={() => getAreas()}>
@@ -183,6 +186,12 @@ interface resetInterface {
   ClickHandler: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 */
+
+interface IDProps {
+  ids: GridRowSelectionModel;
+  data?: GridRowsProp;
+}
+
 function AddCategoryButton(/*reset: resetInterface*/) {
   const [open, setOpen] = React.useState(false);
 
@@ -275,12 +284,18 @@ function AddCategoryButton(/*reset: resetInterface*/) {
   );
 }
 
-interface IDProps {
-  ids: GridRowSelectionModel;
-}
-
 function EditCategoryButton(props: IDProps) {
   const [open, setOpen] = React.useState(false);
+  const id: number = +props.ids[0];
+  var nameCategoria: string = "";
+
+  if (!(id === -1 || Number.isNaN(id))) {
+    props.data?.map((data) => {
+      if (data.id === id) {
+        nameCategoria = data.categoria;
+      }
+    });
+  }
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -294,7 +309,9 @@ function EditCategoryButton(props: IDProps) {
     <>
       <Button
         variant="contained"
-        onClick={handleClickOpen}
+        onClick={() => {
+          handleClickOpen();
+        }}
         color="primary"
         endIcon={<EditIcon />}
       >
@@ -311,8 +328,11 @@ function EditCategoryButton(props: IDProps) {
             event.preventDefault();
             const formData = new FormData(event.currentTarget);
             const formJson = Object.fromEntries((formData as any).entries());
-            const test = formJson;
-            console.log(test);
+            //const test = formJson;
+            //console.log(test);
+            API.post("/api/edit_category/", formJson).then((response) => {
+              console.log(response);
+            });
             handleClose();
           },
         }}
@@ -332,19 +352,67 @@ function EditCategoryButton(props: IDProps) {
         <DialogTitle style={{ backgroundColor: "steelblue" }} color="white">
           Editar Categoría
         </DialogTitle>
-        <DialogContent draggable>{/* Contenido */}</DialogContent>
+        <DialogContent draggable>
+          <Box padding={4}>
+            {id === -1 || Number.isNaN(id) ? (
+              <>
+                <Typography variant="h6">
+                  No se ha seleccionado ningún ID.
+                </Typography>
+              </>
+            ) : (
+              <>
+                <Box sx={{ display: "flex", flexWrap: "wrap" }}>
+                  <TextField
+                    label="ID"
+                    required
+                    margin="normal"
+                    name="id_category"
+                    value={id}
+                    type="number"
+                    helperText="No se puede cambiar el ID."
+                  />
+                  <TextField
+                    label="Nombre"
+                    fullWidth
+                    required
+                    helperText="Modifica el nombre de la categoría."
+                    margin="normal"
+                    name="categoria"
+                    defaultValue={nameCategoria}
+                  />
+                </Box>
+              </>
+            )}
+          </Box>
+        </DialogContent>
         <DialogActions style={{ marginBottom: 3, marginRight: 5 }}>
-          <Button type="submit" title="Enviar" variant="contained">
-            Enviar
-          </Button>
-          <Button
-            title="Cancelar"
-            onClick={handleClose}
-            variant="contained"
-            color="error"
-          >
-            Cancelar
-          </Button>
+          {id === -1 || Number.isNaN(id) ? (
+            <>
+              <Button
+                title="Cancelar"
+                onClick={handleClose}
+                variant="contained"
+                color="error"
+              >
+                Cancelar
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button type="submit" title="Enviar" variant="contained">
+                Enviar
+              </Button>
+              <Button
+                title="Cancelar"
+                onClick={handleClose}
+                variant="contained"
+                color="error"
+              >
+                Cancelar
+              </Button>
+            </>
+          )}
         </DialogActions>
       </Dialog>
     </>
@@ -429,14 +497,16 @@ function DeleteCategoryButton(props: IDProps) {
                 variant="contained"
                 onClick={() => {
                   const content = {
-                    id_category : id,
-                  }
+                    id_category: id,
+                  };
 
                   const contentJson = content as any;
 
-                  API.post("/api/delete_category/", contentJson).then((response) => {
-                    console.log(response);
-                  });
+                  API.post("/api/delete_category/", contentJson).then(
+                    (response) => {
+                      console.log(response);
+                    }
+                  );
                   handleClose();
                 }}
               >
@@ -550,8 +620,18 @@ function AddStateButton(/*reset: resetInterface*/) {
   );
 }
 
-function EditStateButton() {
+function EditStateButton(props: IDProps) {
   const [open, setOpen] = React.useState(false);
+  const id: number = +props.ids[0];
+  var nameEstado: string = "";
+
+  if (!(id === -1 || Number.isNaN(id))) {
+    props.data?.map((data) => {
+      if (data.id === id) {
+        nameEstado = data.estatus;
+      }
+    });
+  }
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -565,7 +645,9 @@ function EditStateButton() {
     <>
       <Button
         variant="contained"
-        onClick={handleClickOpen}
+        onClick={() => {
+          handleClickOpen();
+        }}
         color="primary"
         endIcon={<EditIcon />}
       >
@@ -584,6 +666,9 @@ function EditStateButton() {
             const formJson = Object.fromEntries((formData as any).entries());
             const test = formJson;
             console.log(test);
+            API.post("/api/edit_status/", formJson).then((response) => {
+              console.log(response);
+            });
             handleClose();
           },
         }}
@@ -603,19 +688,67 @@ function EditStateButton() {
         <DialogTitle style={{ backgroundColor: "steelblue" }} color="white">
           Editar Estado
         </DialogTitle>
-        <DialogContent draggable>{/* Contenido */}</DialogContent>
+        <DialogContent draggable>
+          <Box padding={4}>
+            {id === -1 || Number.isNaN(id) ? (
+              <>
+                <Typography variant="h6">
+                  No se ha seleccionado ningún ID.
+                </Typography>
+              </>
+            ) : (
+              <>
+                <Box sx={{ display: "flex", flexWrap: "wrap" }}>
+                  <TextField
+                    label="ID"
+                    required
+                    margin="normal"
+                    name="id_status"
+                    value={id}
+                    type="number"
+                    helperText="No se puede cambiar el ID."
+                  />
+                  <TextField
+                    label="Nombre"
+                    fullWidth
+                    required
+                    helperText="Modifica el nombre del estado."
+                    margin="normal"
+                    name="estatus"
+                    defaultValue={nameEstado}
+                  />
+                </Box>
+              </>
+            )}
+          </Box>
+        </DialogContent>
         <DialogActions style={{ marginBottom: 3, marginRight: 5 }}>
-          <Button type="submit" title="Enviar" variant="contained">
-            Enviar
-          </Button>
-          <Button
-            title="Cancelar"
-            onClick={handleClose}
-            variant="contained"
-            color="error"
-          >
-            Cancelar
-          </Button>
+          {id === -1 || Number.isNaN(id) ? (
+            <>
+              <Button
+                title="Cancelar"
+                onClick={handleClose}
+                variant="contained"
+                color="error"
+              >
+                Cancelar
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button type="submit" title="Enviar" variant="contained">
+                Enviar
+              </Button>
+              <Button
+                title="Cancelar"
+                onClick={handleClose}
+                variant="contained"
+                color="error"
+              >
+                Cancelar
+              </Button>
+            </>
+          )}
         </DialogActions>
       </Dialog>
     </>
@@ -700,14 +833,16 @@ function DeleteStateButton(props: IDProps) {
                 variant="contained"
                 onClick={() => {
                   const content = {
-                    id_status : id,
-                  }
+                    id_status: id,
+                  };
 
                   const contentJson = content as any;
 
-                  API.post("/api/delete_status/", contentJson).then((response) => {
-                    console.log(response);
-                  });
+                  API.post("/api/delete_status/", contentJson).then(
+                    (response) => {
+                      console.log(response);
+                    }
+                  );
                   handleClose();
                 }}
               >
@@ -821,8 +956,18 @@ function AddAreaButton(/*reset: resetInterface*/) {
   );
 }
 
-function EditAreaButton() {
+function EditAreaButton(props: IDProps) {
   const [open, setOpen] = React.useState(false);
+  const id: number = +props.ids[0];
+  var nameArea: string = "";
+
+  if (!(id === -1 || Number.isNaN(id))) {
+    props.data?.map((data) => {
+      if (data.id === id) {
+        nameArea = data.area;
+      }
+    });
+  }
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -836,7 +981,9 @@ function EditAreaButton() {
     <>
       <Button
         variant="contained"
-        onClick={handleClickOpen}
+        onClick={() => {
+          handleClickOpen();
+        }}
         color="primary"
         endIcon={<EditIcon />}
       >
@@ -855,6 +1002,9 @@ function EditAreaButton() {
             const formJson = Object.fromEntries((formData as any).entries());
             const test = formJson;
             console.log(test);
+            API.post("/api/edit_area/", formJson).then((response) => {
+              console.log(response);
+            });
             handleClose();
           },
         }}
@@ -874,19 +1024,67 @@ function EditAreaButton() {
         <DialogTitle style={{ backgroundColor: "steelblue" }} color="white">
           Editar Área
         </DialogTitle>
-        <DialogContent draggable>{/* Contenido */}</DialogContent>
+        <DialogContent draggable>
+          <Box padding={4}>
+            {id === -1 || Number.isNaN(id) ? (
+              <>
+                <Typography variant="h6">
+                  No se ha seleccionado ningún ID.
+                </Typography>
+              </>
+            ) : (
+              <>
+                <Box sx={{ display: "flex", flexWrap: "wrap" }}>
+                  <TextField
+                    label="ID"
+                    required
+                    margin="normal"
+                    name="id_area"
+                    value={id}
+                    type="number"
+                    helperText="No se puede cambiar el ID."
+                  />
+                  <TextField
+                    label="Nombre"
+                    fullWidth
+                    required
+                    helperText="Modifica el nombre del área."
+                    margin="normal"
+                    name="area"
+                    defaultValue={nameArea}
+                  />
+                </Box>
+              </>
+            )}
+          </Box>
+        </DialogContent>
         <DialogActions style={{ marginBottom: 3, marginRight: 5 }}>
-          <Button type="submit" title="Enviar" variant="contained">
-            Enviar
-          </Button>
-          <Button
-            title="Cancelar"
-            onClick={handleClose}
-            variant="contained"
-            color="error"
-          >
-            Cancelar
-          </Button>
+          {id === -1 || Number.isNaN(id) ? (
+            <>
+              <Button
+                title="Cancelar"
+                onClick={handleClose}
+                variant="contained"
+                color="error"
+              >
+                Cancelar
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button type="submit" title="Enviar" variant="contained">
+                Enviar
+              </Button>
+              <Button
+                title="Cancelar"
+                onClick={handleClose}
+                variant="contained"
+                color="error"
+              >
+                Cancelar
+              </Button>
+            </>
+          )}
         </DialogActions>
       </Dialog>
     </>
@@ -971,14 +1169,16 @@ function DeleteAreaButton(props: IDProps) {
                 variant="contained"
                 onClick={() => {
                   const content = {
-                    id_area : id,
-                  }
+                    id_area: id,
+                  };
 
                   const contentJson = content as any;
 
-                  API.post("/api/delete_area/", contentJson).then((response) => {
-                    console.log(response);
-                  });
+                  API.post("/api/delete_area/", contentJson).then(
+                    (response) => {
+                      console.log(response);
+                    }
+                  );
                   handleClose();
                 }}
               >

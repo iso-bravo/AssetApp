@@ -211,17 +211,6 @@ class EditUserByIDView(APIView):
         
         for field in Usuario._meta.fields:
             if field.name in data:
-                if field.name == 'id_departamento':
-                    department = data[field.name]
-                    department_id = Departamento.objects.get(departamento=department).id
-                    setattr(user, field.name, department_id)
-                    
-                elif field.name == 'id_permiso':
-                    permiso = data[field.name]
-                    permiso_id = Permiso.objects.get(permiso=permiso).id
-                    setattr(user, field.name, permiso_id)
-                    
-                else:
                     setattr(user, field.name, data[field.name])
                 
         user.save()

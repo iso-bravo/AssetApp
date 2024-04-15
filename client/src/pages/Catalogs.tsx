@@ -12,9 +12,15 @@ import {
   Typography,
 } from "@mui/material";
 import NavegatorDrawer from "../components/NavegatorDrawer";
-import { DataGrid, GridRowsProp, GridColDef, GridValidRowModel, GridRowSelectionModel } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridRowsProp,
+  GridColDef,
+  GridValidRowModel,
+  GridRowSelectionModel,
+  GridRowId,
+} from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
-import ExportIcon from "@mui/icons-material/Download";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
@@ -69,12 +75,9 @@ export default function CatalogsPage() {
   getEstados();
   getAreas();
 
-  const [IDCategoria, setIDCategoria] = useState<number>(0);
-  const [IDEstado, setIDEstado] = useState<number>(0);
-  const [IDArea, setIDArea] = useState<number>(0);
-
-
-  console.log(IDCategoria);
+  const [IDCategoria, setIDCategoria] = useState<GridRowSelectionModel>([-1]);
+  const [IDEstado, setIDEstado] = useState<GridRowSelectionModel>([-1]);
+  const [IDArea, setIDArea] = useState<GridRowSelectionModel>([-1]);
 
   const categoria: GridColDef[] = [
     { field: "id", headerName: "ID", width: 150 },
@@ -103,17 +106,11 @@ export default function CatalogsPage() {
             <ButtonGroup>
               {/* Grupo de Acciones Categoria*/}
               <AddCategoryButton />
-              <EditCategoryButton />
-              <Button
-                endIcon={<DeleteIcon />}
-                color="error"
-                variant="contained"
-              >
-                Eliminar
-              </Button>
+              <EditCategoryButton ids={IDCategoria} />
+              <DeleteCategoryButton ids={IDCategoria} />
             </ButtonGroup>
           </Box>
-          <IconButton onClick={() => getCategoria()}>
+          <IconButton onClick={() => getCategoria() /* Sale error aquí -> Ver como actualizar tablas */}>
             <ReloadIcon />
           </IconButton>
           <DataGrid
@@ -122,8 +119,8 @@ export default function CatalogsPage() {
             checkboxSelection
             disableMultipleRowSelection
             onRowSelectionModelChange={(id) => {
-              // console.log(id);
-              setCategorias(id);
+              const selected: GridRowSelectionModel = id;
+              setIDCategoria(selected);
             }}
           />
 
@@ -135,13 +132,7 @@ export default function CatalogsPage() {
               {/* Grupo de Acciones Estados*/}
               <AddStateButton />
               <EditStateButton />
-              <Button
-                endIcon={<DeleteIcon />}
-                color="error"
-                variant="contained"
-              >
-                Eliminar
-              </Button>
+              <DeleteStateButton ids={IDEstado} />
             </ButtonGroup>
           </Box>
           <IconButton onClick={() => getEstados()}>
@@ -152,6 +143,10 @@ export default function CatalogsPage() {
             columns={estadosCols}
             checkboxSelection
             disableMultipleRowSelection
+            onRowSelectionModelChange={(id) => {
+              const selected: GridRowSelectionModel = id;
+              setIDEstado(selected);
+            }}
           />
 
           <Typography variant="h4" className=" py-4">
@@ -162,13 +157,7 @@ export default function CatalogsPage() {
               {/* Grupo de Acciones Areas*/}
               <AddAreaButton />
               <EditAreaButton />
-              <Button
-                endIcon={<DeleteIcon />}
-                color="error"
-                variant="contained"
-              >
-                Eliminar
-              </Button>
+              < DeleteAreaButton ids={IDArea}/>
             </ButtonGroup>
           </Box>
           <IconButton onClick={() => getAreas()}>
@@ -179,6 +168,10 @@ export default function CatalogsPage() {
             columns={areasCols}
             checkboxSelection
             disableMultipleRowSelection
+            onRowSelectionModelChange={(id) => {
+              const selected: GridRowSelectionModel = id;
+              setIDArea(selected);
+            }}
           />
         </Box>
       </Container>
@@ -224,7 +217,7 @@ function AddCategoryButton(/*reset: resetInterface*/) {
             const formJson = Object.fromEntries((formData as any).entries());
 
             // TEST
-            console.log(formJson);
+            //console.log(formJson);
 
             API.post("/api/create_category/", formJson).then((response) => {
               console.log(response);
@@ -282,7 +275,11 @@ function AddCategoryButton(/*reset: resetInterface*/) {
   );
 }
 
-function EditCategoryButton() {
+interface IDProps {
+  ids: GridRowSelectionModel;
+}
+
+function EditCategoryButton(props: IDProps) {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -348,6 +345,113 @@ function EditCategoryButton() {
           >
             Cancelar
           </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
+}
+
+function DeleteCategoryButton(props: IDProps) {
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const id: number = +props.ids[0];
+
+  return (
+    <>
+      <Button
+        variant="contained"
+        onClick={handleClickOpen}
+        color="error"
+        endIcon={<DeleteIcon />}
+      >
+        Eliminar
+      </Button>
+      <Dialog open={open} onClose={handleClose} scroll="paper" fullWidth>
+        <IconButton
+          aria-label="close"
+          onClick={handleClose}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: "white",
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+        <DialogTitle style={{ backgroundColor: "steelblue" }} color="white">
+          Eliminar Categoría
+        </DialogTitle>
+        <DialogContent draggable>
+          <Box padding={4}>
+            {id === -1 || Number.isNaN(id) ? (
+              <>
+                <Typography variant="h6">
+                  No se ha seleccionado ningún ID.
+                </Typography>
+              </>
+            ) : (
+              <>
+                <Typography variant="h6">
+                  Se eliminará la categoría con el siguiente ID: <b>{id}</b>
+                </Typography>
+                <Typography variant="h6">
+                  ¿Desea eliminar dicho elemento?
+                </Typography>
+              </>
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions style={{ marginBottom: 3, marginRight: 5 }}>
+          {id === -1 || Number.isNaN(id) ? (
+            <>
+              <Button
+                title="Cancelar"
+                onClick={handleClose}
+                variant="contained"
+                color="error"
+              >
+                Cancelar
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                title="Enviar"
+                variant="contained"
+                onClick={() => {
+                  const content = {
+                    id_category : id,
+                  }
+
+                  const contentJson = content as any;
+
+                  API.post("/api/delete_category/", contentJson).then((response) => {
+                    console.log(response);
+                  });
+                  handleClose();
+                }}
+              >
+                Confirmar
+              </Button>
+              <Button
+                title="Cancelar"
+                onClick={handleClose}
+                variant="contained"
+                color="error"
+              >
+                Cancelar
+              </Button>
+            </>
+          )}
         </DialogActions>
       </Dialog>
     </>
@@ -518,6 +622,113 @@ function EditStateButton() {
   );
 }
 
+function DeleteStateButton(props: IDProps) {
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const id: number = +props.ids[0];
+
+  return (
+    <>
+      <Button
+        variant="contained"
+        onClick={handleClickOpen}
+        color="error"
+        endIcon={<DeleteIcon />}
+      >
+        Eliminar
+      </Button>
+      <Dialog open={open} onClose={handleClose} scroll="paper" fullWidth>
+        <IconButton
+          aria-label="close"
+          onClick={handleClose}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: "white",
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+        <DialogTitle style={{ backgroundColor: "steelblue" }} color="white">
+          Eliminar Estado
+        </DialogTitle>
+        <DialogContent draggable>
+          <Box padding={4}>
+            {id === -1 || Number.isNaN(id) ? (
+              <>
+                <Typography variant="h6">
+                  No se ha seleccionado ningún ID.
+                </Typography>
+              </>
+            ) : (
+              <>
+                <Typography variant="h6">
+                  Se eliminará el estado con el siguiente ID: <b>{id}</b>
+                </Typography>
+                <Typography variant="h6">
+                  ¿Desea eliminar dicho elemento?
+                </Typography>
+              </>
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions style={{ marginBottom: 3, marginRight: 5 }}>
+          {id === -1 || Number.isNaN(id) ? (
+            <>
+              <Button
+                title="Cancelar"
+                onClick={handleClose}
+                variant="contained"
+                color="error"
+              >
+                Cancelar
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                title="Enviar"
+                variant="contained"
+                onClick={() => {
+                  const content = {
+                    id_status : id,
+                  }
+
+                  const contentJson = content as any;
+
+                  API.post("/api/delete_status/", contentJson).then((response) => {
+                    console.log(response);
+                  });
+                  handleClose();
+                }}
+              >
+                Confirmar
+              </Button>
+              <Button
+                title="Cancelar"
+                onClick={handleClose}
+                variant="contained"
+                color="error"
+              >
+                Cancelar
+              </Button>
+            </>
+          )}
+        </DialogActions>
+      </Dialog>
+    </>
+  );
+}
+
 function AddAreaButton(/*reset: resetInterface*/) {
   const [open, setOpen] = React.useState(false);
 
@@ -676,6 +887,113 @@ function EditAreaButton() {
           >
             Cancelar
           </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
+}
+
+function DeleteAreaButton(props: IDProps) {
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const id: number = +props.ids[0];
+
+  return (
+    <>
+      <Button
+        variant="contained"
+        onClick={handleClickOpen}
+        color="error"
+        endIcon={<DeleteIcon />}
+      >
+        Eliminar
+      </Button>
+      <Dialog open={open} onClose={handleClose} scroll="paper" fullWidth>
+        <IconButton
+          aria-label="close"
+          onClick={handleClose}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: "white",
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+        <DialogTitle style={{ backgroundColor: "steelblue" }} color="white">
+          Eliminar Área
+        </DialogTitle>
+        <DialogContent draggable>
+          <Box padding={4}>
+            {id === -1 || Number.isNaN(id) ? (
+              <>
+                <Typography variant="h6">
+                  No se ha seleccionado ningún ID.
+                </Typography>
+              </>
+            ) : (
+              <>
+                <Typography variant="h6">
+                  Se eliminará el área con el siguiente ID: <b>{id}</b>
+                </Typography>
+                <Typography variant="h6">
+                  ¿Desea eliminar dicho elemento?
+                </Typography>
+              </>
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions style={{ marginBottom: 3, marginRight: 5 }}>
+          {id === -1 || Number.isNaN(id) ? (
+            <>
+              <Button
+                title="Cancelar"
+                onClick={handleClose}
+                variant="contained"
+                color="error"
+              >
+                Cancelar
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                title="Enviar"
+                variant="contained"
+                onClick={() => {
+                  const content = {
+                    id_area : id,
+                  }
+
+                  const contentJson = content as any;
+
+                  API.post("/api/delete_area/", contentJson).then((response) => {
+                    console.log(response);
+                  });
+                  handleClose();
+                }}
+              >
+                Confirmar
+              </Button>
+              <Button
+                title="Cancelar"
+                onClick={handleClose}
+                variant="contained"
+                color="error"
+              >
+                Cancelar
+              </Button>
+            </>
+          )}
         </DialogActions>
       </Dialog>
     </>

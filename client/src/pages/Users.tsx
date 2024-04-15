@@ -15,7 +15,6 @@ import {
 import { DataGrid, GridRowsProp, GridColDef } from "@mui/x-data-grid";
 import NavegatorDrawer from "../components/NavegatorDrawer";
 import { useEffect, useState } from "react";
-import ExportIcon from "@mui/icons-material/Download";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
@@ -123,9 +122,6 @@ export default function UsersPage() {
                 variant="contained"
               >
                 Eliminar
-              </Button>
-              <Button endIcon={<ExportIcon />} variant="outlined">
-                Exportar
               </Button>
             </ButtonGroup>
           </Box>

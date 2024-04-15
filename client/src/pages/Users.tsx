@@ -52,11 +52,11 @@ const columns: GridColDef[] = [
 ];
 
 export default function UsersPage() {
-  const [department, setDepartment] = useState<GridRowsProp>([]);
-  const [permissions, setPermissions] = useState<GridRowsProp>([]);
+  //const [department, setDepartment] = useState<GridRowsProp>([]);
+  //const [permissions, setPermissions] = useState<GridRowsProp>([]);
   const [user, setUser] = useState<GridRowsProp>([]);
 
-  function getDepartamentos() {
+  /*function getDepartamentos() {
     useEffect(() => {
       API.get("/api/departments/")
         .then((response) => {
@@ -66,9 +66,9 @@ export default function UsersPage() {
           console.error("Error fetching departments:", error);
         });
     }, []);
-  }
+  }*/
 
-  function getPermisos() {
+  /*function getPermisos() {
     useEffect(() => {
       API.get("/api/permissions/")
         .then((response) => {
@@ -78,7 +78,7 @@ export default function UsersPage() {
           console.error("Error fetching permissions:", error);
         });
     }, []);
-  }
+  }*/
 
   function getUsuarios() {
     useEffect(() => {
@@ -92,8 +92,8 @@ export default function UsersPage() {
     }, []);
   }
 
-  getDepartamentos();
-  getPermisos();
+  //getDepartamentos();
+  //getPermisos();
   getUsuarios();
 
   return (

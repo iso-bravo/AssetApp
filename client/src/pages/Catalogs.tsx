@@ -33,45 +33,65 @@ export default function CatalogsPage() {
   const [estados, setEstados] = useState<GridRowsProp>([]);
   const [areas, setAreas] = useState<GridRowsProp>([]);
 
+  useEffect(() => {
+    API.get("/api/categories/")
+      .then((response) => {
+        setCategorias(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching categories:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    API.get("/api/states/")
+      .then((response) => {
+        setEstados(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching states:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    API.get("/api/areas/")
+      .then((response) => {
+        setAreas(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching areas:", error);
+      });
+  }, []);
+
   function getCategoria() {
-    useEffect(() => {
-      API.get("/api/categories/")
-        .then((response) => {
-          setCategorias(response.data);
-        })
-        .catch((error) => {
-          console.error("Error fetching categories:", error);
-        });
-    }, []);
+    API.get("/api/categories/")
+      .then((response) => {
+        setCategorias(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching categories:", error);
+      });
   }
 
   function getEstados() {
-    useEffect(() => {
-      API.get("/api/states/")
-        .then((response) => {
-          setEstados(response.data);
-        })
-        .catch((error) => {
-          console.error("Error fetching states:", error);
-        });
-    }, []);
+    API.get("/api/states/")
+      .then((response) => {
+        setEstados(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching states:", error);
+      });
   }
 
   function getAreas() {
-    useEffect(() => {
-      API.get("/api/areas/")
-        .then((response) => {
-          setAreas(response.data);
-        })
-        .catch((error) => {
-          console.error("Error fetching areas:", error);
-        });
-    }, []);
+    API.get("/api/areas/")
+      .then((response) => {
+        setAreas(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching areas:", error);
+      });
   }
-
-  getCategoria();
-  getEstados();
-  getAreas();
 
   const [IDCategoria, setIDCategoria] = useState<GridRowSelectionModel>([-1]);
   const [IDEstado, setIDEstado] = useState<GridRowSelectionModel>([-1]);
@@ -103,17 +123,19 @@ export default function CatalogsPage() {
           <Box marginBottom={2}>
             <ButtonGroup>
               {/* Grupo de Acciones Categoria*/}
-              <AddCategoryButton />
-              <EditCategoryButton ids={IDCategoria} data={categorias} />
-              <DeleteCategoryButton ids={IDCategoria} />
+              <AddCategoryButton ClickHandler={() => getCategoria()} />
+              <EditCategoryButton
+                ids={IDCategoria}
+                data={categorias}
+                ClickHandler={() => getCategoria()}
+              />
+              <DeleteCategoryButton
+                ids={IDCategoria}
+                ClickHandler={() => getCategoria()}
+              />
             </ButtonGroup>
           </Box>
-          <IconButton
-            onClick={
-              () =>
-                getCategoria() /* Sale error aquí -> Ver como actualizar tablas */
-            }
-          >
+          <IconButton onClick={() => getCategoria()}>
             <ReloadIcon />
           </IconButton>
           <DataGrid
@@ -133,9 +155,16 @@ export default function CatalogsPage() {
           <Box marginBottom={2}>
             <ButtonGroup>
               {/* Grupo de Acciones Estados*/}
-              <AddStateButton />
-              <EditStateButton ids={IDEstado} data={estados} />
-              <DeleteStateButton ids={IDEstado} />
+              <AddStateButton ClickHandler={() => getEstados()} />
+              <EditStateButton
+                ids={IDEstado}
+                data={estados}
+                ClickHandler={() => getEstados()}
+              />
+              <DeleteStateButton
+                ids={IDEstado}
+                ClickHandler={() => getEstados()}
+              />
             </ButtonGroup>
           </Box>
           <IconButton onClick={() => getEstados()}>
@@ -158,9 +187,13 @@ export default function CatalogsPage() {
           <Box marginBottom={2}>
             <ButtonGroup>
               {/* Grupo de Acciones Areas*/}
-              <AddAreaButton />
-              <EditAreaButton ids={IDArea} data={areas} />
-              <DeleteAreaButton ids={IDArea} />
+              <AddAreaButton ClickHandler={() => getAreas()} />
+              <EditAreaButton
+                ids={IDArea}
+                data={areas}
+                ClickHandler={() => getAreas()}
+              />
+              <DeleteAreaButton ids={IDArea} ClickHandler={() => getAreas()} />
             </ButtonGroup>
           </Box>
           <IconButton onClick={() => getAreas()}>
@@ -181,18 +214,18 @@ export default function CatalogsPage() {
     </>
   );
 }
-/*
+
 interface resetInterface {
-  ClickHandler: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  ClickHandler: Function; //(event: React.MouseEvent<HTMLButtonElement>) => void;
 }
-*/
 
 interface IDProps {
   ids: GridRowSelectionModel;
   data?: GridRowsProp;
+  ClickHandler: Function;
 }
 
-function AddCategoryButton(/*reset: resetInterface*/) {
+function AddCategoryButton(reset: resetInterface) {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -230,8 +263,8 @@ function AddCategoryButton(/*reset: resetInterface*/) {
 
             API.post("/api/create_category/", formJson).then((response) => {
               console.log(response);
-              //reset.ClickHandler; // Nop
             });
+            reset.ClickHandler();
             //reset.ClickHandler; // Aún no se actualizan las categorías automáticamente => Investigar
             // Probablemente es porq el reset se hace antes de que la petición POST se termine
             handleClose();
@@ -333,6 +366,7 @@ function EditCategoryButton(props: IDProps) {
             API.post("/api/edit_category/", formJson).then((response) => {
               console.log(response);
             });
+            props.ClickHandler();
             handleClose();
           },
         }}
@@ -507,6 +541,7 @@ function DeleteCategoryButton(props: IDProps) {
                       console.log(response);
                     }
                   );
+                  props.ClickHandler();
                   handleClose();
                 }}
               >
@@ -528,7 +563,7 @@ function DeleteCategoryButton(props: IDProps) {
   );
 }
 
-function AddStateButton(/*reset: resetInterface*/) {
+function AddStateButton(reset: resetInterface) {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -568,6 +603,7 @@ function AddStateButton(/*reset: resetInterface*/) {
               console.log(response);
               //reset.ClickHandler; // Nop
             });
+            reset.ClickHandler();
             //reset.ClickHandler; // Aún no se actualizan las categorías automáticamente => Investigar
             // Probablemente es porq el reset se hace antes de que la petición POST se termine
             handleClose();
@@ -669,6 +705,7 @@ function EditStateButton(props: IDProps) {
             API.post("/api/edit_status/", formJson).then((response) => {
               console.log(response);
             });
+            props.ClickHandler();
             handleClose();
           },
         }}
@@ -843,6 +880,7 @@ function DeleteStateButton(props: IDProps) {
                       console.log(response);
                     }
                   );
+                  props.ClickHandler();
                   handleClose();
                 }}
               >
@@ -864,7 +902,7 @@ function DeleteStateButton(props: IDProps) {
   );
 }
 
-function AddAreaButton(/*reset: resetInterface*/) {
+function AddAreaButton(reset: resetInterface) {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -904,7 +942,7 @@ function AddAreaButton(/*reset: resetInterface*/) {
               console.log(response);
               //reset.ClickHandler; // Nop
             });
-            //reset.ClickHandler; // Aún no se actualizan las categorías automáticamente => Investigar
+            reset.ClickHandler(); // Aún no se actualizan las categorías automáticamente => Investigar
             // Probablemente es porq el reset se hace antes de que la petición POST se termine
             handleClose();
           },
@@ -1005,6 +1043,7 @@ function EditAreaButton(props: IDProps) {
             API.post("/api/edit_area/", formJson).then((response) => {
               console.log(response);
             });
+            props.ClickHandler();
             handleClose();
           },
         }}
@@ -1179,6 +1218,7 @@ function DeleteAreaButton(props: IDProps) {
                       console.log(response);
                     }
                   );
+                  props.ClickHandler();
                   handleClose();
                 }}
               >

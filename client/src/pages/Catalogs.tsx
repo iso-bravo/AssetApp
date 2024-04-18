@@ -33,45 +33,65 @@ export default function CatalogsPage() {
   const [estados, setEstados] = useState<GridRowsProp>([]);
   const [areas, setAreas] = useState<GridRowsProp>([]);
 
+  useEffect(() => {
+    API.get("/api/categories/")
+      .then((response) => {
+        setCategorias(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching categories:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    API.get("/api/states/")
+      .then((response) => {
+        setEstados(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching states:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    API.get("/api/areas/")
+      .then((response) => {
+        setAreas(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching areas:", error);
+      });
+  }, []);
+
   function getCategoria() {
-    useEffect(() => {
-      API.get("/api/categories/")
-        .then((response) => {
-          setCategorias(response.data);
-        })
-        .catch((error) => {
-          console.error("Error fetching categories:", error);
-        });
-    }, []);
+    API.get("/api/categories/")
+      .then((response) => {
+        setCategorias(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching categories:", error);
+      });
   }
 
   function getEstados() {
-    useEffect(() => {
-      API.get("/api/states/")
-        .then((response) => {
-          setEstados(response.data);
-        })
-        .catch((error) => {
-          console.error("Error fetching states:", error);
-        });
-    }, []);
+    API.get("/api/states/")
+      .then((response) => {
+        setEstados(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching states:", error);
+      });
   }
 
   function getAreas() {
-    useEffect(() => {
-      API.get("/api/areas/")
-        .then((response) => {
-          setAreas(response.data);
-        })
-        .catch((error) => {
-          console.error("Error fetching areas:", error);
-        });
-    }, []);
+    API.get("/api/areas/")
+      .then((response) => {
+        setAreas(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching areas:", error);
+      });
   }
-
-  getCategoria();
-  getEstados();
-  getAreas();
 
   const [IDCategoria, setIDCategoria] = useState<GridRowSelectionModel>([-1]);
   const [IDEstado, setIDEstado] = useState<GridRowSelectionModel>([-1]);
@@ -79,17 +99,17 @@ export default function CatalogsPage() {
 
   const categoriaCols: GridColDef[] = [
     { field: "id", headerName: "ID", width: 150 },
-    { field: "categoria", headerName: "Categoría", width: 150 },
+    { field: "categoria", headerName: "Categoría", width: 400 },
   ];
 
   const estadosCols: GridColDef[] = [
     { field: "id", headerName: "ID", width: 150 },
-    { field: "estatus", headerName: "Estados", width: 150 },
+    { field: "estatus", headerName: "Estados", width: 400 },
   ];
 
   const areasCols: GridColDef[] = [
     { field: "id", headerName: "ID", width: 150 },
-    { field: "area", headerName: "Áreas", width: 150 },
+    { field: "area", headerName: "Áreas", width: 400 },
   ];
 
   return (
@@ -103,17 +123,19 @@ export default function CatalogsPage() {
           <Box marginBottom={2}>
             <ButtonGroup>
               {/* Grupo de Acciones Categoria*/}
-              <AddCategoryButton />
-              <EditCategoryButton ids={IDCategoria} data={categorias} />
-              <DeleteCategoryButton ids={IDCategoria} />
+              <AddCategoryButton ClickHandler={() => getCategoria()} />
+              <EditCategoryButton
+                ids={IDCategoria}
+                data={categorias}
+                ClickHandler={() => getCategoria()}
+              />
+              <DeleteCategoryButton
+                ids={IDCategoria}
+                ClickHandler={() => getCategoria()}
+              />
             </ButtonGroup>
           </Box>
-          <IconButton
-            onClick={
-              () =>
-                getCategoria() /* Sale error aquí -> Ver como actualizar tablas */
-            }
-          >
+          <IconButton onClick={() => getCategoria()}>
             <ReloadIcon />
           </IconButton>
           <DataGrid
@@ -133,9 +155,16 @@ export default function CatalogsPage() {
           <Box marginBottom={2}>
             <ButtonGroup>
               {/* Grupo de Acciones Estados*/}
-              <AddStateButton />
-              <EditStateButton ids={IDEstado} data={estados} />
-              <DeleteStateButton ids={IDEstado} />
+              <AddStateButton ClickHandler={() => getEstados()} />
+              <EditStateButton
+                ids={IDEstado}
+                data={estados}
+                ClickHandler={() => getEstados()}
+              />
+              <DeleteStateButton
+                ids={IDEstado}
+                ClickHandler={() => getEstados()}
+              />
             </ButtonGroup>
           </Box>
           <IconButton onClick={() => getEstados()}>
@@ -158,9 +187,13 @@ export default function CatalogsPage() {
           <Box marginBottom={2}>
             <ButtonGroup>
               {/* Grupo de Acciones Areas*/}
-              <AddAreaButton />
-              <EditAreaButton ids={IDArea} data={areas} />
-              <DeleteAreaButton ids={IDArea} />
+              <AddAreaButton ClickHandler={() => getAreas()} />
+              <EditAreaButton
+                ids={IDArea}
+                data={areas}
+                ClickHandler={() => getAreas()}
+              />
+              <DeleteAreaButton ids={IDArea} ClickHandler={() => getAreas()} />
             </ButtonGroup>
           </Box>
           <IconButton onClick={() => getAreas()}>
@@ -181,18 +214,17 @@ export default function CatalogsPage() {
     </>
   );
 }
-/*
-interface resetInterface {
-  ClickHandler: (event: React.MouseEvent<HTMLButtonElement>) => void;
-}
-*/
 
-interface IDProps {
+interface resetInterface {
+  ClickHandler: Function; //(event: React.MouseEvent<HTMLButtonElement>) => void;
+}
+
+interface IDProps extends resetInterface {
   ids: GridRowSelectionModel;
   data?: GridRowsProp;
 }
 
-function AddCategoryButton(/*reset: resetInterface*/) {
+function AddCategoryButton(reset: resetInterface) {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -230,7 +262,7 @@ function AddCategoryButton(/*reset: resetInterface*/) {
 
             API.post("/api/create_category/", formJson).then((response) => {
               console.log(response);
-              //reset.ClickHandler; // Nop
+              reset.ClickHandler();
             });
             //reset.ClickHandler; // Aún no se actualizan las categorías automáticamente => Investigar
             // Probablemente es porq el reset se hace antes de que la petición POST se termine
@@ -332,6 +364,7 @@ function EditCategoryButton(props: IDProps) {
             //console.log(test);
             API.post("/api/edit_category/", formJson).then((response) => {
               console.log(response);
+              props.ClickHandler();
             });
             handleClose();
           },
@@ -505,6 +538,7 @@ function DeleteCategoryButton(props: IDProps) {
                   API.post("/api/delete_category/", contentJson).then(
                     (response) => {
                       console.log(response);
+                      props.ClickHandler();
                     }
                   );
                   handleClose();
@@ -528,7 +562,7 @@ function DeleteCategoryButton(props: IDProps) {
   );
 }
 
-function AddStateButton(/*reset: resetInterface*/) {
+function AddStateButton(reset: resetInterface) {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -566,8 +600,9 @@ function AddStateButton(/*reset: resetInterface*/) {
 
             API.post("/api/create_status/", formJson).then((response) => {
               console.log(response);
-              //reset.ClickHandler; // Nop
+              reset.ClickHandler(); // Nop
             });
+            //reset.ClickHandler();
             //reset.ClickHandler; // Aún no se actualizan las categorías automáticamente => Investigar
             // Probablemente es porq el reset se hace antes de que la petición POST se termine
             handleClose();
@@ -668,6 +703,7 @@ function EditStateButton(props: IDProps) {
             console.log(test);
             API.post("/api/edit_status/", formJson).then((response) => {
               console.log(response);
+              props.ClickHandler();
             });
             handleClose();
           },
@@ -841,6 +877,7 @@ function DeleteStateButton(props: IDProps) {
                   API.post("/api/delete_status/", contentJson).then(
                     (response) => {
                       console.log(response);
+                      props.ClickHandler();
                     }
                   );
                   handleClose();
@@ -864,7 +901,7 @@ function DeleteStateButton(props: IDProps) {
   );
 }
 
-function AddAreaButton(/*reset: resetInterface*/) {
+function AddAreaButton(reset: resetInterface) {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -902,9 +939,9 @@ function AddAreaButton(/*reset: resetInterface*/) {
 
             API.post("/api/create_area/", formJson).then((response) => {
               console.log(response);
-              //reset.ClickHandler; // Nop
+              reset.ClickHandler(); // Nop
             });
-            //reset.ClickHandler; // Aún no se actualizan las categorías automáticamente => Investigar
+            //reset.ClickHandler(); // Aún no se actualizan las categorías automáticamente => Investigar
             // Probablemente es porq el reset se hace antes de que la petición POST se termine
             handleClose();
           },
@@ -1004,7 +1041,8 @@ function EditAreaButton(props: IDProps) {
             console.log(test);
             API.post("/api/edit_area/", formJson).then((response) => {
               console.log(response);
-            });
+              props.ClickHandler();
+            });  
             handleClose();
           },
         }}
@@ -1177,8 +1215,9 @@ function DeleteAreaButton(props: IDProps) {
                   API.post("/api/delete_area/", contentJson).then(
                     (response) => {
                       console.log(response);
+                      props.ClickHandler();
                     }
-                  );
+                  );                  
                   handleClose();
                 }}
               >

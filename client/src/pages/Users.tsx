@@ -26,6 +26,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import React from "react";
 import { API } from "./Home";
+import ReloadIcon from "@mui/icons-material/Refresh";
 
 // Datos de prueba
 /* const user: GridRowsProp = [
@@ -63,45 +64,65 @@ export default function UsersPage() {
   const [user, setUser] = useState<GridRowsProp>([]);
   const [IDUsuario, setIDUsuario] = useState<GridRowSelectionModel>([-1]);
 
+  useEffect(() => {
+    API.get("/api/departments/")
+      .then((response) => {
+        setDepartment(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching departments:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    API.get("/api/permissions/")
+      .then((response) => {
+        setPermissions(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching permissions:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    API.get("/api/users/")
+      .then((response) => {
+        setUser(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching users:", error);
+      });
+  }, []);
+
   function getDepartamentos() {
-    useEffect(() => {
-      API.get("/api/departments/")
-        .then((response) => {
-          setDepartment(response.data);
-        })
-        .catch((error) => {
-          console.error("Error fetching departments:", error);
-        });
-    }, []);
+    API.get("/api/departments/")
+      .then((response) => {
+        setDepartment(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching departments:", error);
+      });
   }
 
   function getPermisos() {
-    useEffect(() => {
-      API.get("/api/permissions/")
-        .then((response) => {
-          setPermissions(response.data);
-        })
-        .catch((error) => {
-          console.error("Error fetching permissions:", error);
-        });
-    }, []);
+    API.get("/api/permissions/")
+      .then((response) => {
+        setPermissions(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching permissions:", error);
+      });
   }
 
   function getUsuarios() {
-    useEffect(() => {
-      API.get("/api/users/")
-        .then((response) => {
-          setUser(response.data);
-        })
-        .catch((error) => {
-          console.error("Error fetching users:", error);
-        });
-    }, []);
+    API.get("/api/users/")
+      .then((response) => {
+        setUser(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching users:", error);
+      });
   }
-
-  getDepartamentos();
-  getPermisos();
-  getUsuarios();
 
   return (
     <>
@@ -124,16 +145,24 @@ export default function UsersPage() {
               <AddUserButton
                 departament={department}
                 permission={permissions}
+                ClickHandler={() => getUsuarios()}
               />
               <EditUserButton
                 ids={IDUsuario}
                 data={user}
                 departament={department}
                 permission={permissions}
+                ClickHandler={() => getUsuarios()}
               />
-              <DeleteUserButton ids={IDUsuario} />
+              <DeleteUserButton
+                ids={IDUsuario}
+                ClickHandler={() => getUsuarios()}
+              />
             </ButtonGroup>
           </Box>
+          <IconButton onClick={() => getUsuarios()}>
+            <ReloadIcon />
+          </IconButton>
           <DataGrid
             rows={user}
             columns={columns}
@@ -150,9 +179,18 @@ export default function UsersPage() {
   );
 }
 
-interface AddUserProps {
+interface resetInterface {
+  ClickHandler: Function; //(event: React.MouseEvent<HTMLButtonElement>) => void;
+}
+
+interface AddUserProps extends resetInterface {
   departament: GridRowsProp;
   permission: GridRowsProp;
+}
+
+interface IDProps extends AddUserProps {
+  ids: GridRowSelectionModel;
+  data?: GridRowsProp;
 }
 
 function AddUserButton(props: AddUserProps) {
@@ -190,6 +228,7 @@ function AddUserButton(props: AddUserProps) {
 
             API.post("/api/create_user/", formJson).then((response) => {
               console.log(response);
+              props.ClickHandler();
             });
 
             handleClose();
@@ -283,11 +322,6 @@ function AddUserButton(props: AddUserProps) {
   );
 }
 
-interface IDProps extends AddUserProps {
-  ids: GridRowSelectionModel;
-  data?: GridRowsProp;
-}
-
 function EditUserButton(props: IDProps) {
   const [open, setOpen] = React.useState(false);
   const id: number = +props.ids[0];
@@ -342,6 +376,7 @@ function EditUserButton(props: IDProps) {
 
             API.post("/api/edit_user/", formJson).then((response) => {
               console.log(response);
+              props.ClickHandler();
             });
 
             handleClose();
@@ -472,7 +507,7 @@ function EditUserButton(props: IDProps) {
   );
 }
 
-interface IDPropsDelete {
+interface IDPropsDelete extends resetInterface {
   ids: GridRowSelectionModel;
 }
 
@@ -562,6 +597,7 @@ function DeleteUserButton(props: IDPropsDelete) {
                   API.post("/api/delete_user/", contentJson).then(
                     (response) => {
                       console.log(response);
+                      props.ClickHandler();
                     }
                   );
                   handleClose();

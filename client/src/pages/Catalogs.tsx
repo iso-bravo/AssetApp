@@ -99,17 +99,17 @@ export default function CatalogsPage() {
 
   const categoriaCols: GridColDef[] = [
     { field: "id", headerName: "ID", width: 150 },
-    { field: "categoria", headerName: "Categoría", width: 150 },
+    { field: "categoria", headerName: "Categoría", width: 400 },
   ];
 
   const estadosCols: GridColDef[] = [
     { field: "id", headerName: "ID", width: 150 },
-    { field: "estatus", headerName: "Estados", width: 150 },
+    { field: "estatus", headerName: "Estados", width: 400 },
   ];
 
   const areasCols: GridColDef[] = [
     { field: "id", headerName: "ID", width: 150 },
-    { field: "area", headerName: "Áreas", width: 150 },
+    { field: "area", headerName: "Áreas", width: 400 },
   ];
 
   return (
@@ -219,10 +219,9 @@ interface resetInterface {
   ClickHandler: Function; //(event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-interface IDProps {
+interface IDProps extends resetInterface {
   ids: GridRowSelectionModel;
   data?: GridRowsProp;
-  ClickHandler: Function;
 }
 
 function AddCategoryButton(reset: resetInterface) {
@@ -263,8 +262,8 @@ function AddCategoryButton(reset: resetInterface) {
 
             API.post("/api/create_category/", formJson).then((response) => {
               console.log(response);
+              reset.ClickHandler();
             });
-            reset.ClickHandler();
             //reset.ClickHandler; // Aún no se actualizan las categorías automáticamente => Investigar
             // Probablemente es porq el reset se hace antes de que la petición POST se termine
             handleClose();
@@ -365,8 +364,8 @@ function EditCategoryButton(props: IDProps) {
             //console.log(test);
             API.post("/api/edit_category/", formJson).then((response) => {
               console.log(response);
+              props.ClickHandler();
             });
-            props.ClickHandler();
             handleClose();
           },
         }}
@@ -539,9 +538,9 @@ function DeleteCategoryButton(props: IDProps) {
                   API.post("/api/delete_category/", contentJson).then(
                     (response) => {
                       console.log(response);
+                      props.ClickHandler();
                     }
                   );
-                  props.ClickHandler();
                   handleClose();
                 }}
               >
@@ -601,9 +600,9 @@ function AddStateButton(reset: resetInterface) {
 
             API.post("/api/create_status/", formJson).then((response) => {
               console.log(response);
-              //reset.ClickHandler; // Nop
+              reset.ClickHandler(); // Nop
             });
-            reset.ClickHandler();
+            //reset.ClickHandler();
             //reset.ClickHandler; // Aún no se actualizan las categorías automáticamente => Investigar
             // Probablemente es porq el reset se hace antes de que la petición POST se termine
             handleClose();
@@ -704,8 +703,8 @@ function EditStateButton(props: IDProps) {
             console.log(test);
             API.post("/api/edit_status/", formJson).then((response) => {
               console.log(response);
+              props.ClickHandler();
             });
-            props.ClickHandler();
             handleClose();
           },
         }}
@@ -878,9 +877,9 @@ function DeleteStateButton(props: IDProps) {
                   API.post("/api/delete_status/", contentJson).then(
                     (response) => {
                       console.log(response);
+                      props.ClickHandler();
                     }
                   );
-                  props.ClickHandler();
                   handleClose();
                 }}
               >
@@ -940,9 +939,9 @@ function AddAreaButton(reset: resetInterface) {
 
             API.post("/api/create_area/", formJson).then((response) => {
               console.log(response);
-              //reset.ClickHandler; // Nop
+              reset.ClickHandler(); // Nop
             });
-            reset.ClickHandler(); // Aún no se actualizan las categorías automáticamente => Investigar
+            //reset.ClickHandler(); // Aún no se actualizan las categorías automáticamente => Investigar
             // Probablemente es porq el reset se hace antes de que la petición POST se termine
             handleClose();
           },
@@ -1042,8 +1041,8 @@ function EditAreaButton(props: IDProps) {
             console.log(test);
             API.post("/api/edit_area/", formJson).then((response) => {
               console.log(response);
-            });
-            props.ClickHandler();
+              props.ClickHandler();
+            });  
             handleClose();
           },
         }}
@@ -1216,9 +1215,9 @@ function DeleteAreaButton(props: IDProps) {
                   API.post("/api/delete_area/", contentJson).then(
                     (response) => {
                       console.log(response);
+                      props.ClickHandler();
                     }
-                  );
-                  props.ClickHandler();
+                  );                  
                   handleClose();
                 }}
               >

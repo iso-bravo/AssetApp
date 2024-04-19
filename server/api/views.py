@@ -13,6 +13,10 @@ from django.core.exceptions import ObjectDoesNotExist
 from .models import (Areas, Asset, Categorias, Departamento, Estados, Permiso, Usuario)
 from .serializers import (AreasSerializer, AssetSerializer, CategoriasSerializer, EstadosSerializer, UsuarioSerializer, DepartamentoSerializer, PermisoSerializer)
 
+# from .utils import conectar_bd, obtener_datos_asset, CONEXION_ASSET, generarQR, get_page_pdf
+from .test import obtener_datos_asset, generarQR, get_page_pdf
+
+
 #Login
 class LoginView(APIView):
     def post(self, request):
@@ -421,3 +425,13 @@ class ExportAssetsCsvView(APIView):
                             user, area])
 
         return response
+    
+class GenerateQRView(APIView):
+    def get(self, request):
+        _id = request.data.get('id')
+
+        generarQR(_id)
+
+        get_page_pdf(_id)
+        
+        return Response({'mensaje': 'Correcto'}, status=200)

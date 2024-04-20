@@ -264,7 +264,6 @@ function AddUserButton(props: AddUserProps) {
             <TextField
               label="Constraseña"
               fullWidth
-              required
               type="password"
               helperText="Escriba la contraseña."
               margin="normal"

@@ -17,14 +17,14 @@ import DetailsIcon from "@mui/icons-material/Info";
 
 interface Details {
   id: number;
-  Number_Serie: number;
+  Number_Serie: string;
   Modelo: string;
   Description: string;
   Marca: string;
   ID_Categoria: number;
   Fecha_Registro: string;
   Tipo_Compra: string;
-  No_Factura: number;
+  No_Factura: string;
   Factura: string;
   ID_Usuario: number;
   ID_Area: number;

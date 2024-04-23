@@ -46,7 +46,7 @@ export default function Assets() {
   const [autosize, setAutosize] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  console.log(autosize)
+  console.log(autosize);
 
   useEffect(() => {
     axios
@@ -100,7 +100,13 @@ export default function Assets() {
           <Box marginBottom={2}>
             <ButtonGroup>
               {/* Grupo de Acciones */}
-              <AddAssetDialogButton ClickHandler={() => {getAssets()}} Autosize={setAutosize} Loading={setLoading} />
+              <AddAssetDialogButton
+                ClickHandler={() => {
+                  getAssets();
+                }}
+                Autosize={setAutosize}
+                Loading={setLoading}
+              />
               <EditAssetDialogButton />
               <DeleteAssetButton
                 ids={IDAsset}
@@ -178,6 +184,17 @@ function AddAssetDialogButton(props: resetInterface) {
   const [users, setUsers] = useState<Options[]>([]);
   const [areas, setAreas] = useState<Options[]>([]);
   const [file, setFile] = useState<string>("");
+  const [image, setImage] = useState<File | undefined>();
+  const [imageURL, setImageURL] = useState<string>("");
+
+  function handleImage(e: React.FormEvent<HTMLInputElement>) {
+    const target = e.target as HTMLInputElement & {
+      files: FileList;
+    }
+    const file = target.files[0];
+    setImageURL(URL.createObjectURL(file));
+    setImage(file);
+  }
 
   useEffect(() => {
     axios
@@ -266,21 +283,48 @@ function AddAssetDialogButton(props: resetInterface) {
         fullWidth
         PaperProps={{
           component: "form",
-          onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
+          onSubmit: async (event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault();
             const formData = new FormData(event.currentTarget);
             const formJson = Object.fromEntries((formData as any).entries());
             console.log(formJson);
 
-            console.log(file);
+            const data = {
+              descripcion: formJson.descripcion,
+              factura_pedimientoPDF: formJson.factura_pedimientoPDF,
+              id_area: formJson.id_area,
+              id_categoria: formJson.id_categoria,
+              id_estatus: formJson.id_estatus,
+              id_usuario: formJson.id_usuario,
+              imagen: file,
+              marca: formJson.marca,
+              modelo: formJson.modelo,
+              noFactura_pedimiento: formJson.noFactura_pedimento,
+              numero_serie: formJson.numero_serie,
+              tipo_compra: formJson.tipo_compra,
+            };
 
             props.Loading(true);
 
-            API.post("/api/create_asset/", formJson).then((response) => {
+            try {
+              if (!image) return;
+              const imageData = new FormData();
+              imageData.append("image", image);
+              
+              // falta endpoint para subir imagenes a directorio local
+
+              //const { data } = await axios.post("/api/image", formData);
+              //console.log(data);
+            } catch (error: any) {
+              console.log(error.response?.data);
+            }
+
+            API.post("/api/create_asset/", data).then((response) => {
               console.log(response);
               props.ClickHandler();
               props.Loading(false);
             });
+
             handleClose();
           },
         }}
@@ -304,7 +348,6 @@ function AddAssetDialogButton(props: resetInterface) {
           <Box sx={{ display: "flex", flexWrap: "wrap" }}>
             <TextField
               label="Número de serie"
-              type="number"
               fullWidth
               required
               helperText="Escribe el número de serie."
@@ -437,7 +480,7 @@ function AddAssetDialogButton(props: resetInterface) {
               ))}
             </TextField>
             <InputLabel>Imagen: </InputLabel>
-            <TextField
+            {/*<TextField
               type="file"
               fullWidth
               required
@@ -446,14 +489,47 @@ function AddAssetDialogButton(props: resetInterface) {
               aria-labelledby="Modelo"
               name="imagen"
               onChange={(e) => {
-                setFile(e.target.value);
+                setFile(e.target.name);
               }}
-            />
-            <Button type="submit" variant="contained" color="primary">
-              Enviar
-            </Button>
+            />*/}
+            <Box>
+              <input
+                type="file"
+                name="image"
+                accept="image/*"
+                onChange={(e) => {
+                  const pathImage = e.target.value;
+                  var titleImage = pathImage.slice(pathImage.indexOf("h") + 2);
+
+                  var fileName = titleImage;
+                  var idxDot = fileName.lastIndexOf(".") + 1;
+                  var extFile = fileName.slice(idxDot).toLowerCase();
+                  if (
+                    extFile == "jpg" ||
+                    extFile == "jpeg" ||
+                    extFile == "png"
+                  ) {
+                    setFile(titleImage);
+                    console.log(titleImage);
+                    handleImage(e);
+                    console.log(image);
+
+                  } else {
+                    alert("Solo jpg/jpeg y png son permitidos.");
+                  }
+                }}
+              />
+            </Box>
           </Box>
         </DialogContent>
+        <DialogActions style={{ padding: 20 }}>
+          <Button type="submit" variant="contained" color="primary">
+            Enviar
+          </Button>
+          <Button color="error" variant="contained" onClick={handleClose}>
+            Cancelar
+          </Button>
+        </DialogActions>
       </Dialog>
     </>
   );
@@ -620,10 +696,9 @@ function DeleteAssetButton(props: IDProps) {
                       props.ClickHandler();
                       props.Autosize(true);
                       props.Loading(false);
-                      
                     }
                   );
-                  
+
                   handleClose();
                 }}
               >

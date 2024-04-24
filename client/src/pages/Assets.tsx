@@ -63,12 +63,122 @@ export default function Assets() {
     Number_Serie: "",
     Tipo_Compra: "",
   });
+  //const [categorias, setCategorias] = useState<GridRowsProp>([]);
+  //const [estados, setEstados] = useState<GridRowsProp>([]);
+  //const [areas, setAreas] = useState<GridRowsProp>([]);
 
+  /*useEffect(() => {
+    API.get("/api/categories/")
+      .then((response) => {
+        setCategorias(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching categories:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    API.get("/api/states/")
+      .then((response) => {
+        setEstados(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching states:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    API.get("/api/areas/")
+      .then((response) => {
+        setAreas(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching areas:", error);
+      });
+  }, []);*/
+
+  // Asignación de la información que se despliega en la tabla
   useEffect(() => {
     axios
       .get("http://127.0.0.1:8000/api/asset_all/")
-      .then((response) => {
-        setRows(response.data);
+      .then(async (response) => {
+        var composeData: GridRowsProp = response.data;
+
+        // Get categories
+        const categories: GridRowsProp = await API.get("/api/categories/")
+          .then((response) => {
+            return response.data;
+          })
+          .catch((error) => {
+            console.error("Error fetching categories:", error);
+          });
+
+        // Get states
+        const states: GridRowsProp = await API.get("/api/states/")
+          .then((response) => {
+            return response.data;
+          })
+          .catch((error) => {
+            console.error("Error fetching states:", error);
+          });
+
+        // Get areas
+        const areas: GridRowsProp = await API.get("/api/areas/")
+          .then((response) => {
+            return response.data;
+          })
+          .catch((error) => {
+            console.error("Error fetching areas:", error);
+          });
+
+        // Get usuarios
+        const usuarios: GridRowsProp = await API.get("/api/users/")
+          .then((response) => {
+            return response.data;
+          })
+          .catch((error) => {
+            console.error("Error fetching users:", error);
+          });
+
+        // TEST
+        //console.log(categories);
+        //console.log(states);
+        //console.log(areas);
+
+        // Asignación por ID en función map
+        composeData.map((asset) => {
+          // Asignación categoría por ID
+          categories.map((category) => {
+            if (category.id === asset.id_categoria) {
+              asset.id_categoria = category.categoria;
+            }
+          });
+
+          // Asignación estado por ID
+          states.map((state) => {
+            if (state.id === asset.id_estatus) {
+              asset.id_estatus = state.estatus;
+            }
+          });
+          console.log(asset);
+
+          // Asignación areas por ID
+          areas.map((area) => {
+            if (area.id === asset.id_area) {
+              asset.id_area = area.area;
+            }
+          });
+
+          // Asignación usuario por ID
+          usuarios.map((usuario) => {
+            if (usuario.id === asset.id_usuario) {
+              asset.id_usuario = usuario.nombre;
+            }
+          });
+        });
+
+        // Set rows
+        setRows(composeData);
       })
       .catch((error) => {
         console.error("Error al obtener datos del servidor:", error);

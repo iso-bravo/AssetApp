@@ -32,6 +32,9 @@ export default function CatalogsPage() {
   const [categorias, setCategorias] = useState<GridRowsProp>([]);
   const [estados, setEstados] = useState<GridRowsProp>([]);
   const [areas, setAreas] = useState<GridRowsProp>([]);
+  const [loadingCategories, setLoadingCategories] = useState<boolean>(false);
+  const [loadingStates, setLoadingStates] = useState<boolean>(false);
+  const [loadingAreas, setLoadingAreas] = useState<boolean>(false);
 
   useEffect(() => {
     API.get("/api/categories/")
@@ -123,15 +126,20 @@ export default function CatalogsPage() {
           <Box marginBottom={2}>
             <ButtonGroup>
               {/* Grupo de Acciones Categoria*/}
-              <AddCategoryButton ClickHandler={() => getCategoria()} />
+              <AddCategoryButton
+                ClickHandler={() => getCategoria()}
+                Loading={setLoadingCategories}
+              />
               <EditCategoryButton
                 ids={IDCategoria}
                 data={categorias}
                 ClickHandler={() => getCategoria()}
+                Loading={setLoadingCategories}
               />
               <DeleteCategoryButton
                 ids={IDCategoria}
                 ClickHandler={() => getCategoria()}
+                Loading={setLoadingCategories}
               />
             </ButtonGroup>
           </Box>
@@ -142,6 +150,7 @@ export default function CatalogsPage() {
             rows={categorias}
             columns={categoriaCols}
             checkboxSelection
+            loading={loadingCategories}
             disableMultipleRowSelection
             onRowSelectionModelChange={(id) => {
               const selected: GridRowSelectionModel = id;
@@ -155,15 +164,20 @@ export default function CatalogsPage() {
           <Box marginBottom={2}>
             <ButtonGroup>
               {/* Grupo de Acciones Estados*/}
-              <AddStateButton ClickHandler={() => getEstados()} />
+              <AddStateButton
+                ClickHandler={() => getEstados()}
+                Loading={setLoadingStates}
+              />
               <EditStateButton
                 ids={IDEstado}
                 data={estados}
                 ClickHandler={() => getEstados()}
+                Loading={setLoadingStates}
               />
               <DeleteStateButton
                 ids={IDEstado}
                 ClickHandler={() => getEstados()}
+                Loading={setLoadingStates}
               />
             </ButtonGroup>
           </Box>
@@ -174,6 +188,7 @@ export default function CatalogsPage() {
             rows={estados}
             columns={estadosCols}
             checkboxSelection
+            loading={loadingStates}
             disableMultipleRowSelection
             onRowSelectionModelChange={(id) => {
               const selected: GridRowSelectionModel = id;
@@ -187,13 +202,21 @@ export default function CatalogsPage() {
           <Box marginBottom={2}>
             <ButtonGroup>
               {/* Grupo de Acciones Areas*/}
-              <AddAreaButton ClickHandler={() => getAreas()} />
+              <AddAreaButton
+                ClickHandler={() => getAreas()}
+                Loading={setLoadingAreas}
+              />
               <EditAreaButton
                 ids={IDArea}
                 data={areas}
                 ClickHandler={() => getAreas()}
+                Loading={setLoadingAreas}
               />
-              <DeleteAreaButton ids={IDArea} ClickHandler={() => getAreas()} />
+              <DeleteAreaButton
+                ids={IDArea}
+                ClickHandler={() => getAreas()}
+                Loading={setLoadingAreas}
+              />
             </ButtonGroup>
           </Box>
           <IconButton onClick={() => getAreas()}>
@@ -203,6 +226,7 @@ export default function CatalogsPage() {
             rows={areas}
             columns={areasCols}
             checkboxSelection
+            loading={loadingAreas}
             disableMultipleRowSelection
             onRowSelectionModelChange={(id) => {
               const selected: GridRowSelectionModel = id;
@@ -217,6 +241,7 @@ export default function CatalogsPage() {
 
 interface resetInterface {
   ClickHandler: Function; //(event: React.MouseEvent<HTMLButtonElement>) => void;
+  Loading: Function;
 }
 
 interface IDProps extends resetInterface {
@@ -259,10 +284,11 @@ function AddCategoryButton(reset: resetInterface) {
 
             // TEST
             //console.log(formJson);
-
+            reset.Loading(true);
             API.post("/api/create_category/", formJson).then((response) => {
               console.log(response);
               reset.ClickHandler();
+              reset.Loading(false);
             });
             //reset.ClickHandler; // Aún no se actualizan las categorías automáticamente => Investigar
             // Probablemente es porq el reset se hace antes de que la petición POST se termine
@@ -362,9 +388,11 @@ function EditCategoryButton(props: IDProps) {
             const formJson = Object.fromEntries((formData as any).entries());
             //const test = formJson;
             //console.log(test);
+            props.Loading(true);
             API.post("/api/edit_category/", formJson).then((response) => {
               console.log(response);
               props.ClickHandler();
+              props.Loading(false);
             });
             handleClose();
           },
@@ -535,10 +563,12 @@ function DeleteCategoryButton(props: IDProps) {
 
                   const contentJson = content as any;
 
+                  props.Loading(true);
                   API.post("/api/delete_category/", contentJson).then(
                     (response) => {
                       console.log(response);
                       props.ClickHandler();
+                      props.Loading(false);
                     }
                   );
                   handleClose();
@@ -598,9 +628,11 @@ function AddStateButton(reset: resetInterface) {
             // TEST
             console.log(formJson);
 
+            reset.Loading(true);
             API.post("/api/create_status/", formJson).then((response) => {
               console.log(response);
               reset.ClickHandler(); // Nop
+              reset.Loading(false);
             });
             //reset.ClickHandler();
             //reset.ClickHandler; // Aún no se actualizan las categorías automáticamente => Investigar
@@ -701,9 +733,12 @@ function EditStateButton(props: IDProps) {
             const formJson = Object.fromEntries((formData as any).entries());
             const test = formJson;
             console.log(test);
+
+            props.Loading(true);
             API.post("/api/edit_status/", formJson).then((response) => {
               console.log(response);
               props.ClickHandler();
+              props.Loading(false);
             });
             handleClose();
           },
@@ -874,10 +909,12 @@ function DeleteStateButton(props: IDProps) {
 
                   const contentJson = content as any;
 
+                  props.Loading(true);
                   API.post("/api/delete_status/", contentJson).then(
                     (response) => {
                       console.log(response);
                       props.ClickHandler();
+                      props.Loading(false);
                     }
                   );
                   handleClose();
@@ -937,9 +974,11 @@ function AddAreaButton(reset: resetInterface) {
             // TEST
             console.log(formJson);
 
+            reset.Loading(true);
             API.post("/api/create_area/", formJson).then((response) => {
               console.log(response);
               reset.ClickHandler(); // Nop
+              reset.Loading(false);
             });
             //reset.ClickHandler(); // Aún no se actualizan las categorías automáticamente => Investigar
             // Probablemente es porq el reset se hace antes de que la petición POST se termine
@@ -1039,10 +1078,13 @@ function EditAreaButton(props: IDProps) {
             const formJson = Object.fromEntries((formData as any).entries());
             const test = formJson;
             console.log(test);
+
+            props.Loading(true);
             API.post("/api/edit_area/", formJson).then((response) => {
               console.log(response);
               props.ClickHandler();
-            });  
+              props.Loading(false);
+            });
             handleClose();
           },
         }}
@@ -1212,12 +1254,14 @@ function DeleteAreaButton(props: IDProps) {
 
                   const contentJson = content as any;
 
+                  props.Loading(true);
                   API.post("/api/delete_area/", contentJson).then(
                     (response) => {
                       console.log(response);
                       props.ClickHandler();
+                      props.Loading(false);
                     }
-                  );                  
+                  );
                   handleClose();
                 }}
               >

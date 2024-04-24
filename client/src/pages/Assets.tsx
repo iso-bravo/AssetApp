@@ -28,6 +28,8 @@ import ExportIcon from "@mui/icons-material/Download";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { API } from "./Home";
+import AssetDetails from "../components/AssetDetails";
+import { Details } from "../components/AssetDetails";
 
 // Definir columnas
 const columns: GridColDef[] = [
@@ -45,8 +47,22 @@ export default function Assets() {
   const [IDAsset, setIDAsset] = useState<GridRowSelectionModel>([-1]);
   const [autosize, setAutosize] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-
-  console.log(autosize);
+  const [details, setDetails] = useState<Details>({
+    Description: "",
+    Factura: "",
+    id: 0,
+    Fecha_Registro: "",
+    ID_Area: 0,
+    ID_Categoria: 0,
+    ID_Estatus: 0,
+    ID_Usuario: 0,
+    Imagen: "",
+    Marca: "",
+    Modelo: "",
+    No_Factura: "",
+    Number_Serie: "",
+    Tipo_Compra: "",
+  });
 
   useEffect(() => {
     axios
@@ -116,6 +132,7 @@ export default function Assets() {
                 }}
                 Autosize={setAutosize}
               />
+              <AssetDetails asset={details} />
               <Button
                 endIcon={<ExportIcon />}
                 variant="outlined"
@@ -135,6 +152,48 @@ export default function Assets() {
             onRowSelectionModelChange={(id) => {
               const selected: GridRowSelectionModel = id;
               setIDAsset(selected);
+              console.log(selected);
+              console.log(selected[0] !== undefined);
+              if (selected[0] !== undefined) {
+                rows.map((row) => {
+                  if (row.id === selected[0]) {
+                    console.log(row.id);
+                    setDetails({
+                      id: row.id,
+                      Description: row.descripcion,
+                      Factura: row.factura_pedimentoPDF,
+                      Fecha_Registro: row.fecha_registro,
+                      ID_Area: row.id_area,
+                      ID_Categoria: row.id_categoria,
+                      ID_Estatus: row.id_estatus,
+                      ID_Usuario: row.id_usuario,
+                      Imagen: row.imagen,
+                      Marca: row.marca,
+                      Modelo: row.modelo,
+                      No_Factura: row.noFactura_pedimento,
+                      Number_Serie: row.numero_serie,
+                      Tipo_Compra: row.tipo_compra,
+                    });
+                  }
+                });
+              } else {
+                setDetails({
+                  Description: "",
+                  Factura: "",
+                  id: 0,
+                  Fecha_Registro: "",
+                  ID_Area: 0,
+                  ID_Categoria: 0,
+                  ID_Estatus: 0,
+                  ID_Usuario: 0,
+                  Imagen: "",
+                  Marca: "",
+                  Modelo: "",
+                  No_Factura: "",
+                  Number_Serie: "",
+                  Tipo_Compra: "",
+                });
+              }
             }}
           />
         </Box>
@@ -190,7 +249,7 @@ function AddAssetDialogButton(props: resetInterface) {
   function handleImage(e: React.FormEvent<HTMLInputElement>) {
     const target = e.target as HTMLInputElement & {
       files: FileList;
-    }
+    };
     const file = target.files[0];
     setImageURL(URL.createObjectURL(file));
     setImage(file);
@@ -310,7 +369,7 @@ function AddAssetDialogButton(props: resetInterface) {
               if (!image) return;
               const imageData = new FormData();
               imageData.append("image", image);
-              
+
               // falta endpoint para subir imagenes a directorio local
 
               //const { data } = await axios.post("/api/image", formData);
@@ -513,7 +572,6 @@ function AddAssetDialogButton(props: resetInterface) {
                     console.log(titleImage);
                     handleImage(e);
                     console.log(image);
-
                   } else {
                     alert("Solo jpg/jpeg y png son permitidos.");
                   }

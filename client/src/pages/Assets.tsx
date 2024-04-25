@@ -20,6 +20,7 @@ import {
   GridRowsProp,
   GridColDef,
   GridRowSelectionModel,
+  GridToolbar,
 } from "@mui/x-data-grid";
 import NavegatorDrawer from "../components/NavegatorDrawer";
 import AddIcon from "@mui/icons-material/Add";
@@ -63,42 +64,8 @@ export default function Assets() {
     Number_Serie: "",
     Tipo_Compra: "",
   });
-  //const [categorias, setCategorias] = useState<GridRowsProp>([]);
-  //const [estados, setEstados] = useState<GridRowsProp>([]);
-  //const [areas, setAreas] = useState<GridRowsProp>([]);
 
-  /*useEffect(() => {
-    API.get("/api/categories/")
-      .then((response) => {
-        setCategorias(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching categories:", error);
-      });
-  }, []);
-
-  useEffect(() => {
-    API.get("/api/states/")
-      .then((response) => {
-        setEstados(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching states:", error);
-      });
-  }, []);
-
-  useEffect(() => {
-    API.get("/api/areas/")
-      .then((response) => {
-        setAreas(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching areas:", error);
-      });
-  }, []);*/
-
-  // Asignación de la información que se despliega en la tabla
-  useEffect(() => {
+  function getAssets() {
     axios
       .get("http://127.0.0.1:8000/api/asset_all/")
       .then(async (response) => {
@@ -160,7 +127,6 @@ export default function Assets() {
               asset.id_estatus = state.estatus;
             }
           });
-          console.log(asset);
 
           // Asignación areas por ID
           areas.map((area) => {
@@ -183,18 +149,12 @@ export default function Assets() {
       .catch((error) => {
         console.error("Error al obtener datos del servidor:", error);
       });
-  }, []);
-
-  function getAssets() {
-    axios
-      .get("http://127.0.0.1:8000/api/asset_all/")
-      .then((response) => {
-        setRows(response.data);
-      })
-      .catch((error) => {
-        console.error("Error al obtener datos del servidor:", error);
-      });
   }
+
+  // Asignación de la información que se despliega en la tabla
+  useEffect(() => {
+    getAssets();
+  }, []);
 
   const exportCSV = () => {
     API.get("/api/export_csv/", { responseType: "blob" }).then((response) => {
@@ -257,17 +217,25 @@ export default function Assets() {
             columns={columns}
             checkboxSelection
             loading={loading}
+            slots={{ toolbar: GridToolbar }}
+            slotProps={{
+              toolbar: {
+                showQuickFilter: true,
+              },
+            }}
             pageSizeOptions={[5, 10, 25, 50, 100]}
+            initialState={{
+              pagination: {
+                paginationModel: { pageSize: 10, page: 0 },
+              },
+            }}
             disableMultipleRowSelection
             onRowSelectionModelChange={(id) => {
               const selected: GridRowSelectionModel = id;
               setIDAsset(selected);
-              console.log(selected);
-              console.log(selected[0] !== undefined);
               if (selected[0] !== undefined) {
                 rows.map((row) => {
                   if (row.id === selected[0]) {
-                    console.log(row.id);
                     setDetails({
                       id: row.id,
                       Description: row.descripcion,

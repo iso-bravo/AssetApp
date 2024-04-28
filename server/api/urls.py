@@ -37,4 +37,9 @@ urlpatterns = [
     path('delete_area/', views.DeleteAreaByIDView.as_view(), name='delete_area'),
     
     path('export_csv/', views.ExportAssetsCsvView.as_view(), name='export_csv'),
+    
+    path('generate_labels_pdf/', views.GenerateLabelsPDFView.as_view(), name='generate_labels_pdf'),
+    path('generate_label_id/', views.GenerateLabelByIDView.as_view(), name='generate_label_id'),
+    path('generate_select_labels/', views.GenerateSelectLabelsPDFView.as_view(), name='generate_select_labels'),
+
 ]

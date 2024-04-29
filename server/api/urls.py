@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('login/', views.LoginView.as_view(), name='login'),
@@ -37,4 +39,6 @@ urlpatterns = [
     path('delete_area/', views.DeleteAreaByIDView.as_view(), name='delete_area'),
     
     path('export_csv/', views.ExportAssetsCsvView.as_view(), name='export_csv'),
-]
+
+    path('upload_file/', views.UploadFile.as_view(), name='upload_file'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

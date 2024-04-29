@@ -329,7 +329,9 @@ function AddAssetDialogButton(props: resetInterface) {
       files: FileList;
     };
     const file = target.files[0];
-    setImageURL(URL.createObjectURL(file));
+    const blop = URL.createObjectURL(file);
+    setImageURL(blop);
+    console.log(blop);
     setImage(file);
   }
 
@@ -450,8 +452,8 @@ function AddAssetDialogButton(props: resetInterface) {
 
               // falta endpoint para subir imagenes a directorio local
 
-              //const { data } = await axios.post("/api/image", formData);
-              //console.log(data);
+              const { data } = await API.post("/api/upload_file/", imageData);
+              console.log(data);
             } catch (error: any) {
               console.log(error.response?.data);
             }

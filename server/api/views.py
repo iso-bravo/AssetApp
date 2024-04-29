@@ -11,7 +11,12 @@ from rest_framework.views import APIView
 from django.core.exceptions import ObjectDoesNotExist
 
 from .models import (Areas, Asset, Categorias, Departamento, Estados, Permiso, Usuario)
-from .serializers import (AreasSerializer, AssetSerializer, CategoriasSerializer, EstadosSerializer, UsuarioSerializer, DepartamentoSerializer, PermisoSerializer)
+from .serializers import (AreasSerializer, AssetSerializer, CategoriasSerializer, EstadosSerializer, UsuarioSerializer, DepartamentoSerializer, 
+PermisoSerializer)
+
+from django.shortcuts import render
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 
 #Login
 class LoginView(APIView):
@@ -105,7 +110,8 @@ class CreateAssetView(APIView):
         data = request.data
         logger.error(f'data: {data}')
         new_asset_data = {}
-        
+        print(request)
+        print(request.FILES)
         for field in Asset._meta.fields:
             if field.name in data:
                     new_asset_data[field.name] = data[field.name]
@@ -421,3 +427,14 @@ class ExportAssetsCsvView(APIView):
                             user, area])
 
         return response
+    
+class UploadFile(APIView):
+    def post(self, request):
+        if request.method == 'POST' and request.FILES['image']:
+            image = request.FILES['image']
+            fs = FileSystemStorage()
+            filename = fs.save(image.name, image)
+            uploaded_file_url = fs.url(filename)
+            return Response({'mensaje': 'Imagen subida exitosamente.', 'file': uploaded_file_url}, status=200)
+
+        return "Error al subir imagen"

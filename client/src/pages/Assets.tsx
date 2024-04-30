@@ -28,6 +28,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import ExportIcon from "@mui/icons-material/Download";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import ImportIcon from "@mui/icons-material/Upload";
 import { API } from "./Home";
 import AssetDetails from "../components/AssetDetails";
 import { Details } from "../components/AssetDetails";
@@ -203,6 +204,8 @@ export default function Assets() {
                 Autosize={setAutosize}
               />
               <AssetDetails asset={details} />
+            </ButtonGroup>
+            <ButtonGroup>
               <Button
                 endIcon={<ExportIcon />}
                 variant="outlined"
@@ -210,6 +213,7 @@ export default function Assets() {
               >
                 Exportar
               </Button>
+              <ImportAssetButton />
             </ButtonGroup>
           </Box>
           <DataGrid
@@ -619,18 +623,6 @@ function AddAssetDialogButton(props: resetInterface) {
               ))}
             </TextField>
             <InputLabel>Imagen: </InputLabel>
-            {/*<TextField
-              type="file"
-              fullWidth
-              required
-              helperText="Adjunta una imagen."
-              margin="normal"
-              aria-labelledby="Modelo"
-              name="imagen"
-              onChange={(e) => {
-                setFile(e.target.name);
-              }}
-            />*/}
             <Box>
               <input
                 type="file"
@@ -852,6 +844,123 @@ function DeleteAssetButton(props: IDProps) {
               </Button>
             </>
           )}
+        </DialogActions>
+      </Dialog>
+    </>
+  );
+}
+
+function ImportAssetButton() {
+  const [open, setOpen] = React.useState(false);
+  const [fileCSV, setFileCSV] = useState<File | undefined>();
+  const [fileName, setFileName] = useState<string>("");
+
+  function handleFile(e: React.FormEvent<HTMLInputElement>) {
+    const target = e.target as HTMLInputElement & {
+      files: FileList;
+    };
+    const file = target.files[0];
+    const blop = URL.createObjectURL(file);
+    // setImageURL(blop);
+    // console.log(blop);
+    setFileCSV(file);
+  }
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  return (
+    <>
+      <Button
+        variant="outlined"
+        onClick={handleClickOpen}
+        color="success"
+        endIcon={<ImportIcon />}
+      >
+        Importar
+      </Button>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        scroll="paper"
+        fullWidth
+        PaperProps={{
+          component: "form",
+          onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
+            event.preventDefault();
+            // const blop = URL.createObjectURL(file);
+            // const formData = new FormData(event.currentTarget);
+            // const formJson = Object.fromEntries((formData as any).entries());
+            const json = {
+              csv: fileCSV,
+              name: fileName,
+            }
+            
+            console.log(json);
+            // Agregar Endpoint aquí
+
+            handleClose();
+          },
+        }}
+      >
+        <IconButton
+          aria-label="close"
+          onClick={handleClose}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: "white",
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+        <DialogTitle style={{ backgroundColor: "steelblue" }} color="white">
+          Importar Assets
+        </DialogTitle>
+        <DialogContent draggable>
+          <Box padding={4}>
+            <InputLabel>Imagen: </InputLabel>
+            <Box>
+              <input
+                type="file"
+                name="csv"
+                // .xlsx, .xls, & .csv
+                accept=".csv"
+                onChange={(e) => {
+                  const pathFile = e.target.value;
+                  var titleFile = pathFile.slice(pathFile.indexOf("h") + 2);
+                  var idxDot = titleFile.lastIndexOf(".") + 1;
+                  var extFile = titleFile.slice(idxDot).toLowerCase();
+                  console.log(titleFile);
+                  if (extFile == "csv") {
+                    setFileName(titleFile);
+                    handleFile(e);
+                  } else {
+                    alert("Solo .csv es permitido.");
+                  }
+                }}
+              />
+            </Box>
+          </Box>
+        </DialogContent>
+        <DialogActions style={{ marginBottom: 3, marginRight: 5 }}>
+          <Button title="Enviar" variant="contained" type="submit">
+            Confirmar
+          </Button>
+          <Button
+            title="Cancelar"
+            onClick={handleClose}
+            variant="contained"
+            color="error"
+          >
+            Cancelar
+          </Button>
         </DialogActions>
       </Dialog>
     </>

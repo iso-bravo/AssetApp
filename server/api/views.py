@@ -14,6 +14,8 @@ from .models import (Areas, Asset, Categorias, Departamento, Estados, Permiso, U
 from .serializers import (AreasSerializer, AssetSerializer, CategoriasSerializer, EstadosSerializer, UsuarioSerializer, DepartamentoSerializer, 
 PermisoSerializer)
 
+from .labels_logic import generate_qr_list, make_pdf, asset_df, get_page_pdf, get_pages_pdf
+
 from django.shortcuts import render
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
@@ -121,6 +123,8 @@ class CreateAssetView(APIView):
         new_asset = Asset(**new_asset_data)
         new_asset.save()
         
+        make_pdf()
+        
         return Response({'mensaje': 'Registro exitoso'}, status=200)
 
 class DeleteAssetView(APIView):
@@ -129,6 +133,8 @@ class DeleteAssetView(APIView):
         
         asset = Asset.objects.get(id=asset_id)
         asset.delete()
+        
+        make_pdf()
         
         return Response({'mensaje': 'Eliminado correctamente'}, status=200)
     
@@ -164,6 +170,8 @@ class EditAssetView(APIView):
                     setattr(asset, field.name, data[field.name])
                 
         asset.save()
+        
+        make_pdf()
                 
         return Response({'mensaje': 'Editado correctamente'}, status=200)
     
@@ -427,6 +435,42 @@ class ExportAssetsCsvView(APIView):
                             user, area])
 
         return response
+
+# Labels
+class GenerateLabelsPDFView(APIView):
+    def get(self, request):
+        try:
+            make_pdf()
+            return Response({'mensaje': 'Creado Correctamente'}, status=200)
+        
+        except Exception as e:
+            return Response("Error: {}".format(str(e)))
+
+class GenerateLabelByIDView(APIView):
+    def get(self, request):
+        _id = request.data.get('id')
+        try:
+            get_page_pdf(_id)
+        
+            return Response({'mensaje': 'Correcto'}, status=200)
+        except Exception as e:
+            return Response("Error: {}".format(str(e)))
+        
+class GenerateSelectLabelsPDFView(APIView):
+    def get(self, request):
+        try:
+            data = request.data
+        
+            if 'ids' in data:
+                ids = data['ids']
+            
+                get_pages_pdf(ids)
+            
+                return Response({'mensaje': 'Correcto'}, status=200)
+            else:
+                return Response({'mensaje': 'El JSON no contiene el campo "ids"'}, status=400)
+        except Exception as e:
+            return Response("Error: {}".format(str(e)))
     
 class UploadFile(APIView):
     def post(self, request):

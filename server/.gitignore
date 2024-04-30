@@ -4,3 +4,5 @@ api/__pycache__/
 venv/
 .venv/
 Asset/__pycache__/
+api/labels_pdf/
+api/qr_imgs/

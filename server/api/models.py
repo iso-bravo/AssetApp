@@ -39,13 +39,16 @@ class Areas(models.Model):
     def __str__(self):
         return self.area
     
+def upload_path(filename):
+    return '/'.join(['images'], filename)
+
 class Asset(models.Model):
     numero_serie = models.CharField(max_length=100)
     modelo = models.CharField(max_length=100)
     descripcion = models.TextField(null=True, blank=True)
     marca = models.CharField(max_length=100)
     id_categoria = models.IntegerField(null=True)
-    imagen = models.ImageField(upload_to='assets_imgs/', null=True, blank=True)
+    imagen = models.ImageField(upload_to=upload_path, null=True, blank=True)
     fecha_registro = models.DateField()
     id_estatus = models.IntegerField(null=True)
     tipo_compra = models.CharField(max_length=100)
@@ -57,4 +60,3 @@ class Asset(models.Model):
     def __str__(self):
         return self.numero_serie
     
-

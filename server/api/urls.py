@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('login/', views.LoginView.as_view(), name='login'),
@@ -42,4 +44,6 @@ urlpatterns = [
     path('generate_label_id/', views.GenerateLabelByIDView.as_view(), name='generate_label_id'),
     path('generate_select_labels/', views.GenerateSelectLabelsPDFView.as_view(), name='generate_select_labels'),
 
-]
+
+    path('upload_file/', views.UploadFile.as_view(), name='upload_file'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

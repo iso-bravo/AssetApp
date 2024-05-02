@@ -891,18 +891,23 @@ function ImportAssetButton() {
         fullWidth
         PaperProps={{
           component: "form",
-          onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
+          onSubmit: async (event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault();
             // const blop = URL.createObjectURL(file);
             // const formData = new FormData(event.currentTarget);
             // const formJson = Object.fromEntries((formData as any).entries());
-            const json = {
+            if (!fileCSV) return;
+            const csvJson = new FormData();
+            csvJson.append("csv", fileCSV);
+            /*const json = {
               csv: fileCSV,
               name: fileName,
-            }
-            
-            console.log(json);
+            };*/
+
+            console.log(csvJson);
             // Agregar Endpoint aquí
+            const { data } = await API.post("/api/import_file/", csvJson);
+            console.log(data);
 
             handleClose();
           },
@@ -925,7 +930,7 @@ function ImportAssetButton() {
         </DialogTitle>
         <DialogContent draggable>
           <Box padding={4}>
-            <InputLabel>Imagen: </InputLabel>
+            <InputLabel>CSV: </InputLabel>
             <Box>
               <input
                 type="file"

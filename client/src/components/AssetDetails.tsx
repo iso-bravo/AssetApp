@@ -10,6 +10,7 @@ import {
   DialogActions,
   Typography,
   Paper,
+  Stack,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import React from "react";
@@ -38,6 +39,7 @@ export interface PropsDetail {
 
 export default function AssetDetails(props: PropsDetail) {
   const [open, setOpen] = React.useState(false);
+  const ImageSRC = "http://127.0.0.1:8000/api" + props.asset.Imagen;
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -46,7 +48,7 @@ export default function AssetDetails(props: PropsDetail) {
   const handleClose = () => {
     setOpen(false);
   };
-
+  
   return (
     <>
       <Button
@@ -83,52 +85,55 @@ export default function AssetDetails(props: PropsDetail) {
                 {props.asset.id === 0 ? (
                   <Typography>No se ha seleccionado ningún ID.</Typography>
                 ) : (
-                  <List>
-                    <ListItem>
-                      <b>ID:&nbsp;</b> {props.asset.id}
-                    </ListItem>
-                    <ListItem>
-                      <b>Número de serie:&nbsp;</b> {props.asset.Number_Serie}
-                    </ListItem>
-                    <ListItem>
-                      <b>Modelo:&nbsp;</b>
-                      {props.asset.Modelo}
-                    </ListItem>
-                    <ListItem>
-                      <b>Descripción:&nbsp;</b> {props.asset.Description}
-                    </ListItem>
-                    <ListItem>
-                      <b>Marca:&nbsp;</b> {props.asset.Marca}
-                    </ListItem>
-                    <ListItem>
-                      <b>Categoría:&nbsp;</b> {props.asset.ID_Categoria}
-                    </ListItem>
-                    <ListItem>
-                      <b>Fecha de registro:&nbsp;</b>{" "}
-                      {props.asset.Fecha_Registro}
-                    </ListItem>
-                    <ListItem>
-                      <b>Tipo de compra:&nbsp;</b> {props.asset.Tipo_Compra}
-                    </ListItem>
-                    <ListItem>
-                      <b>No. de factura:&nbsp;</b> {props.asset.No_Factura}
-                    </ListItem>
-                    <ListItem>
-                      <b>Factura:&nbsp;</b> {props.asset.Factura}
-                    </ListItem>
-                    <ListItem>
-                      <b>Usuario:&nbsp;</b> {props.asset.ID_Usuario}
-                    </ListItem>
-                    <ListItem>
-                      <b>Área:&nbsp;</b> {props.asset.ID_Area}
-                    </ListItem>
-                    <ListItem>
-                      <b>Estatus:&nbsp;</b> {props.asset.ID_Estatus}
-                    </ListItem>
-                    <ListItem>
-                      <b>Imagen:&nbsp;</b> {props.asset.Imagen}
-                    </ListItem>
-                  </List>
+                  <Stack>
+                    <List>
+                      <ListItem>
+                        <b>ID:&nbsp;</b> {props.asset.id}
+                      </ListItem>
+                      <ListItem>
+                        <b>Número de serie:&nbsp;</b> {props.asset.Number_Serie}
+                      </ListItem>
+                      <ListItem>
+                        <b>Modelo:&nbsp;</b>
+                        {props.asset.Modelo}
+                      </ListItem>
+                      <ListItem>
+                        <b>Descripción:&nbsp;</b> {props.asset.Description}
+                      </ListItem>
+                      <ListItem>
+                        <b>Marca:&nbsp;</b> {props.asset.Marca}
+                      </ListItem>
+                      <ListItem>
+                        <b>Categoría:&nbsp;</b> {props.asset.ID_Categoria}
+                      </ListItem>
+                      <ListItem>
+                        <b>Fecha de registro:&nbsp;</b>{" "}
+                        {props.asset.Fecha_Registro}
+                      </ListItem>
+                      <ListItem>
+                        <b>Tipo de compra:&nbsp;</b> {props.asset.Tipo_Compra}
+                      </ListItem>
+                      <ListItem>
+                        <b>No. de factura:&nbsp;</b> {props.asset.No_Factura}
+                      </ListItem>
+                      <ListItem>
+                        <b>Factura:&nbsp;</b> {props.asset.Factura}
+                      </ListItem>
+                      <ListItem>
+                        <b>Usuario:&nbsp;</b> {props.asset.ID_Usuario}
+                      </ListItem>
+                      <ListItem>
+                        <b>Área:&nbsp;</b> {props.asset.ID_Area}
+                      </ListItem>
+                      <ListItem>
+                        <b>Estatus:&nbsp;</b> {props.asset.ID_Estatus}
+                      </ListItem>
+                      <ListItem>
+                        <b>Título de Imagen:&nbsp;</b> {props.asset.Imagen}
+                      </ListItem>
+                    </List>
+                    <img /*src={path + props.asset.Imagen}*/ src={ImageSRC} height={400} width={400}/>
+                  </Stack>
                 )}
               </Box>
             </Paper>

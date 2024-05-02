@@ -123,7 +123,7 @@ class CreateAssetView(APIView):
         new_asset = Asset(**new_asset_data)
         new_asset.save()
         
-        make_pdf()
+        #make_pdf()
         
         return Response({'mensaje': 'Registro exitoso'}, status=200)
 
@@ -475,10 +475,38 @@ class GenerateSelectLabelsPDFView(APIView):
 class UploadFile(APIView):
     def post(self, request):
         if request.method == 'POST' and request.FILES['image']:
-            image = request.FILES['image']
-            fs = FileSystemStorage()
-            filename = fs.save(image.name, image)
-            uploaded_file_url = fs.url(filename)
-            return Response({'mensaje': 'Imagen subida exitosamente.', 'file': uploaded_file_url}, status=200)
+            try:
+                image = request.FILES['image']
+                fs = FileSystemStorage()
+                filename = fs.save(image.name, image)
+                uploaded_file_url = fs.url(filename)
+                return Response({'mensaje': 'Imagen subida exitosamente.', 'file': uploaded_file_url}, status=200)
+            except Exception as e:
+                return Response("Error: {}".format(str(e)))
 
-        return "Error al subir imagen"
+class ImportCSV(APIView):
+    def post(self, request):
+        if request.method == 'POST' and request.FILES['csv']:
+            try:
+                fileCSV = request.FILES['csv']
+                if not fileCSV.name.endswith('.csv'):
+                    return Response({"mensaje" : "El archivo no es CSV."})
+                print(fileCSV)
+                print(request.FILES) 
+
+                file_data = fileCSV.read().decode('utf-8')
+                csv_data = file_data.split('\n')
+
+                for x in csv_data:
+                    fields = x.split(',')
+                    print(fields)
+
+                #datareader = csv.reader(fileCSV)
+                #print(datareader)
+                #for row in datareader:
+                #    print(row)
+
+                return Response({'mensaje': 'CSV enviado exitosamente.'}, status=200) 
+            except Exception as e:
+                return Response("Error: {}".format(str(e)))
+        return Response({"mensaje" : "Error mágico"})

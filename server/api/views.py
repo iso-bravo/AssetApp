@@ -123,7 +123,7 @@ class CreateAssetView(APIView):
         new_asset = Asset(**new_asset_data)
         new_asset.save()
         
-        #make_pdf()
+        make_pdf()
         
         return Response({'mensaje': 'Registro exitoso'}, status=200)
 
@@ -501,6 +501,8 @@ class ImportCSV(APIView):
                     fields = x.split(',')
                     print(fields)
 
+                print(fileCSV)
+                print(request.FILES) 
                 #datareader = csv.reader(fileCSV)
                 #print(datareader)
                 #for row in datareader:

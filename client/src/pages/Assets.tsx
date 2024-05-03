@@ -896,7 +896,10 @@ function ImportAssetButton() {
             // const blop = URL.createObjectURL(file);
             // const formData = new FormData(event.currentTarget);
             // const formJson = Object.fromEntries((formData as any).entries());
-            if (!fileCSV) return;
+            if (!fileCSV) {
+              alert("No se seleccionó ningún archivo o el tipo de archivo no es csv.");
+              return;
+            }
             const csvJson = new FormData();
             csvJson.append("csv", fileCSV);
             /*const json = {
@@ -947,7 +950,9 @@ function ImportAssetButton() {
                     setFileName(titleFile);
                     handleFile(e);
                   } else {
-                    alert("Solo .csv es permitido.");
+                    alert("Solo .xlsx, .xls, & .csv es permitido.");
+                    setFileName("Archivo no válido");
+                    setFileCSV(undefined);
                   }
                 }}
               />

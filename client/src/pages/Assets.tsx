@@ -326,16 +326,16 @@ function AddAssetDialogButton(props: resetInterface) {
   const [areas, setAreas] = useState<Options[]>([]);
   const [file, setFile] = useState<string>("");
   const [image, setImage] = useState<File | undefined>();
-  const [imageURL, setImageURL] = useState<string>("");
+  // const [imageURL, setImageURL] = useState<string>("");
 
   function handleImage(e: React.FormEvent<HTMLInputElement>) {
     const target = e.target as HTMLInputElement & {
       files: FileList;
     };
     const file = target.files[0];
-    const blop = URL.createObjectURL(file);
-    setImageURL(blop);
-    console.log(blop);
+    // const blop = URL.createObjectURL(file);
+    // setImageURL(blop);
+    // console.log(blop);
     setImage(file);
   }
 
@@ -853,14 +853,14 @@ function DeleteAssetButton(props: IDProps) {
 function ImportAssetButton() {
   const [open, setOpen] = React.useState(false);
   const [fileCSV, setFileCSV] = useState<File | undefined>();
-  const [fileName, setFileName] = useState<string>("");
+  // const [fileName, setFileName] = useState<string>("");
 
   function handleFile(e: React.FormEvent<HTMLInputElement>) {
     const target = e.target as HTMLInputElement & {
       files: FileList;
     };
     const file = target.files[0];
-    const blop = URL.createObjectURL(file);
+    // const blop = URL.createObjectURL(file);
     // setImageURL(blop);
     // console.log(blop);
     setFileCSV(file);
@@ -947,11 +947,11 @@ function ImportAssetButton() {
                   var extFile = titleFile.slice(idxDot).toLowerCase();
                   console.log(titleFile);
                   if (extFile == "csv") {
-                    setFileName(titleFile);
+                    // setFileName(titleFile);
                     handleFile(e);
                   } else {
                     alert("Solo .xlsx, .xls, & .csv es permitido.");
-                    setFileName("Archivo no válido");
+                    // setFileName("Archivo no válido");
                     setFileCSV(undefined);
                   }
                 }}

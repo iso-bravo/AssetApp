@@ -497,9 +497,27 @@ class ImportCSV(APIView):
                 file_data = fileCSV.read().decode('utf-8')
                 csv_data = file_data.split('\n')
 
+                asset_data = {}
+
                 for x in csv_data:
                     fields = x.split(',')
                     print(fields)
+                    created = Asset.objects.update_or_create(
+                        numero_serie = fields[17],
+                        modelo = fields[16],
+                        descripcion = fields[2],
+                        marca = fields[15],
+                        #id_categoria = "",
+                        #imagen = "",
+                        fecha_registro = datetime.now().date(),
+                        #id_estatus = "",
+                        tipo_compra = "",
+                        noFactura_pedimento = fields[0],
+                        #factura_pedimentoPDF = "",
+                        #id_usuario = "",
+                        #id_area = "",
+                    )
+                    
 
                 print(fileCSV)
                 print(request.FILES) 

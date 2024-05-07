@@ -502,7 +502,9 @@ class ImportCSV(APIView):
 
                 for x in csv_data:
                     fields = x.split(',')
-                    if not isFirstCycle:
+                    print(isFirstCycle)
+                    if isFirstCycle == False:
+                        print("Dentro del if de create")
                         Asset.objects.update_or_create(
                             numero_serie = fields[17],
                             modelo = fields[16],
@@ -524,8 +526,8 @@ class ImportCSV(APIView):
                         print(fields)
                         index = 0
                         for y in fields:
-                            print("y:")
-                            print(y)
+                            #print("y:")
+                            #print(y)
                             if y == 'Número de Serie' or y == 'Modelo' or y == 'Descripción Español' or y == 'Marca' or y == 'Número de Factura' or y == 'Número de Pedimento':
                                 dic =  {'nombre': y, 'index': index}
                                 columns.append(dic)

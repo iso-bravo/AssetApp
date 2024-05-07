@@ -252,7 +252,7 @@ export default function Assets() {
                       Imagen: row.imagen,
                       Marca: row.marca,
                       Modelo: row.modelo,
-                      No_Factura: row.noFactura_pedimento,
+                      No_Factura: row.noFactura,
                       Number_Serie: row.numero_serie,
                       Tipo_Compra: row.tipo_compra,
                     });
@@ -442,7 +442,7 @@ function AddAssetDialogButton(props: resetInterface) {
               imagen: file,
               marca: formJson.marca,
               modelo: formJson.modelo,
-              noFactura_pedimiento: formJson.noFactura_pedimento,
+              noFactura: formJson.noFactura,
               numero_serie: formJson.numero_serie,
               tipo_compra: formJson.tipo_compra,
             };
@@ -546,7 +546,7 @@ function AddAssetDialogButton(props: resetInterface) {
               label="Categoría"
               fullWidth
               required
-              helperText="Indica ;a categoria."
+              helperText="Indica la categoria."
               multiline
               margin="normal"
               name="id_categoria"
@@ -569,20 +569,20 @@ function AddAssetDialogButton(props: resetInterface) {
               name="tipo_compra"
             />
             <TextField
-              label="No. de factura/pedimento"
+              label="No. de factura"
               fullWidth
               required
               helperText="Escribe el número de factura."
               multiline
               margin="normal"
               aria-labelledby="Modelo"
-              name="noFactura_pedimiento"
+              name="noFactura"
             />
             <TextField
-              label="Factura/Pedimento"
+              label="Factura PDF"
               fullWidth
               required
-              helperText="Indica la factura."
+              helperText="Adjunta la factura."
               multiline
               margin="normal"
               aria-labelledby="Modelo"
@@ -907,7 +907,7 @@ function ImportAssetButton() {
               name: fileName,
             };*/
 
-            console.log(csvJson);
+            // console.log(csvJson);
             // Agregar Endpoint aquí
             const { data } = await API.post("/api/import_file/", csvJson);
             console.log(data);

@@ -491,36 +491,50 @@ class ImportCSV(APIView):
                 fileCSV = request.FILES['csv']
                 if not fileCSV.name.endswith('.csv'):
                     return Response({"mensaje" : "El archivo no es CSV."})
-                print(fileCSV)
-                print(request.FILES) 
+                #print(fileCSV)
+                #print(request.FILES) 
 
                 file_data = fileCSV.read().decode('utf-8')
                 csv_data = file_data.split('\n')
 
-                asset_data = {}
+                isFirstCycle = True
+                columns = []
 
                 for x in csv_data:
                     fields = x.split(',')
-                    print(fields)
-                    created = Asset.objects.update_or_create(
-                        numero_serie = fields[17],
-                        modelo = fields[16],
-                        descripcion = fields[2],
-                        marca = fields[15],
-                        #id_categoria = "",
-                        #imagen = "",
-                        fecha_registro = datetime.now().date(),
-                        #id_estatus = "",
-                        tipo_compra = "",
-                        noFactura_pedimento = fields[0],
-                        #factura_pedimentoPDF = "",
-                        #id_usuario = "",
-                        #id_area = "",
-                    )
-                    
+                    if not isFirstCycle:
+                        Asset.objects.update_or_create(
+                            numero_serie = fields[17],
+                            modelo = fields[16],
+                            descripcion = fields[2],
+                            marca = fields[15],
+                            #id_categoria = "",
+                            #imagen = "",
+                            fecha_registro = datetime.now().date(),
+                            #id_estatus = "",
+                            tipo_compra = "",
+                            noFactura = fields[0],
+                            noPedimento = fields[6],
+                            #factura_pedimentoPDF = "",
+                            #id_usuario = "",
+                            #id_area = "",
+                        )
+                    else:
+                        print("Fields:")
+                        print(fields)
+                        index = 0
+                        for y in fields:
+                            print("y:")
+                            print(y)
+                            if y == 'Número de Serie' or y == 'Modelo' or y == 'Descripción Español' or y == 'Marca' or y == 'Número de Factura' or y == 'Número de Pedimento':
+                                dic =  {'nombre': y, 'index': index}
+                                columns.append(dic)
+                            index += 1
 
-                print(fileCSV)
-                print(request.FILES) 
+                        print("Columns:")
+                        print(columns)
+                        isFirstCycle = False
+    
                 #datareader = csv.reader(fileCSV)
                 #print(datareader)
                 #for row in datareader:

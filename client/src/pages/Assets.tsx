@@ -54,10 +54,10 @@ export default function Assets() {
     Factura: "",
     id: 0,
     Fecha_Registro: "",
-    ID_Area: 0,
-    ID_Categoria: 0,
-    ID_Estatus: 0,
-    ID_Usuario: 0,
+    ID_Area: "0",
+    ID_Categoria: "0",
+    ID_Estatus: "0",
+    ID_Usuario: "0",
     Imagen: "",
     Marca: "",
     Modelo: "",
@@ -66,7 +66,7 @@ export default function Assets() {
     Tipo_Compra: "",
   });
 
-  function getAssets() {
+  function updateAssets() {
     axios
       .get("http://127.0.0.1:8000/api/asset_all/")
       .then(async (response) => {
@@ -154,7 +154,7 @@ export default function Assets() {
 
   // Asignación de la información que se despliega en la tabla
   useEffect(() => {
-    getAssets();
+    updateAssets();
   }, []);
 
   const exportCSV = () => {
@@ -189,17 +189,25 @@ export default function Assets() {
               {/* Grupo de Acciones */}
               <AddAssetDialogButton
                 ClickHandler={() => {
-                  getAssets();
+                  updateAssets();
                 }}
                 Autosize={setAutosize}
                 Loading={setLoading}
               />
-              <EditAssetDialogButton />
+              <EditAssetDialogButton
+                data={details}
+                ids={IDAsset}
+                ClickHandler={() => {
+                  updateAssets();
+                }}
+                Autosize={setAutosize}
+                Loading={setLoading}
+              />
               <DeleteAssetButton
                 ids={IDAsset}
                 Loading={setLoading}
                 ClickHandler={() => {
-                  getAssets();
+                  updateAssets();
                 }}
                 Autosize={setAutosize}
               />
@@ -252,7 +260,7 @@ export default function Assets() {
                       Imagen: row.imagen,
                       Marca: row.marca,
                       Modelo: row.modelo,
-                      No_Factura: row.noFactura_pedimento,
+                      No_Factura: row.noFactura,
                       Number_Serie: row.numero_serie,
                       Tipo_Compra: row.tipo_compra,
                     });
@@ -264,10 +272,10 @@ export default function Assets() {
                   Factura: "",
                   id: 0,
                   Fecha_Registro: "",
-                  ID_Area: 0,
-                  ID_Categoria: 0,
-                  ID_Estatus: 0,
-                  ID_Usuario: 0,
+                  ID_Area: "0",
+                  ID_Categoria: "0",
+                  ID_Estatus: "0",
+                  ID_Usuario: "0",
                   Imagen: "",
                   Marca: "",
                   Modelo: "",
@@ -317,6 +325,12 @@ interface resetInterface {
 
 interface IDProps extends resetInterface {
   ids: GridRowSelectionModel;
+  data?: GridRowsProp;
+}
+
+interface editProps extends resetInterface {
+  ids: GridRowSelectionModel;
+  data: Details;
 }
 
 function AddAssetDialogButton(props: resetInterface) {
@@ -326,16 +340,16 @@ function AddAssetDialogButton(props: resetInterface) {
   const [areas, setAreas] = useState<Options[]>([]);
   const [file, setFile] = useState<string>("");
   const [image, setImage] = useState<File | undefined>();
-  const [imageURL, setImageURL] = useState<string>("");
+  // const [imageURL, setImageURL] = useState<string>("");
 
   function handleImage(e: React.FormEvent<HTMLInputElement>) {
     const target = e.target as HTMLInputElement & {
       files: FileList;
     };
     const file = target.files[0];
-    const blop = URL.createObjectURL(file);
-    setImageURL(blop);
-    console.log(blop);
+    // const blop = URL.createObjectURL(file);
+    // setImageURL(blop);
+    // console.log(blop);
     setImage(file);
   }
 
@@ -430,7 +444,7 @@ function AddAssetDialogButton(props: resetInterface) {
             event.preventDefault();
             const formData = new FormData(event.currentTarget);
             const formJson = Object.fromEntries((formData as any).entries());
-            console.log(formJson);
+            //console.log(formJson);
 
             const data = {
               descripcion: formJson.descripcion,
@@ -442,7 +456,7 @@ function AddAssetDialogButton(props: resetInterface) {
               imagen: file,
               marca: formJson.marca,
               modelo: formJson.modelo,
-              noFactura_pedimiento: formJson.noFactura_pedimento,
+              noFactura: formJson.noFactura,
               numero_serie: formJson.numero_serie,
               tipo_compra: formJson.tipo_compra,
             };
@@ -546,7 +560,7 @@ function AddAssetDialogButton(props: resetInterface) {
               label="Categoría"
               fullWidth
               required
-              helperText="Indica ;a categoria."
+              helperText="Indica la categoria."
               multiline
               margin="normal"
               name="id_categoria"
@@ -569,20 +583,20 @@ function AddAssetDialogButton(props: resetInterface) {
               name="tipo_compra"
             />
             <TextField
-              label="No. de factura/pedimento"
+              label="No. de factura"
               fullWidth
               required
               helperText="Escribe el número de factura."
               multiline
               margin="normal"
               aria-labelledby="Modelo"
-              name="noFactura_pedimiento"
+              name="noFactura"
             />
             <TextField
-              label="Factura/Pedimento"
+              label="Factura PDF"
               fullWidth
               required
-              helperText="Indica la factura."
+              helperText="Adjunta la factura."
               multiline
               margin="normal"
               aria-labelledby="Modelo"
@@ -665,7 +679,140 @@ function AddAssetDialogButton(props: resetInterface) {
   );
 }
 
-function EditAssetDialogButton() {
+function EditAssetDialogButton(props: editProps) {
+  const [categories, setCategories] = useState<Options[]>([]);
+  const [status, setStatus] = useState<Options[]>([]);
+  const [users, setUsers] = useState<Options[]>([]);
+  const [areas, setAreas] = useState<Options[]>([]);
+  const [file, setFile] = useState<string>("");
+  const [image, setImage] = useState<File | undefined>();
+  const [categorySelectedValue, setCategorySelectedValue] = useState("");
+  const [userSelectedValue, setUserSelectedValue] = useState("");
+  const [stateSelectedValue, setStateSelectedValue] = useState("");
+  const [areaSelectedValue, setAreaSelectedValue] = useState("");
+
+  function handleImage(e: React.FormEvent<HTMLInputElement>) {
+    const target = e.target as HTMLInputElement & {
+      files: FileList;
+    };
+    const file = target.files[0];
+    setImage(file);
+  }
+
+  const asset = props.data;
+
+  useEffect(() => {
+    API.get("/api/categories/")
+      .then((response) => {
+        const mappedCategories = response.data.map((item: ServerCategory) => ({
+          value: item.id.toString(),
+          label: item.categoria,
+        }));
+        setCategories(mappedCategories);
+      })
+      .catch((error) => {
+        console.error("Error al obtener categorías del servidor:", error);
+      });
+  }, []);
+
+  API.get("/api/categories/")
+    .then((response) => {
+      var categorySelected = "";
+      response.data.map((category: ServerCategory) => {
+        if (asset.ID_Categoria === category.categoria) {
+          categorySelected = category.id.toString();
+        }
+      });
+      setCategorySelectedValue(categorySelected);
+    })
+    .catch((error) => {
+      console.error("Error fetching departments:", error);
+    });
+
+  useEffect(() => {
+    API.get("/api/states/")
+      .then((response) => {
+        const mappedStates = response.data.map((item: ServerStatus) => ({
+          value: item.id.toString(),
+          label: item.estatus,
+        }));
+        setStatus(mappedStates);
+      })
+      .catch((error) => {
+        console.error("Error al obtener estados del servidor:", error);
+      });
+  }, []);
+
+  API.get("/api/states/")
+    .then((response) => {
+      var stateSelected = "";
+      response.data.map((state: ServerStatus) => {
+        if (asset.ID_Estatus === state.estatus) {
+          stateSelected = state.id.toString();
+        }
+      });
+      setStateSelectedValue(stateSelected);
+    })
+    .catch((error) => {
+      console.error("Error fetching departments:", error);
+    });
+
+  useEffect(() => {
+    API.get("/api/users/")
+      .then((response) => {
+        const mappedUsers = response.data.map((item: ServerUser) => ({
+          value: item.id.toString(),
+          label: item.nombre,
+        }));
+        setUsers(mappedUsers);
+      })
+      .catch((error) => {
+        console.error("Error al obtener usuarios del servidor:", error);
+      });
+  }, []);
+
+  API.get("/api/users/")
+    .then((response) => {
+      var userSelected = "";
+      response.data.map((user: ServerUser) => {
+        if (asset.ID_Usuario === user.nombre) {
+          userSelected = user.id.toString();
+        }
+      });
+      setUserSelectedValue(userSelected);
+    })
+    .catch((error) => {
+      console.error("Error fetching departments:", error);
+    });
+
+  useEffect(() => {
+    API.get("/api/areas/")
+      .then((response) => {
+        const mappedAreas = response.data.map((item: ServerArea) => ({
+          value: item.id.toString(),
+          label: item.area,
+        }));
+        setAreas(mappedAreas);
+      })
+      .catch((error) => {
+        console.error("Error al obtener areas del servidor:", error);
+      });
+  }, []);
+
+  API.get("/api/areas/")
+    .then((response) => {
+      var areaSelected = "";
+      response.data.map((area: ServerArea) => {
+        if (asset.ID_Area === area.area) {
+          areaSelected = area.id.toString();
+        }
+      });
+      setAreaSelectedValue(areaSelected);
+    })
+    .catch((error) => {
+      console.error("Error fetching departments:", error);
+    });
+
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -675,6 +822,8 @@ function EditAssetDialogButton() {
   const handleClose = () => {
     setOpen(false);
   };
+
+  const id: number = +props.ids[0];
 
   return (
     <>
@@ -693,12 +842,51 @@ function EditAssetDialogButton() {
         fullWidth
         PaperProps={{
           component: "form",
-          onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
+          onSubmit: async (event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault();
             const formData = new FormData(event.currentTarget);
             const formJson = Object.fromEntries((formData as any).entries());
-            const test = formJson;
-            console.log(test);
+
+            const data = {
+              id: formJson.id,
+              descripcion: formJson.descripcion,
+              factura_pedimientoPDF: formJson.factura_pedimientoPDF,
+              id_area: formJson.id_area,
+              id_categoria: formJson.id_categoria,
+              id_estatus: formJson.id_estatus,
+              id_usuario: formJson.id_usuario,
+              imagen: file,
+              marca: formJson.marca,
+              modelo: formJson.modelo,
+              noFactura: formJson.noFactura,
+              numero_serie: formJson.numero_serie,
+              tipo_compra: formJson.tipo_compra,
+            };
+
+            console.log(data);
+
+            props.Loading(true);
+
+            try {
+              if (!image) {
+                console.log("No image");
+              } else {
+                const imageData = new FormData();
+                imageData.append("image", image);
+
+                const { data } = await API.post("/api/upload_file/", imageData);
+                console.log(data);
+              }
+            } catch (error: any) {
+              console.log(error.response?.data);
+            }
+
+            API.post("/api/edit_asset/", data).then((response) => {
+              console.log(response);
+              props.ClickHandler();
+              props.Loading(false);
+            });
+
             handleClose();
           },
         }}
@@ -718,19 +906,212 @@ function EditAssetDialogButton() {
         <DialogTitle style={{ backgroundColor: "steelblue" }} color="white">
           Editar Asset
         </DialogTitle>
-        <DialogContent draggable></DialogContent>
-        <DialogActions style={{ marginBottom: 3, marginRight: 5 }}>
-          <Button type="submit" title="Editar" variant="contained">
-            Editar
-          </Button>
-          <Button
-            title="Cancelar"
-            onClick={handleClose}
-            variant="contained"
-            color="error"
-          >
-            Cancelar
-          </Button>
+        <DialogContent draggable>
+          <Box padding={4}>
+            {id === -1 || Number.isNaN(id) ? (
+              <>
+                <Typography variant="h6">
+                  No se ha seleccionado ningún ID.
+                </Typography>
+              </>
+            ) : (
+              <Box sx={{ display: "flex", flexWrap: "wrap" }}>
+                <TextField
+                  label="ID"
+                  required
+                  margin="normal"
+                  name="id"
+                  value={id}
+                  type="number"
+                  helperText="No se puede cambiar el ID."
+                />
+                <TextField
+                  label="Número de serie"
+                  fullWidth
+                  required
+                  helperText="Escribe el número de serie."
+                  margin="normal"
+                  name="numero_serie"
+                  defaultValue={asset.Number_Serie}
+                />
+                <TextField
+                  label="Modelo"
+                  fullWidth
+                  required
+                  helperText="Escribe el modelo del producto."
+                  multiline
+                  margin="normal"
+                  name="modelo"
+                  defaultValue={asset.Modelo}
+                />
+                <TextField
+                  label="Descripción"
+                  fullWidth
+                  required
+                  helperText="Agrega una descripción."
+                  multiline
+                  margin="normal"
+                  name="descripcion"
+                  defaultValue={asset.Description}
+                />
+                <TextField
+                  label="Marca"
+                  fullWidth
+                  required
+                  helperText="Indica la marca."
+                  multiline
+                  margin="normal"
+                  name="marca"
+                  defaultValue={asset.Marca}
+                />
+                <TextField
+                  select
+                  label="Estatus"
+                  fullWidth
+                  required
+                  helperText="Indica el estatus."
+                  multiline
+                  margin="normal"
+                  name="id_estatus"
+                  defaultValue={stateSelectedValue}
+                >
+                  {status.map((stat) => (
+                    <MenuItem key={stat.value} value={stat.value}>
+                      {stat.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <TextField
+                  select
+                  label="Categoría"
+                  fullWidth
+                  required
+                  helperText="Indica la categoria."
+                  multiline
+                  margin="normal"
+                  name="id_categoria"
+                  defaultValue={categorySelectedValue}
+                >
+                  {categories.map((category) => (
+                    <MenuItem key={category.value} value={category.value}>
+                      {category.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <TextField
+                  label="Tipo de compra"
+                  fullWidth
+                  required
+                  helperText="Selecciona el tipo de compra."
+                  multiline
+                  margin="normal"
+                  aria-labelledby="Modelo"
+                  name="tipo_compra"
+                  defaultValue={asset.Tipo_Compra}
+                />
+                <TextField
+                  label="No. de factura"
+                  fullWidth
+                  helperText="Escribe el número de factura."
+                  multiline
+                  margin="normal"
+                  aria-labelledby="Modelo"
+                  name="noFactura"
+                  defaultValue={asset.No_Factura}
+                />
+                <TextField
+                  label="Factura PDF"
+                  fullWidth
+                  helperText="Adjunta la factura."
+                  multiline
+                  margin="normal"
+                  aria-labelledby="Modelo"
+                  name="factura_pedimientoPDF"
+                  defaultValue={asset.Factura}
+                />
+                <TextField
+                  select
+                  label="Usuario"
+                  fullWidth
+                  required
+                  helperText="Indica el usuario."
+                  multiline
+                  margin="normal"
+                  name="id_usuario"
+                  defaultValue={userSelectedValue}
+                >
+                  {users.map((user) => (
+                    <MenuItem key={user.value} value={user.value}>
+                      {user.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <TextField
+                  select
+                  label="Area"
+                  fullWidth
+                  required
+                  helperText="Indica el area."
+                  multiline
+                  margin="normal"
+                  name="id_area"
+                  defaultValue={areaSelectedValue}
+                >
+                  {areas.map((area) => (
+                    <MenuItem key={area.value} value={area.value}>
+                      {area.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <InputLabel>Imagen: </InputLabel>
+                <Box>
+                  <input
+                    type="file"
+                    name="image"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const pathImage = e.target.value;
+                      var titleImage = pathImage.slice(
+                        pathImage.indexOf("h") + 2
+                      );
+
+                      var fileName = titleImage;
+                      var idxDot = fileName.lastIndexOf(".") + 1;
+                      var extFile = fileName.slice(idxDot).toLowerCase();
+                      if (
+                        extFile == "jpg" ||
+                        extFile == "jpeg" ||
+                        extFile == "png"
+                      ) {
+                        setFile(titleImage);
+                        console.log(titleImage);
+                        handleImage(e);
+                        console.log(image);
+                      } else {
+                        alert("Solo jpg/jpeg y png son permitidos.");
+                      }
+                    }}
+                  />
+                </Box>
+              </Box>
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions style={{ padding: 20 }}>
+          {!(id === -1 || Number.isNaN(id)) ? (
+            <>
+              <Button type="submit" variant="contained" color="primary">
+                Enviar
+              </Button>
+              <Button color="error" variant="contained" onClick={handleClose}>
+                Cancelar
+              </Button>
+            </>
+          ) : (
+            <Button color="error" variant="contained" onClick={handleClose}>
+              Cancelar
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
     </>
@@ -853,14 +1234,14 @@ function DeleteAssetButton(props: IDProps) {
 function ImportAssetButton() {
   const [open, setOpen] = React.useState(false);
   const [fileCSV, setFileCSV] = useState<File | undefined>();
-  const [fileName, setFileName] = useState<string>("");
+  // const [fileName, setFileName] = useState<string>("");
 
   function handleFile(e: React.FormEvent<HTMLInputElement>) {
     const target = e.target as HTMLInputElement & {
       files: FileList;
     };
     const file = target.files[0];
-    const blop = URL.createObjectURL(file);
+    // const blop = URL.createObjectURL(file);
     // setImageURL(blop);
     // console.log(blop);
     setFileCSV(file);
@@ -896,16 +1277,14 @@ function ImportAssetButton() {
             // const blop = URL.createObjectURL(file);
             // const formData = new FormData(event.currentTarget);
             // const formJson = Object.fromEntries((formData as any).entries());
-            if (!fileCSV) return;
+            if (!fileCSV) {
+              alert(
+                "No se seleccionó ningún archivo o el tipo de archivo no es csv."
+              );
+              return;
+            }
             const csvJson = new FormData();
             csvJson.append("csv", fileCSV);
-            /*const json = {
-              csv: fileCSV,
-              name: fileName,
-            };*/
-
-            console.log(csvJson);
-            // Agregar Endpoint aquí
             const { data } = await API.post("/api/import_file/", csvJson);
             console.log(data);
 
@@ -944,10 +1323,12 @@ function ImportAssetButton() {
                   var extFile = titleFile.slice(idxDot).toLowerCase();
                   console.log(titleFile);
                   if (extFile == "csv") {
-                    setFileName(titleFile);
+                    // setFileName(titleFile);
                     handleFile(e);
                   } else {
-                    alert("Solo .csv es permitido.");
+                    alert("Solo .xlsx, .xls, & .csv es permitido.");
+                    // setFileName("Archivo no válido");
+                    setFileCSV(undefined);
                   }
                 }}
               />

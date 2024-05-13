@@ -846,7 +846,6 @@ function EditAssetDialogButton(props: editProps) {
             event.preventDefault();
             const formData = new FormData(event.currentTarget);
             const formJson = Object.fromEntries((formData as any).entries());
-            console.log(formJson);
 
             const data = {
               id: formJson.id,
@@ -863,6 +862,8 @@ function EditAssetDialogButton(props: editProps) {
               numero_serie: formJson.numero_serie,
               tipo_compra: formJson.tipo_compra,
             };
+
+            console.log(data);
 
             props.Loading(true);
 

@@ -22,14 +22,14 @@ export interface Details {
   Modelo: string;
   Description: string;
   Marca: string;
-  ID_Categoria: number;
+  ID_Categoria: string;
   Fecha_Registro: string;
   Tipo_Compra: string;
   No_Factura: string;
   Factura: string;
-  ID_Usuario: number;
-  ID_Area: number;
-  ID_Estatus: number;
+  ID_Usuario: string;
+  ID_Area: string;
+  ID_Estatus: string;
   Imagen: string;
 }
 

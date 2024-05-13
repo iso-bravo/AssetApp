@@ -491,8 +491,6 @@ class ImportCSV(APIView):
                 fileCSV = request.FILES['csv']
                 if not fileCSV.name.endswith('.csv'):
                     return Response({"mensaje" : "El archivo no es CSV."})
-                #print(fileCSV)
-                #print(request.FILES) 
 
                 file_data = fileCSV.read().decode('utf-8')
                 csv_data = file_data.split('\n')
@@ -502,17 +500,17 @@ class ImportCSV(APIView):
 
                 for x in csv_data:
                     fields = x.split(',')
-                    print(isFirstCycle)
+                    
+                    date = datetime.now().date()
                     if isFirstCycle == False:
-                        print("Dentro del if de create")
-                        Asset.objects.update_or_create(
+                        data = Asset.objects.create(
                             numero_serie = fields[17],
                             modelo = fields[16],
                             descripcion = fields[2],
                             marca = fields[15],
                             #id_categoria = "",
                             #imagen = "",
-                            fecha_registro = datetime.now().date(),
+                            fecha_registro = date,
                             #id_estatus = "",
                             tipo_compra = "",
                             noFactura = fields[0],
@@ -522,26 +520,15 @@ class ImportCSV(APIView):
                             #id_area = "",
                         )
                     else:
-                        print("Fields:")
-                        print(fields)
                         index = 0
                         for y in fields:
-                            #print("y:")
-                            #print(y)
                             if y == 'Número de Serie' or y == 'Modelo' or y == 'Descripción Español' or y == 'Marca' or y == 'Número de Factura' or y == 'Número de Pedimento':
                                 dic =  {'nombre': y, 'index': index}
                                 columns.append(dic)
                             index += 1
-
-                        print("Columns:")
-                        print(columns)
+                        columns
                         isFirstCycle = False
-    
-                #datareader = csv.reader(fileCSV)
-                #print(datareader)
-                #for row in datareader:
-                #    print(row)
-
+                        
                 return Response({'mensaje': 'CSV enviado exitosamente.'}, status=200) 
             except Exception as e:
                 return Response("Error: {}".format(str(e)))

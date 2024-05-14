@@ -143,38 +143,16 @@ class EditAssetView(APIView):
         data = request.data
         asset_id = request.data.get('id')
         asset = Asset.objects.get(id=asset_id)
-        
+                    
         for field in Asset._meta.fields:
             if field.name in data:
-                if field.name == 'id_categoria':
-                    category = data[field.name]
-                    category_id = Categorias.objects.get(categoria=category).id
-                    setattr(asset, field.name, category_id)
-                    
-                elif field.name == 'id_estatus':
-                    status = data[field.name]
-                    status_id = Estados.objects.get(estatus=status).id
-                    setattr(asset, field.name, status_id)
-                    
-                elif field.name == 'id_usuario':
-                    user = data[field.name]
-                    user_id = Usuario.objects.get(nombre=user).id
-                    setattr(asset, field.name, user_id)
-                    
-                elif field.name == 'id_area':
-                    area = data[field.name]
-                    area_id = Areas.objects.get(area=area).id
-                    setattr(asset, field.name, area_id)
-                    
-                else:
                     setattr(asset, field.name, data[field.name])
-                
         asset.save()
         
         make_pdf()
                 
         return Response({'mensaje': 'Editado correctamente'}, status=200)
-    
+
 class GetStatusCategoriesView(APIView):
     def get(self, request):
         data = {}

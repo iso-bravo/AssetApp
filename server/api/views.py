@@ -528,7 +528,7 @@ class ImportCSV(APIView):
                             index += 1
                         columns
                         isFirstCycle = False
-                        
+                make_pdf()   
                 return Response({'mensaje': 'CSV enviado exitosamente.'}, status=200) 
             except Exception as e:
                 return Response("Error: {}".format(str(e)))

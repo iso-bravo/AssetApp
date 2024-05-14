@@ -41,6 +41,10 @@ export default function AssetDetails(props: PropsDetail) {
   const [open, setOpen] = React.useState(false);
   const ImageSRC = "http://127.0.0.1:8000/api" + props.asset.Imagen;
 
+  // server\api\qr_imgs\qrcode2587.png
+  const QR = "http://127.0.0.1:8000/api/qr_imgs/qrcode" + props.asset.id + ".png";
+  
+
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -48,7 +52,7 @@ export default function AssetDetails(props: PropsDetail) {
   const handleClose = () => {
     setOpen(false);
   };
-  
+
   return (
     <>
       <Button
@@ -79,13 +83,13 @@ export default function AssetDetails(props: PropsDetail) {
           Detalles
         </DialogTitle>
         <DialogContent draggable>
-          <Box marginLeft={30} marginRight={30} marginTop={4} marginBottom={4}>
+          <Box marginLeft={20} marginRight={20} marginTop={4} marginBottom={4}>
             <Paper elevation={12}>
               <Box paddingLeft={12} paddingTop={4} paddingBottom={4}>
                 {props.asset.id === 0 ? (
                   <Typography>No se ha seleccionado ningún ID.</Typography>
                 ) : (
-                  <Stack>
+                  <Stack direction="row" useFlexGap flexWrap="wrap">
                     <List>
                       <ListItem>
                         <b>ID:&nbsp;</b> {props.asset.id}
@@ -132,7 +136,10 @@ export default function AssetDetails(props: PropsDetail) {
                         <b>Título de Imagen:&nbsp;</b> {props.asset.Imagen}
                       </ListItem>
                     </List>
-                    <img /*src={path + props.asset.Imagen}*/ src={ImageSRC} height={400} width={400}/>
+                    <Box height={420} width={400}>
+                      <img src={ImageSRC} height={400} width={400} />
+                      <img src={ImageSRC} height={400} width={400} />
+                    </Box>
                   </Stack>
                 )}
               </Box>

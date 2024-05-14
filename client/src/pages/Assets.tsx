@@ -25,10 +25,10 @@ import {
 import NavegatorDrawer from "../components/NavegatorDrawer";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
-import ExportIcon from "@mui/icons-material/Download";
+import ExportIcon from "@mui/icons-material/Upload";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import ImportIcon from "@mui/icons-material/Upload";
+import ImportIcon from "@mui/icons-material/Download";
 import { API } from "./Home";
 import AssetDetails from "../components/AssetDetails";
 import { Details } from "../components/AssetDetails";

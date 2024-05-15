@@ -14,6 +14,8 @@ import {
   DialogContent,
   DialogActions,
   MenuItem,
+  Paper,
+  Stack,
 } from "@mui/material";
 import {
   DataGrid,
@@ -32,6 +34,10 @@ import ImportIcon from "@mui/icons-material/Download";
 import { API } from "./Home";
 import AssetDetails from "../components/AssetDetails";
 import { Details } from "../components/AssetDetails";
+import PDFIcon from "@mui/icons-material/PictureAsPdf";
+
+// Solución si Etiquetas.pdf existe
+import PDF from "../../../server/api/labels_pdf/Etiquetas.pdf";
 
 // Definir columnas
 const columns: GridColDef[] = [
@@ -47,7 +53,7 @@ const columns: GridColDef[] = [
 export default function Assets() {
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [IDAsset, setIDAsset] = useState<GridRowSelectionModel>([-1]);
-  const [autosize, setAutosize] = useState<boolean>(false);
+  //const [autosize, setAutosize] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [details, setDetails] = useState<Details>({
     Description: "",
@@ -191,7 +197,7 @@ export default function Assets() {
                 ClickHandler={() => {
                   updateAssets();
                 }}
-                Autosize={setAutosize}
+                //Autosize={setAutosize}
                 Loading={setLoading}
               />
               <EditAssetDialogButton
@@ -200,7 +206,7 @@ export default function Assets() {
                 ClickHandler={() => {
                   updateAssets();
                 }}
-                Autosize={setAutosize}
+                //Autosize={setAutosize}
                 Loading={setLoading}
               />
               <DeleteAssetButton
@@ -209,7 +215,7 @@ export default function Assets() {
                 ClickHandler={() => {
                   updateAssets();
                 }}
-                Autosize={setAutosize}
+                //Autosize={setAutosize}
               />
               <AssetDetails asset={details} />
             </ButtonGroup>
@@ -221,8 +227,15 @@ export default function Assets() {
               >
                 Exportar
               </Button>
-              <ImportAssetButton />
+              <ImportAssetButton
+                ClickHandler={() => {
+                  updateAssets();
+                }}
+                //Autosize={setAutosize}
+                Loading={setLoading}
+              />
             </ButtonGroup>
+            
           </Box>
           <DataGrid
             rows={rows}
@@ -286,6 +299,35 @@ export default function Assets() {
               }
             }}
           />
+          <Container
+              style={{
+                width: 250,
+                alignContent: "center",
+                alignItems: "center",
+                marginTop: 50,
+              }}
+            >
+              <a href={PDF} download>
+                <Paper
+                  style={{
+                    height: 40,
+                    alignItems: "center",
+                    alignContent: "center",
+                    textAlign: "center",
+                    backgroundColor: "tomato",
+                    color: "white",
+                    paddingLeft: "10%",
+                    paddingRight: "10%",
+                  }}
+                >
+                  <Stack direction="row" spacing={2}>
+                    <ImportIcon />
+                      <div>ETIQUETAS</div>
+                    <PDFIcon />
+                  </Stack>
+                </Paper>
+              </a>
+            </Container>
         </Box>
       </Container>
     </>
@@ -319,7 +361,7 @@ type ServerArea = {
 
 interface resetInterface {
   ClickHandler: Function; //(event: React.MouseEvent<HTMLButtonElement>) => void;
-  Autosize: Function;
+  //Autosize: Function;
   Loading: Function;
 }
 
@@ -1205,7 +1247,7 @@ function DeleteAssetButton(props: IDProps) {
                     (response) => {
                       console.log(response);
                       props.ClickHandler();
-                      props.Autosize(true);
+                      //props.Autosize(true);
                       props.Loading(false);
                     }
                   );
@@ -1231,7 +1273,7 @@ function DeleteAssetButton(props: IDProps) {
   );
 }
 
-function ImportAssetButton() {
+function ImportAssetButton(props: resetInterface) {
   const [open, setOpen] = React.useState(false);
   const [fileCSV, setFileCSV] = useState<File | undefined>();
   // const [fileName, setFileName] = useState<string>("");
@@ -1274,6 +1316,7 @@ function ImportAssetButton() {
           component: "form",
           onSubmit: async (event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault();
+            props.Loading(true);
             // const blop = URL.createObjectURL(file);
             // const formData = new FormData(event.currentTarget);
             // const formJson = Object.fromEntries((formData as any).entries());
@@ -1285,8 +1328,11 @@ function ImportAssetButton() {
             }
             const csvJson = new FormData();
             csvJson.append("csv", fileCSV);
-            const { data } = await API.post("/api/import_file/", csvJson);
-            console.log(data);
+            API.post("/api/import_file/", csvJson).then((response) => {
+              console.log(response);
+              props.ClickHandler();
+              props.Loading(false);
+            });
 
             handleClose();
           },

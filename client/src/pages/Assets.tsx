@@ -35,6 +35,7 @@ import { API } from "./Home";
 import AssetDetails from "../components/AssetDetails";
 import { Details } from "../components/AssetDetails";
 import PDFIcon from "@mui/icons-material/PictureAsPdf";
+import DetailsIcon from "@mui/icons-material/Info";
 
 // Solución si Etiquetas.pdf existe
 import PDF from "../../../server/api/labels_pdf/Etiquetas.pdf";
@@ -43,17 +44,17 @@ import { PDFDocument } from "pdf-lib";
 
 // Función para descargar solo las etiquetas de los Assets seleccionados en un PDF
 const downloadSelectedPages = async (pages: Array<number>) => {
-        const existingPdfBytes = await fetch(PDF).then(res => res.arrayBuffer());
-        const pdfDoc = await PDFDocument.load(existingPdfBytes);
-        const newPdfDoc = await PDFDocument.create();
-        const copiedPages = await newPdfDoc.copyPages(pdfDoc, pages);
+  const existingPdfBytes = await fetch(PDF).then((res) => res.arrayBuffer());
+  const pdfDoc = await PDFDocument.load(existingPdfBytes);
+  const newPdfDoc = await PDFDocument.create();
+  const copiedPages = await newPdfDoc.copyPages(pdfDoc, pages);
 
-        copiedPages.forEach(page => newPdfDoc.addPage(page));
+  copiedPages.forEach((page) => newPdfDoc.addPage(page));
 
-        const pdfBytes = await newPdfDoc.save();
-        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-        saveAs(blob, 'Etiquetas_seleccionadas.pdf');
-    };
+  const pdfBytes = await newPdfDoc.save();
+  const blob = new Blob([pdfBytes], { type: "application/pdf" });
+  saveAs(blob, "Etiquetas_seleccionadas.pdf");
+};
 
 // Definir columnas para la tabla de datos
 const columns: GridColDef[] = [
@@ -259,7 +260,18 @@ export default function Assets() {
                 }}
                 //Autosize={setAutosize}
               />
-              <AssetDetails asset={details} />
+              {!(IDAsset.length > 1) ? (
+                <AssetDetails asset={details} />
+              ) : (
+                <Button
+                  variant="contained"
+                  onClick={() => alert("No se pueden seleccionar multiples assets.")}
+                  color="info"
+                  endIcon={<DetailsIcon />}
+                >
+                  Detalles
+                </Button>
+              )}
             </ButtonGroup>
             <ButtonGroup>
               <Button
@@ -374,7 +386,10 @@ export default function Assets() {
                   </Paper>
                 </a>
               ) : (
-                <button onClick={() => downloadSelectedPages(pages)} style={{width: 202}}>
+                <button
+                  onClick={() => downloadSelectedPages(pages)}
+                  style={{ width: 202 }}
+                >
                   <Paper
                     style={{
                       height: 40,

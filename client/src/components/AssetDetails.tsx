@@ -40,9 +40,6 @@ export interface PropsDetail {
 export default function AssetDetails(props: PropsDetail) {
   const [open, setOpen] = React.useState(false);
   const ImageSRC = "http://127.0.0.1:8000/api" + props.asset.Imagen;
-  // server\api\qr_imgs\qrcode2587.png
-  const QR =
-    "http://127.0.0.1:8000/api/qr_imgs/qrcode" + props.asset.id + ".png";
 
   const handleClickOpen = () => {
     setOpen(true);

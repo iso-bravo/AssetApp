@@ -265,7 +265,9 @@ export default function Assets() {
               ) : (
                 <Button
                   variant="contained"
-                  onClick={() => alert("No se pueden seleccionar multiples assets.")}
+                  onClick={() =>
+                    alert("No se pueden seleccionar multiples assets.")
+                  }
                   color="info"
                   endIcon={<DetailsIcon />}
                 >

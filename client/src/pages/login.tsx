@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+// src/pages/Login.tsx
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import IconButton from '@mui/material/IconButton';
 import Input from '@mui/material/Input';
@@ -12,12 +13,14 @@ import Button from '@mui/material/Button';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import AuthContext from '../auth/Auth';
 
-function LogIn() {
+const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const authContext = useContext(AuthContext);
 
   const handleClickShowPassword = () => setShowPassword(!showPassword);
 
@@ -31,8 +34,8 @@ function LogIn() {
         nombre: username,
         contraseña: password
       });
-      console.log(response.data);
       if (response.status === 200 && response.data.mensaje === 'Inicio de sesión exitoso') {
+        authContext?.login({ username });
         navigate('/home');
       } else {
         toast.error('Usuario o contraseña incorrectos. Intentelo de nuevo');
@@ -88,4 +91,4 @@ function LogIn() {
   );
 }
 
-export default LogIn;
+export default Login;

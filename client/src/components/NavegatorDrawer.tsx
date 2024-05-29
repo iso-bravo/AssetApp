@@ -16,7 +16,7 @@ import AssetsIcon from "@mui/icons-material/TableChart";
 import UsersIcon from "@mui/icons-material/Person";
 import CatalogIcon from "@mui/icons-material/List";
 import TagIcon from "@mui/icons-material/Tag";
-
+import { useNavigate } from "react-router-dom";
 
 // Lista de enlaces del drawer
 const Pages: { title: string; href: string }[] = [
@@ -28,9 +28,10 @@ const Pages: { title: string; href: string }[] = [
 
 // Componente principal
 export default function NavegatorDrawer() {
+  const navigate = useNavigate();
 
   // Función para asignar los íconos según el index del elemento
-  function iconAsigment(i: number) { 
+  function iconAsigment(i: number) {
     switch (i) {
       case 0: // Inicio
         return <HomeIcon />;
@@ -67,15 +68,15 @@ export default function NavegatorDrawer() {
             width: 230,
             boxSizing: "border-box",
             backgroundColor: "steelblue",
-            color: "white"
+            color: "white",
           },
         }}
       >
         <Toolbar />
-        <List> 
+        <List>
           {Pages.map((page, index) => (
             <ListItem key={page.title} disablePadding>
-              <ListItemButton component="a" href={page.href}>
+              <ListItemButton onClick={() => navigate(page.href)}>
                 <ListItemIcon>{iconAsigment(index)}</ListItemIcon>
                 <ListItemText primary={page.title} />
               </ListItemButton>
@@ -85,7 +86,7 @@ export default function NavegatorDrawer() {
         <Divider />
         <List>
           <ListItem key="1" disablePadding>
-            <ListItemButton component="a" href="/">
+            <ListItemButton onClick={() => navigate("/")}>
               <ListItemIcon>
                 <LogoutIcon />
               </ListItemIcon>

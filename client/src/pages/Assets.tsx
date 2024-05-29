@@ -14,6 +14,8 @@ import {
   DialogContent,
   DialogActions,
   MenuItem,
+  Paper,
+  Stack,
 } from "@mui/material";
 import {
   DataGrid,
@@ -32,8 +34,29 @@ import ImportIcon from "@mui/icons-material/Download";
 import { API } from "./Home";
 import AssetDetails from "../components/AssetDetails";
 import { Details } from "../components/AssetDetails";
+import PDFIcon from "@mui/icons-material/PictureAsPdf";
+import DetailsIcon from "@mui/icons-material/Info";
 
-// Definir columnas
+// Solución si Etiquetas.pdf existe
+import PDF from "../../../server/api/labels_pdf/Etiquetas.pdf";
+import { saveAs } from "file-saver";
+import { PDFDocument } from "pdf-lib";
+
+// Función para descargar solo las etiquetas de los Assets seleccionados en un PDF
+const downloadSelectedPages = async (pages: Array<number>) => {
+  const existingPdfBytes = await fetch(PDF).then((res) => res.arrayBuffer());
+  const pdfDoc = await PDFDocument.load(existingPdfBytes);
+  const newPdfDoc = await PDFDocument.create();
+  const copiedPages = await newPdfDoc.copyPages(pdfDoc, pages);
+
+  copiedPages.forEach((page) => newPdfDoc.addPage(page));
+
+  const pdfBytes = await newPdfDoc.save();
+  const blob = new Blob([pdfBytes], { type: "application/pdf" });
+  saveAs(blob, "Etiquetas_seleccionadas.pdf");
+};
+
+// Definir columnas para la tabla de datos
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 100 },
   { field: "numero_serie", headerName: "Número de serie", width: 150 },
@@ -47,7 +70,34 @@ const columns: GridColDef[] = [
 export default function Assets() {
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [IDAsset, setIDAsset] = useState<GridRowSelectionModel>([-1]);
-  const [autosize, setAutosize] = useState<boolean>(false);
+
+  // Ocupo los IDs en una lista de este tipo para descargar las etiquetas
+  const IDS: Array<Number> = [];
+  IDAsset.map((id) => {
+    const element: Number = +id;
+    IDS.push(element);
+  });
+
+  // Se le tiene que pasar una lista de páginas a la función de descargar etiquetas por Asset
+
+  // Aquí se obtiene una lista con los números de página que corresponde a las
+  // etiquetas de los Assets seleccionados, esta es la que se le pasa a la
+  // función downloadSelectedPages
+
+  const pages: Array<number> = [];
+  for (let i = 0; i < rows.length; i++) {
+    const element = rows[i];
+    for (let j = 0; j < IDS.length; j++) {
+      if (IDS[j] === element["id"]) {
+        pages.push(i);
+      }
+    }
+  }
+
+  // TEST
+  //console.log(pages);
+
+  //const [autosize, setAutosize] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [details, setDetails] = useState<Details>({
     Description: "",
@@ -151,7 +201,6 @@ export default function Assets() {
         console.error("Error al obtener datos del servidor:", error);
       });
   }
-
   // Asignación de la información que se despliega en la tabla
   useEffect(() => {
     updateAssets();
@@ -186,12 +235,12 @@ export default function Assets() {
           </Typography>
           <Box marginBottom={2}>
             <ButtonGroup>
-              {/* Grupo de Acciones */}
+              {/* Grupo de botones para manipular y visualizar los datos */}
               <AddAssetDialogButton
                 ClickHandler={() => {
                   updateAssets();
                 }}
-                Autosize={setAutosize}
+                //Autosize={setAutosize}
                 Loading={setLoading}
               />
               <EditAssetDialogButton
@@ -200,7 +249,7 @@ export default function Assets() {
                 ClickHandler={() => {
                   updateAssets();
                 }}
-                Autosize={setAutosize}
+                //Autosize={setAutosize}
                 Loading={setLoading}
               />
               <DeleteAssetButton
@@ -209,9 +258,22 @@ export default function Assets() {
                 ClickHandler={() => {
                   updateAssets();
                 }}
-                Autosize={setAutosize}
+                //Autosize={setAutosize}
               />
-              <AssetDetails asset={details} />
+              {!(IDAsset.length > 1) ? (
+                <AssetDetails asset={details} />
+              ) : (
+                <Button
+                  variant="contained"
+                  onClick={() =>
+                    alert("No se pueden seleccionar multiples assets.")
+                  }
+                  color="info"
+                  endIcon={<DetailsIcon />}
+                >
+                  Detalles
+                </Button>
+              )}
             </ButtonGroup>
             <ButtonGroup>
               <Button
@@ -221,7 +283,13 @@ export default function Assets() {
               >
                 Exportar
               </Button>
-              <ImportAssetButton />
+              <ImportAssetButton
+                ClickHandler={() => {
+                  updateAssets();
+                }}
+                //Autosize={setAutosize}
+                Loading={setLoading}
+              />
             </ButtonGroup>
           </Box>
           <DataGrid
@@ -241,7 +309,6 @@ export default function Assets() {
                 paginationModel: { pageSize: 10, page: 0 },
               },
             }}
-            disableMultipleRowSelection
             onRowSelectionModelChange={(id) => {
               const selected: GridRowSelectionModel = id;
               setIDAsset(selected);
@@ -286,12 +353,74 @@ export default function Assets() {
               }
             }}
           />
+          <Container
+            style={{
+              width: 250,
+              alignContent: "center",
+              alignItems: "center",
+              marginTop: 50,
+            }}
+          >
+            {
+              // Aquí se cambia de un botón de ETIQUETAS a otro dependiendo de los Assets seleccionados
+              // Si no se selecciona nada entonces se descargan todas las etiquetas
+              // Si se seleccionan entonces se ejecuta la función downloadSelectedPages y se
+              // descargan solo las etiquetas seleccionadas en un mismo PDF
+              IDAsset[0] === -1 || IDAsset.length === 0 ? (
+                <a href={PDF} download>
+                  <Paper
+                    style={{
+                      height: 40,
+                      alignItems: "center",
+                      alignContent: "center",
+                      textAlign: "center",
+                      backgroundColor: "tomato",
+                      color: "white",
+                      paddingLeft: "10%",
+                      paddingRight: "10%",
+                    }}
+                  >
+                    <Stack direction="row" spacing={2}>
+                      <ImportIcon />
+                      <div>ETIQUETAS</div>
+                      <PDFIcon />
+                    </Stack>
+                  </Paper>
+                </a>
+              ) : (
+                <button
+                  onClick={() => downloadSelectedPages(pages)}
+                  style={{ width: 202 }}
+                >
+                  <Paper
+                    style={{
+                      height: 40,
+                      alignItems: "center",
+                      alignContent: "center",
+                      textAlign: "center",
+                      backgroundColor: "brown",
+                      color: "white",
+                      paddingLeft: "10%",
+                      paddingRight: "10%",
+                    }}
+                  >
+                    <Stack direction="row" spacing={2}>
+                      <ImportIcon />
+                      <div>ETIQUETAS</div>
+                      <PDFIcon />
+                    </Stack>
+                  </Paper>
+                </button>
+              )
+            }
+          </Container>
         </Box>
       </Container>
     </>
   );
 }
 
+// Tipos e interfaces
 type Options = {
   value: string;
   label: string;
@@ -318,8 +447,8 @@ type ServerArea = {
 };
 
 interface resetInterface {
-  ClickHandler: Function; //(event: React.MouseEvent<HTMLButtonElement>) => void;
-  Autosize: Function;
+  ClickHandler: Function;
+  //Autosize: Function;
   Loading: Function;
 }
 
@@ -908,11 +1037,17 @@ function EditAssetDialogButton(props: editProps) {
         </DialogTitle>
         <DialogContent draggable>
           <Box padding={4}>
-            {id === -1 || Number.isNaN(id) ? (
+            {id === -1 || Number.isNaN(id) || props.ids.length > 1 ? (
               <>
-                <Typography variant="h6">
-                  No se ha seleccionado ningún ID.
-                </Typography>
+                {id === -1 || Number.isNaN(id) ? (
+                  <Typography variant="h6">
+                    No se ha seleccionado ningún ID.
+                  </Typography>
+                ) : (
+                  <Typography variant="h6">
+                    No se pueden editar más de un asset a la vez.
+                  </Typography>
+                )}
               </>
             ) : (
               <Box sx={{ display: "flex", flexWrap: "wrap" }}>
@@ -1098,7 +1233,7 @@ function EditAssetDialogButton(props: editProps) {
           </Box>
         </DialogContent>
         <DialogActions style={{ padding: 20 }}>
-          {!(id === -1 || Number.isNaN(id)) ? (
+          {!(id === -1 || Number.isNaN(id) || props.ids.length > 1) ? (
             <>
               <Button type="submit" variant="contained" color="primary">
                 Enviar
@@ -1159,11 +1294,17 @@ function DeleteAssetButton(props: IDProps) {
         </DialogTitle>
         <DialogContent draggable>
           <Box padding={4}>
-            {id === -1 || Number.isNaN(id) ? (
+            {id === -1 || Number.isNaN(id) || props.ids.length > 1 ? (
               <>
-                <Typography variant="h6">
-                  No se ha seleccionado ningún ID.
-                </Typography>
+                {id === -1 || Number.isNaN(id) ? (
+                  <Typography variant="h6">
+                    No se ha seleccionado ningún ID.
+                  </Typography>
+                ) : (
+                  <Typography variant="h6">
+                    No se puede eliminar multiples assets.
+                  </Typography>
+                )}
               </>
             ) : (
               <>
@@ -1178,7 +1319,7 @@ function DeleteAssetButton(props: IDProps) {
           </Box>
         </DialogContent>
         <DialogActions style={{ marginBottom: 3, marginRight: 5 }}>
-          {id === -1 || Number.isNaN(id) ? (
+          {id === -1 || Number.isNaN(id) || props.ids.length > 1 ? (
             <>
               <Button
                 title="Cancelar"
@@ -1205,7 +1346,7 @@ function DeleteAssetButton(props: IDProps) {
                     (response) => {
                       console.log(response);
                       props.ClickHandler();
-                      props.Autosize(true);
+                      //props.Autosize(true);
                       props.Loading(false);
                     }
                   );
@@ -1231,7 +1372,7 @@ function DeleteAssetButton(props: IDProps) {
   );
 }
 
-function ImportAssetButton() {
+function ImportAssetButton(props: resetInterface) {
   const [open, setOpen] = React.useState(false);
   const [fileCSV, setFileCSV] = useState<File | undefined>();
   // const [fileName, setFileName] = useState<string>("");
@@ -1274,6 +1415,7 @@ function ImportAssetButton() {
           component: "form",
           onSubmit: async (event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault();
+            props.Loading(true);
             // const blop = URL.createObjectURL(file);
             // const formData = new FormData(event.currentTarget);
             // const formJson = Object.fromEntries((formData as any).entries());
@@ -1285,8 +1427,11 @@ function ImportAssetButton() {
             }
             const csvJson = new FormData();
             csvJson.append("csv", fileCSV);
-            const { data } = await API.post("/api/import_file/", csvJson);
-            console.log(data);
+            API.post("/api/import_file/", csvJson).then((response) => {
+              console.log(response);
+              props.ClickHandler();
+              props.Loading(false);
+            });
 
             handleClose();
           },

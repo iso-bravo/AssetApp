@@ -18,7 +18,7 @@ import {
   GridColDef,
   GridRowSelectionModel,
 } from "@mui/x-data-grid";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
@@ -26,6 +26,20 @@ import EditIcon from "@mui/icons-material/Edit";
 import ReloadIcon from "@mui/icons-material/Refresh";
 import React from "react";
 import { API } from "./Home";
+import AuthContext from "../auth/Auth";
+
+interface Usuario {
+  id: String;
+  nombre: String;
+  contraseña: String;
+  id_departamento: String;
+  id_permiso: String;
+}
+
+interface Permiso {
+  id: String;
+  permiso: String;
+}
 
 //Componente de la vista de Catálogos
 export default function CatalogsPage() {
@@ -36,34 +50,53 @@ export default function CatalogsPage() {
   const [loadingStates, setLoadingStates] = useState<boolean>(false);
   const [loadingAreas, setLoadingAreas] = useState<boolean>(false);
 
+  const [permiso, setPermiso] = useState<String>("viewer");
+
+  // Obtener sesión actual
+  const authContext = useContext(AuthContext);
+  if (!authContext || !authContext.user) {
+    throw new Error("useContext must be used within an AuthProvider");
+  }
+
+  // Usuario autenticado
+  const username: String = authContext.user.username;
+
+  // Permisos del usuario autenticado
   useEffect(() => {
-    API.get("/api/categories/")
-      .then((response) => {
-        setCategorias(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching categories:", error);
+    API.get("/api/users/").then(async (response) => {
+      const usuarios: Usuario[] = response.data;
+
+      // get permisos
+      const permisos: Permiso[] = await API.get("/api/permissions/")
+        .then((response) => {
+          return response.data;
+        })
+        .catch((error) => {
+          console.error("Error fetching permissions:", error);
+        });
+
+      usuarios.map((usuario) => {
+        if (usuario.nombre.toLowerCase() === username) {
+          permisos.map((permiso) => {
+            if (permiso.id === usuario.id_permiso) {
+              setPermiso(permiso.permiso);
+            }
+          });
+        }
       });
+    });
   }, []);
 
   useEffect(() => {
-    API.get("/api/states/")
-      .then((response) => {
-        setEstados(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching states:", error);
-      });
+    getCategoria();
   }, []);
 
   useEffect(() => {
-    API.get("/api/areas/")
-      .then((response) => {
-        setAreas(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching areas:", error);
-      });
+    getEstados();
+  }, []);
+
+  useEffect(() => {
+    getAreas();
   }, []);
 
   function getCategoria() {
@@ -120,119 +153,134 @@ export default function CatalogsPage() {
       <NavegatorDrawer />
       <Container>
         <Box marginTop={3} marginBottom={10} marginLeft={30} minWidth={100}>
-          <Typography variant="h4" className=" py-4">
-            Categorias
-          </Typography>
-          <Box marginBottom={2}>
-            <ButtonGroup>
-              {/* Grupo de Acciones Categoria*/}
-              <AddCategoryButton
-                ClickHandler={() => getCategoria()}
-                Loading={setLoadingCategories}
+          {!(permiso === "admin") ? (
+            <Typography variant="h4" className=" py-4">
+              Catálogos
+            </Typography>
+          ) : (
+            <></>
+          )}
+          {permiso === "admin" ? (
+            <>
+              <Typography variant="h4" className=" py-4">
+                Categorias
+              </Typography>
+              <Box marginBottom={2}>
+                <ButtonGroup>
+                  {/* Grupo de Acciones Categoria*/}
+                  <AddCategoryButton
+                    ClickHandler={() => getCategoria()}
+                    Loading={setLoadingCategories}
+                  />
+                  <EditCategoryButton
+                    ids={IDCategoria}
+                    data={categorias}
+                    ClickHandler={() => getCategoria()}
+                    Loading={setLoadingCategories}
+                  />
+                  <DeleteCategoryButton
+                    ids={IDCategoria}
+                    ClickHandler={() => getCategoria()}
+                    Loading={setLoadingCategories}
+                  />
+                </ButtonGroup>
+              </Box>
+              <IconButton onClick={() => getCategoria()}>
+                <ReloadIcon />
+              </IconButton>
+              <DataGrid
+                rows={categorias}
+                columns={categoriaCols}
+                checkboxSelection
+                loading={loadingCategories}
+                disableMultipleRowSelection
+                onRowSelectionModelChange={(id) => {
+                  const selected: GridRowSelectionModel = id;
+                  setIDCategoria(selected);
+                }}
               />
-              <EditCategoryButton
-                ids={IDCategoria}
-                data={categorias}
-                ClickHandler={() => getCategoria()}
-                Loading={setLoadingCategories}
-              />
-              <DeleteCategoryButton
-                ids={IDCategoria}
-                ClickHandler={() => getCategoria()}
-                Loading={setLoadingCategories}
-              />
-            </ButtonGroup>
-          </Box>
-          <IconButton onClick={() => getCategoria()}>
-            <ReloadIcon />
-          </IconButton>
-          <DataGrid
-            rows={categorias}
-            columns={categoriaCols}
-            checkboxSelection
-            loading={loadingCategories}
-            disableMultipleRowSelection
-            onRowSelectionModelChange={(id) => {
-              const selected: GridRowSelectionModel = id;
-              setIDCategoria(selected);
-            }}
-          />
 
-          <Typography variant="h4" className=" py-4">
-            Estados
-          </Typography>
-          <Box marginBottom={2}>
-            <ButtonGroup>
-              {/* Grupo de Acciones Estados*/}
-              <AddStateButton
-                ClickHandler={() => getEstados()}
-                Loading={setLoadingStates}
+              <Typography variant="h4" className=" py-4">
+                Estados
+              </Typography>
+              <Box marginBottom={2}>
+                <ButtonGroup>
+                  {/* Grupo de Acciones Estados*/}
+                  <AddStateButton
+                    ClickHandler={() => getEstados()}
+                    Loading={setLoadingStates}
+                  />
+                  <EditStateButton
+                    ids={IDEstado}
+                    data={estados}
+                    ClickHandler={() => getEstados()}
+                    Loading={setLoadingStates}
+                  />
+                  <DeleteStateButton
+                    ids={IDEstado}
+                    ClickHandler={() => getEstados()}
+                    Loading={setLoadingStates}
+                  />
+                </ButtonGroup>
+              </Box>
+              <IconButton onClick={() => getEstados()}>
+                <ReloadIcon />
+              </IconButton>
+              <DataGrid
+                rows={estados}
+                columns={estadosCols}
+                checkboxSelection
+                loading={loadingStates}
+                disableMultipleRowSelection
+                onRowSelectionModelChange={(id) => {
+                  const selected: GridRowSelectionModel = id;
+                  setIDEstado(selected);
+                }}
               />
-              <EditStateButton
-                ids={IDEstado}
-                data={estados}
-                ClickHandler={() => getEstados()}
-                Loading={setLoadingStates}
-              />
-              <DeleteStateButton
-                ids={IDEstado}
-                ClickHandler={() => getEstados()}
-                Loading={setLoadingStates}
-              />
-            </ButtonGroup>
-          </Box>
-          <IconButton onClick={() => getEstados()}>
-            <ReloadIcon />
-          </IconButton>
-          <DataGrid
-            rows={estados}
-            columns={estadosCols}
-            checkboxSelection
-            loading={loadingStates}
-            disableMultipleRowSelection
-            onRowSelectionModelChange={(id) => {
-              const selected: GridRowSelectionModel = id;
-              setIDEstado(selected);
-            }}
-          />
 
-          <Typography variant="h4" className=" py-4">
-            Áreas
-          </Typography>
-          <Box marginBottom={2}>
-            <ButtonGroup>
-              {/* Grupo de Acciones Areas*/}
-              <AddAreaButton
-                ClickHandler={() => getAreas()}
-                Loading={setLoadingAreas}
+              <Typography variant="h4" className=" py-4">
+                Áreas
+              </Typography>
+              <Box marginBottom={2}>
+                <ButtonGroup>
+                  {/* Grupo de Acciones Areas*/}
+                  <AddAreaButton
+                    ClickHandler={() => getAreas()}
+                    Loading={setLoadingAreas}
+                  />
+                  <EditAreaButton
+                    ids={IDArea}
+                    data={areas}
+                    ClickHandler={() => getAreas()}
+                    Loading={setLoadingAreas}
+                  />
+                  <DeleteAreaButton
+                    ids={IDArea}
+                    ClickHandler={() => getAreas()}
+                    Loading={setLoadingAreas}
+                  />
+                </ButtonGroup>
+              </Box>
+              <IconButton onClick={() => getAreas()}>
+                <ReloadIcon />
+              </IconButton>
+              <DataGrid
+                rows={areas}
+                columns={areasCols}
+                checkboxSelection
+                loading={loadingAreas}
+                disableMultipleRowSelection
+                onRowSelectionModelChange={(id) => {
+                  const selected: GridRowSelectionModel = id;
+                  setIDArea(selected);
+                }}
               />
-              <EditAreaButton
-                ids={IDArea}
-                data={areas}
-                ClickHandler={() => getAreas()}
-                Loading={setLoadingAreas}
-              />
-              <DeleteAreaButton
-                ids={IDArea}
-                ClickHandler={() => getAreas()}
-                Loading={setLoadingAreas}
-              />
-            </ButtonGroup>
-          </Box>
-          <IconButton onClick={() => getAreas()}>
-            <ReloadIcon />
-          </IconButton>
-          <DataGrid
-            rows={areas}
-            columns={areasCols}
-            checkboxSelection
-            loading={loadingAreas}
-            disableMultipleRowSelection
-            onRowSelectionModelChange={(id) => {
-              const selected: GridRowSelectionModel = id;
-              setIDArea(selected);
-            }}
-          />
+            </>
+          ) : (
+            <Typography>
+              Solo el administrador puede ver los catálogos.
+            </Typography>
+          )}
         </Box>
       </Container>
     </>

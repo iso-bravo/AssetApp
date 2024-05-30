@@ -19,7 +19,7 @@ import {
   GridRowSelectionModel,
 } from "@mui/x-data-grid";
 import NavegatorDrawer from "../components/NavegatorDrawer";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
@@ -27,28 +27,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import React from "react";
 import { API } from "./Home";
 import ReloadIcon from "@mui/icons-material/Refresh";
-
-// Datos de prueba
-/* const user: GridRowsProp = [
-  {
-    id: 1,
-    Nombre: "Miguel A.",
-    Departamento: "Recursos Humanos",
-    Permisos: "Abrir permisos",
-  },
-  {
-    id: 2,
-    Nombre: "Ramiro N.",
-    Departamento: "Informática",
-    Permisos: "Abrir permisos",
-  },
-  {
-    id: 3,
-    Nombre: "Oscar E.",
-    Departamento: "Mantenimiento",
-    Permisos: "Abrir permisos",
-  },
-];*/
+import AuthContext from "../auth/Auth";
 
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 150 },
@@ -64,6 +43,17 @@ export default function UsersPage() {
   const [user, setUser] = useState<GridRowsProp>([]);
   const [IDUsuario, setIDUsuario] = useState<GridRowSelectionModel>([-1]);
 
+  const [permiso, setPermiso] = useState<String>("viewer");
+
+  // Obtener sesión actual
+  const authContext = useContext(AuthContext);
+  if (!authContext || !authContext.user) {
+    throw new Error("useContext must be used within an AuthProvider");
+  }
+
+  // Usuario autenticado
+  const username: String = authContext.user.username;
+
   useEffect(() => {
     API.get("/api/departments/")
       .then((response) => {
@@ -85,39 +75,50 @@ export default function UsersPage() {
   }, []);
 
   useEffect(() => {
-    API.get("/api/users/")
-      .then((response) => {
-        setUser(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching users:", error);
-      });
+    getUsuarios();
   }, []);
-
-  function getDepartamentos() {
-    API.get("/api/departments/")
-      .then((response) => {
-        setDepartment(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching departments:", error);
-      });
-  }
-
-  function getPermisos() {
-    API.get("/api/permissions/")
-      .then((response) => {
-        setPermissions(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching permissions:", error);
-      });
-  }
 
   function getUsuarios() {
     API.get("/api/users/")
-      .then((response) => {
-        setUser(response.data);
+      .then(async (response) => {
+        let composeData: GridRowsProp = response.data;
+
+        // get departamentos
+        const departamentos: GridRowsProp = await API.get("/api/departments/")
+          .then((response) => {
+            return response.data;
+          })
+          .catch((error) => {
+            console.error("Error fetching departments:", error);
+          });
+
+        // get permisos
+        const permisos: GridRowsProp = await API.get("/api/permissions/")
+          .then((response) => {
+            return response.data;
+          })
+          .catch((error) => {
+            console.error("Error fetching permissions:", error);
+          });
+
+        // Rellenar departamentos y permisos
+        composeData.map((user) => {
+          departamentos.map((departamento) => {
+            if (departamento.id === user.id_departamento) {
+              user.id_departamento = departamento.departamento;
+            }
+          });
+          permisos.map((permiso) => {
+            if (permiso.id === user.id_permiso) {
+              user.id_permiso = permiso.permiso;
+              if (user.nombre.toLowerCase() === username) {
+                setPermiso(permiso.permiso);
+              }
+            }
+          });
+        });
+
+        setUser(composeData);
       })
       .catch((error) => {
         console.error("Error fetching users:", error);
@@ -139,40 +140,48 @@ export default function UsersPage() {
           <Typography variant="h4" margin={4}>
             Usuarios
           </Typography>
-          <Box marginBottom={2}>
-            <ButtonGroup>
-              {/* Grupo de Acciones */}
-              <AddUserButton
-                departament={department}
-                permission={permissions}
-                ClickHandler={() => getUsuarios()}
-              />
-              <EditUserButton
-                ids={IDUsuario}
-                data={user}
-                departament={department}
-                permission={permissions}
-                ClickHandler={() => getUsuarios()}
-              />
-              <DeleteUserButton
-                ids={IDUsuario}
-                ClickHandler={() => getUsuarios()}
-              />
-            </ButtonGroup>
-          </Box>
-          <IconButton onClick={() => getUsuarios()}>
-            <ReloadIcon />
-          </IconButton>
-          <DataGrid
-            rows={user}
-            columns={columns}
-            checkboxSelection
-            disableMultipleRowSelection
-            onRowSelectionModelChange={(id) => {
-              const selected: GridRowSelectionModel = id;
-              setIDUsuario(selected);
-            }}
-          />
+          {permiso === "admin" ? (
+            <Box marginBottom={2}>
+              <ButtonGroup>
+                {/* Grupo de Acciones */}
+                <AddUserButton
+                  departament={department}
+                  permission={permissions}
+                  ClickHandler={() => getUsuarios()}
+                />
+                <EditUserButton
+                  ids={IDUsuario}
+                  data={user}
+                  departament={department}
+                  permission={permissions}
+                  ClickHandler={() => getUsuarios()}
+                />
+                <DeleteUserButton
+                  ids={IDUsuario}
+                  ClickHandler={() => getUsuarios()}
+                />
+              </ButtonGroup>
+            </Box>
+          ) : (
+            <Typography>
+              Solo el administrador puede ver los usuarios.
+            </Typography>
+          )}
+          { permiso === "admin" ? (<>
+            <IconButton onClick={() => getUsuarios()}>
+              <ReloadIcon />
+            </IconButton>
+            <DataGrid
+              rows={user}
+              columns={columns}
+              checkboxSelection
+              disableMultipleRowSelection
+              onRowSelectionModelChange={(id) => {
+                const selected: GridRowSelectionModel = id;
+                setIDUsuario(selected);
+              }}
+            />
+          </>) : <></>}
         </Box>
       </Container>
     </>
@@ -226,8 +235,7 @@ function AddUserButton(props: AddUserProps) {
             const formData = new FormData(event.currentTarget);
             const formJson = Object.fromEntries((formData as any).entries());
 
-            API.post("/api/create_user/", formJson).then((response) => {
-              console.log(response);
+            API.post("/api/create_user/", formJson).then(() => {
               props.ClickHandler();
             });
 
@@ -324,18 +332,26 @@ function AddUserButton(props: AddUserProps) {
 function EditUserButton(props: IDProps) {
   const [open, setOpen] = React.useState(false);
   const id: number = +props.ids[0];
-  var nameUsuario: string = "";
-  var idDepartamento: number = -1;
-  var idPermisos: number = -1;
-  var pass: string = "";
+  let nameUsuario: string = "";
+  let idDepartamento: number = -1;
+  let idPermisos: number = -1;
+  let pass: string = "";
 
   if (!(id === -1 || Number.isNaN(id))) {
     props.data?.map((data) => {
       if (data.id === id) {
         nameUsuario = data.nombre;
         pass = data.contraseña;
-        idDepartamento = data.id_departamento;
-        idPermisos = data.id_permiso;
+        props.departament.map((departamento) => {
+          if (departamento.departamento === data.id_departamento) {
+            idDepartamento = departamento.id;
+          }
+        });
+        props.permission.map((permiso) => {
+          if (permiso.permiso === data.id_permiso) {
+            idPermisos = permiso.id;
+          }
+        });
       }
     });
   }
@@ -371,10 +387,8 @@ function EditUserButton(props: IDProps) {
             event.preventDefault();
             const formData = new FormData(event.currentTarget);
             const formJson = Object.fromEntries((formData as any).entries());
-            console.log(formJson);
 
-            API.post("/api/edit_user/", formJson).then((response) => {
-              console.log(response);
+            API.post("/api/edit_user/", formJson).then(() => {
               props.ClickHandler();
             });
 
@@ -593,12 +607,9 @@ function DeleteUserButton(props: IDPropsDelete) {
 
                   const contentJson = content as any;
 
-                  API.post("/api/delete_user/", contentJson).then(
-                    (response) => {
-                      console.log(response);
-                      props.ClickHandler();
-                    }
-                  );
+                  API.post("/api/delete_user/", contentJson).then(() => {
+                    props.ClickHandler();
+                  });
                   handleClose();
                 }}
               >

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import {
   Box,
@@ -41,6 +41,7 @@ import DetailsIcon from "@mui/icons-material/Info";
 import PDF from "../../../server/api/labels_pdf/Etiquetas.pdf";
 import { saveAs } from "file-saver";
 import { PDFDocument } from "pdf-lib";
+import AuthContext from "../auth/Auth";
 
 // Función para descargar solo las etiquetas de los Assets seleccionados en un PDF
 const downloadSelectedPages = async (pages: Array<number>) => {
@@ -65,6 +66,19 @@ const columns: GridColDef[] = [
   { field: "id_categoria", headerName: "Categoría", width: 150 },
   { field: "id_estatus", headerName: "Estatus", width: 150 },
 ];
+
+interface Usuario {
+  id: String;
+  nombre: String;
+  contraseña: String;
+  id_departamento: String;
+  id_permiso: String;
+}
+
+interface Permiso {
+  id: String;
+  permiso: String;
+}
 
 // Vista Assets
 export default function Assets() {
@@ -120,7 +134,7 @@ export default function Assets() {
     axios
       .get("http://127.0.0.1:8000/api/asset_all/")
       .then(async (response) => {
-        var composeData: GridRowsProp = response.data;
+        let composeData: GridRowsProp = response.data;
 
         // Get categories
         const categories: GridRowsProp = await API.get("/api/categories/")
@@ -217,6 +231,43 @@ export default function Assets() {
     });
   };
 
+  const [permiso, setPermiso] = useState<String>("viewer");
+
+  // Obtener sesión actual
+  const authContext = useContext(AuthContext);
+  if (!authContext || !authContext.user) {
+    throw new Error("useContext must be used within an AuthProvider");
+  }
+
+  // Usuario autenticado
+  const username: String = authContext.user.username;
+
+  // Permisos del usuario autenticado
+  useEffect(() => {
+    API.get("/api/users/").then(async (response) => {
+      const usuarios: Usuario[] = response.data;
+
+      // get permisos
+      const permisos: Permiso[] = await API.get("/api/permissions/")
+        .then((response) => {
+          return response.data;
+        })
+        .catch((error) => {
+          console.error("Error fetching permissions:", error);
+        });
+
+      usuarios.map((usuario) => {
+        if (usuario.nombre.toLowerCase() === username) {
+          permisos.map((permiso) => {
+            if (permiso.id === usuario.id_permiso) {
+              setPermiso(permiso.permiso);
+            }
+          });
+        }
+      });
+    });
+  }, []);
+
   return (
     <>
       <NavegatorDrawer />
@@ -236,13 +287,17 @@ export default function Assets() {
           <Box marginBottom={2}>
             <ButtonGroup>
               {/* Grupo de botones para manipular y visualizar los datos */}
-              <AddAssetDialogButton
-                ClickHandler={() => {
-                  updateAssets();
-                }}
-                //Autosize={setAutosize}
-                Loading={setLoading}
-              />
+              {permiso === "admin" || permiso === "register" ? (
+                <AddAssetDialogButton
+                  ClickHandler={() => {
+                    updateAssets();
+                  }}
+                  //Autosize={setAutosize}
+                  Loading={setLoading}
+                />
+              ) : (
+                <></>
+              )}
               <EditAssetDialogButton
                 data={details}
                 ids={IDAsset}
@@ -252,14 +307,18 @@ export default function Assets() {
                 //Autosize={setAutosize}
                 Loading={setLoading}
               />
-              <DeleteAssetButton
-                ids={IDAsset}
-                Loading={setLoading}
-                ClickHandler={() => {
-                  updateAssets();
-                }}
-                //Autosize={setAutosize}
-              />
+              {permiso === "admin" ? (
+                <DeleteAssetButton
+                  ids={IDAsset}
+                  Loading={setLoading}
+                  ClickHandler={() => {
+                    updateAssets();
+                  }}
+                  //Autosize={setAutosize}
+                />
+              ) : (
+                <></>
+              )}
               {!(IDAsset.length > 1) ? (
                 <AssetDetails asset={details} />
               ) : (
@@ -275,7 +334,8 @@ export default function Assets() {
                 </Button>
               )}
             </ButtonGroup>
-            <ButtonGroup>
+
+            { permiso === "admin" ? (<ButtonGroup>
               <Button
                 endIcon={<ExportIcon />}
                 variant="outlined"
@@ -290,7 +350,60 @@ export default function Assets() {
                 //Autosize={setAutosize}
                 Loading={setLoading}
               />
-            </ButtonGroup>
+              {
+                // Aquí se cambia de un botón de ETIQUETAS a otro dependiendo de los Assets seleccionados
+                // Si no se selecciona nada entonces se descargan todas las etiquetas
+                // Si se seleccionan entonces se ejecuta la función downloadSelectedPages y se
+                // descargan solo las etiquetas seleccionadas en un mismo PDF
+                IDAsset[0] === -1 || IDAsset.length === 0 ? (
+                  <a href={PDF} download>
+                    <Paper
+                      style={{
+                        width: 202,
+                        height: 40,
+                        alignItems: "center",
+                        alignContent: "center",
+                        textAlign: "center",
+                        backgroundColor: "tomato",
+                        color: "white",
+                        paddingLeft: "10%",
+                        paddingRight: "10%",
+                      }}
+                    >
+                      <Stack direction="row" spacing={2}>
+                        <ImportIcon />
+                        <div>ETIQUETAS</div>
+                        <PDFIcon />
+                      </Stack>
+                    </Paper>
+                  </a>
+                ) : (
+                  <button
+                    onClick={() => downloadSelectedPages(pages)}
+                    style={{ width: 202 }}
+                  >
+                    <Paper
+                      style={{
+                        height: 40,
+                        alignItems: "center",
+                        alignContent: "center",
+                        textAlign: "center",
+                        backgroundColor: "brown",
+                        color: "white",
+                        paddingLeft: "10%",
+                        paddingRight: "10%",
+                      }}
+                    >
+                      <Stack direction="row" spacing={2}>
+                        <ImportIcon />
+                        <div>ETIQUETAS</div>
+                        <PDFIcon />
+                      </Stack>
+                    </Paper>
+                  </button>
+                )
+              }
+            </ButtonGroup>) : <></>}
           </Box>
           <DataGrid
             rows={rows}
@@ -353,67 +466,6 @@ export default function Assets() {
               }
             }}
           />
-          <Container
-            style={{
-              width: 250,
-              alignContent: "center",
-              alignItems: "center",
-              marginTop: 50,
-            }}
-          >
-            {
-              // Aquí se cambia de un botón de ETIQUETAS a otro dependiendo de los Assets seleccionados
-              // Si no se selecciona nada entonces se descargan todas las etiquetas
-              // Si se seleccionan entonces se ejecuta la función downloadSelectedPages y se
-              // descargan solo las etiquetas seleccionadas en un mismo PDF
-              IDAsset[0] === -1 || IDAsset.length === 0 ? (
-                <a href={PDF} download>
-                  <Paper
-                    style={{
-                      height: 40,
-                      alignItems: "center",
-                      alignContent: "center",
-                      textAlign: "center",
-                      backgroundColor: "tomato",
-                      color: "white",
-                      paddingLeft: "10%",
-                      paddingRight: "10%",
-                    }}
-                  >
-                    <Stack direction="row" spacing={2}>
-                      <ImportIcon />
-                      <div>ETIQUETAS</div>
-                      <PDFIcon />
-                    </Stack>
-                  </Paper>
-                </a>
-              ) : (
-                <button
-                  onClick={() => downloadSelectedPages(pages)}
-                  style={{ width: 202 }}
-                >
-                  <Paper
-                    style={{
-                      height: 40,
-                      alignItems: "center",
-                      alignContent: "center",
-                      textAlign: "center",
-                      backgroundColor: "brown",
-                      color: "white",
-                      paddingLeft: "10%",
-                      paddingRight: "10%",
-                    }}
-                  >
-                    <Stack direction="row" spacing={2}>
-                      <ImportIcon />
-                      <div>ETIQUETAS</div>
-                      <PDFIcon />
-                    </Stack>
-                  </Paper>
-                </button>
-              )
-            }
-          </Container>
         </Box>
       </Container>
     </>

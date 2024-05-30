@@ -15,6 +15,9 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AuthContext from '../auth/Auth';
 
+// Asegúrate de que la ruta de la imagen sea correcta
+import BackgroundImage from '../assets/destinos-playa.jpg';
+
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState('');
@@ -47,45 +50,50 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center">
+    <div className="fixed top-0 left-0 w-full h-full flex">
       <ToastContainer />
-      <div className="bg-[#E4E3E3] px-12 py-12 rounded-md w-7/8 sm:w-2/3 md:w-2/4 lg:w-1/3 2xl:w-1/4 h-2/3 flex flex-col">
-        <h1 className="text-3xl text-center">Iniciar Sesión</h1>
-        <div className='pt-8 border-[#E4E3E3]'>
-          <TextField
-            className="w-full border-t-8"
-            id="standard-basic"
-            label="Usuario"
-            variant="standard"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </div>
-        <div className='pt-6 border-[#E4E3E3]'>
-          <FormControl className="w-full" variant="standard">
-            <InputLabel className='text-xl' htmlFor="standard-adornment-password">Contraseña</InputLabel>
-            <Input
-              id="standard-adornment-password"
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              endAdornment={
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    onClick={handleClickShowPassword}
-                    onMouseDown={handleMouseDownPassword}
-                  >
-                    {showPassword ? <Visibility /> : <VisibilityOff />}
-                  </IconButton>
-                </InputAdornment>
-              }
+      <div className="w-1/2 h-full flex items-center justify-center bg-[#E4E3E3]">
+        <div className="px-12 py-12 rounded-md w-3/4 sm:w-2/3 md:w-2/4 lg:w-2/3 2xl:w-1/2 flex flex-col">
+          <h1 className="text-3xl text-center">Iniciar Sesión</h1>
+          <div className='pt-8'>
+            <TextField
+              className="w-full"
+              id="standard-basic"
+              label="Usuario"
+              variant="standard"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
             />
-          </FormControl>
+          </div>
+          <div className='pt-6'>
+            <FormControl className="w-full" variant="standard">
+              <InputLabel htmlFor="standard-adornment-password">Contraseña</InputLabel>
+              <Input
+                id="standard-adornment-password"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleClickShowPassword}
+                      onMouseDown={handleMouseDownPassword}
+                    >
+                      {showPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>
+                }
+              />
+            </FormControl>
+          </div>
+          <div className='w-full pt-10'>
+            <Button className='w-full h-12' variant="contained" onClick={handleLogin}>Ingresar</Button>
+          </div>
         </div>
-        <div className='w-full border-t-8 pt-10'>
-          <Button className='w-full h-12' variant="contained" onClick={handleLogin}>Ingresar</Button>
-        </div>
+      </div>
+      <div className="w-1/2 h-full" style={{ backgroundImage: `url(${BackgroundImage})`, backgroundSize: 'cover' }}>
+        {/* Imagen de fondo */}
       </div>
     </div>
   );

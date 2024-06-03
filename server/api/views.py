@@ -1,6 +1,8 @@
 import logging
 from datetime import datetime
 import csv
+from dotenv import load_dotenv
+import os, re
 
 from django.contrib.auth import login
 from django.http import HttpResponse
@@ -20,6 +22,9 @@ from django.shortcuts import render
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render, get_object_or_404
+
+load_dotenv()
+asset_info_html = os.getenv('ASSET_INFO_HTML')
 
 #Login
 class LoginView(APIView):
@@ -471,7 +476,7 @@ def asset_info_qr(request, id):
         'Note': asset.noFactura or asset.noPedimento,
         'SpecifySupplier': asset.marca
     }
-    return render(request, 'asset_info.html', context)
+    return render(request, asset_info_html, context)
 
 # Upload and Import
 class UploadFile(APIView):

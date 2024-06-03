@@ -476,7 +476,8 @@ def asset_info_qr(request, id):
         'Note': asset.noFactura or asset.noPedimento,
         'SpecifySupplier': asset.marca
     }
-    return render(request, asset_info_html)
+
+    return render(request, 'asset_info.html', context)
 
 # Upload and Import
 class UploadFile(APIView):

@@ -56,10 +56,14 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'Asset.urls'
 
+asset_info_html = os.getenv('ASSET_INFO_HTML')
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates'), asset_info_html,
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

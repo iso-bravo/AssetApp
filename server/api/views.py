@@ -19,6 +19,7 @@ from .labels_logic import generate_qr_list, make_pdf, asset_df, get_page_pdf, ge
 from django.shortcuts import render
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
+from django.shortcuts import render, get_object_or_404
 
 #Login
 class LoginView(APIView):
@@ -449,7 +450,30 @@ class GenerateSelectLabelsPDFView(APIView):
                 return Response({'mensaje': 'El JSON no contiene el campo "ids"'}, status=400)
         except Exception as e:
             return Response("Error: {}".format(str(e)))
+        
+def asset_info_qr(request, id):
+    asset = get_object_or_404(Asset, id=id)
+    categoria = get_object_or_404(Categorias, id=asset.id_categoria)
+    estado = get_object_or_404(Estados, id=asset.id_estatus)
+    usuario = get_object_or_404(Usuario, id=asset.id_usuario)
+    area = get_object_or_404(Areas, id=asset.id_area)
     
+    context = {
+        'Id': asset.id,
+        'AssetId': asset.numero_serie,
+        'AssetModelNo': asset.modelo,
+        'Description': asset.descripcion,
+        'Category': categoria.categoria,
+        'UnitPrice': asset.tipo_compra,
+        'Departamento': area.area,
+        'AssignEmployeeId': usuario.nombre,
+        'AssetStatus': estado.estatus,
+        'Note': asset.noFactura or asset.noPedimento,
+        'SpecifySupplier': asset.marca
+    }
+    return render(request, 'asset_info.html', context)
+
+# Upload and Import
 class UploadFile(APIView):
     def post(self, request):
         if request.method == 'POST' and request.FILES['image']:

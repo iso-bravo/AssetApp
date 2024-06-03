@@ -23,7 +23,7 @@ def generate_qr_list(id_list):
         # Crea un objeto QRCode
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
         # Agrega la información que deseas codificar en el código QR
-        data = "http://" + ip + ":" + port + f"/info/{i}/"
+        data = "http://" + ip + ":" + port + f"api/info/{i}/"
         # Agrega la información al objeto QRCode
         qr.add_data(data)
         # Compila el código QR

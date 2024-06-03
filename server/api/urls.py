@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
+from .views import asset_info_qr
 
 urlpatterns = [
     path('login/', views.LoginView.as_view(), name='login'),
@@ -46,4 +47,7 @@ urlpatterns = [
 
     path('upload_file/', views.UploadFile.as_view(), name='upload_file'),
     path('import_file/', views.ImportCSV.as_view(), name='import_file'),
+    
+    path('info/<int:id>/', asset_info_qr, name='asset_info_qr'),
+    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

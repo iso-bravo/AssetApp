@@ -460,21 +460,24 @@ def asset_info_qr(request, id):
     asset = get_object_or_404(Asset, id=id)
     categoria = get_object_or_404(Categorias, id=asset.id_categoria)
     estado = get_object_or_404(Estados, id=asset.id_estatus)
-    usuario = get_object_or_404(Usuario, id=asset.id_usuario)
     area = get_object_or_404(Areas, id=asset.id_area)
+    imageName = asset.imagen
+    image = 'api/assets_imgs/' + str(imageName) + '.jpg'
+    countryOrigin
     
     context = {
         'Id': asset.id,
-        'AssetId': asset.numero_serie,
+        'NoSerie': asset.numero_serie,
         'AssetModelNo': asset.modelo,
         'Description': asset.descripcion,
         'Category': categoria.categoria,
         'UnitPrice': asset.tipo_compra,
-        'Departamento': area.area,
-        'AssignEmployeeId': usuario.nombre,
+        'Area': area.area,
         'AssetStatus': estado.estatus,
-        'Note': asset.noFactura or asset.noPedimento,
-        'SpecifySupplier': asset.marca
+        'NoPedimento': asset.noPedimento,
+        'NoFactura': asset.noFactura,
+        'Mark': asset.marca,
+        'Image':  image,
     }
 
     return render(request, 'asset_info.html', context)

@@ -494,6 +494,15 @@ class UploadFile(APIView):
                 return Response({'mensaje': 'Imagen subida exitosamente.', 'file': uploaded_file_url}, status=200)
             except Exception as e:
                 return Response("Error: {}".format(str(e)))
+        if request.method == 'POST' and request.FILES['pdf']:
+            try:
+                pdf = request.FILES['pdf']
+                fs = FileSystemStorage()
+                filename = fs.save(pdf.name, pdf)
+                uploaded_file_url = fs.url(filename)
+                return Response({'mensaje': 'PDF  subido exitosamente.', 'file': uploaded_file_url}, status=200)
+            except Exception as e:
+                return Response("Error: {}".format(str(e)))
 
 class ImportCSV(APIView):
     def post(self, request):
@@ -524,8 +533,8 @@ class ImportCSV(APIView):
                             fecha_registro = date,
                             #id_estatus = "",
                             tipo_compra = "",
-                            noFactura = fields[0],
-                            noPedimento = fields[6],
+                            noFactura = fields[6],
+                            noPedimento = fields[0],
                             #factura_pedimentoPDF = "",
                             #id_usuario = "",
                             #id_area = "",

@@ -17,6 +17,7 @@ import React from "react";
 import DetailsIcon from "@mui/icons-material/Info";
 
 export interface Details {
+  pais_origen: string;
   id: number;
   Number_Serie: string;
   Modelo: string;
@@ -31,6 +32,7 @@ export interface Details {
   ID_Area: string;
   ID_Estatus: string;
   Imagen: string;
+  noPedimento: string;
 }
 
 export interface PropsDetail {
@@ -92,6 +94,12 @@ export default function AssetDetails(props: PropsDetail) {
                       </ListItem>
                       <ListItem>
                         <b>Número de serie:&nbsp;</b> {props.asset.Number_Serie}
+                      </ListItem>
+                      <ListItem>
+                        <b>Número de pedimento:&nbsp;</b> {props.asset.noPedimento}
+                      </ListItem>
+                      <ListItem>
+                        <b>País de origen:&nbsp;</b> {props.asset.pais_origen}
                       </ListItem>
                       <ListItem>
                         <b>Modelo:&nbsp;</b>

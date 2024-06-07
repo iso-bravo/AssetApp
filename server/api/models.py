@@ -58,6 +58,7 @@ class Asset(models.Model):
     factura_pedimentoPDF = models.TextField(null=True, blank=True)
     id_usuario = models.IntegerField(null=True)
     id_area = models.IntegerField(null=True)
+    pais_origen = models.TextField(null=True, blank=True)
     
     def __str__(self):
         return self.numero_serie

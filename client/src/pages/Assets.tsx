@@ -128,6 +128,8 @@ export default function Assets() {
     No_Factura: "",
     Number_Serie: "",
     Tipo_Compra: "",
+    noPedimento: "",
+    pais_origen: "",
   });
 
   function updateAssets() {
@@ -335,75 +337,79 @@ export default function Assets() {
               )}
             </ButtonGroup>
 
-            { permiso === "admin" ? (<ButtonGroup>
-              <Button
-                endIcon={<ExportIcon />}
-                variant="outlined"
-                onClick={exportCSV}
-              >
-                Exportar
-              </Button>
-              <ImportAssetButton
-                ClickHandler={() => {
-                  updateAssets();
-                }}
-                //Autosize={setAutosize}
-                Loading={setLoading}
-              />
-              {
-                // Aquí se cambia de un botón de ETIQUETAS a otro dependiendo de los Assets seleccionados
-                // Si no se selecciona nada entonces se descargan todas las etiquetas
-                // Si se seleccionan entonces se ejecuta la función downloadSelectedPages y se
-                // descargan solo las etiquetas seleccionadas en un mismo PDF
-                IDAsset[0] === -1 || IDAsset.length === 0 ? (
-                  <a href={PDF} download>
-                    <Paper
-                      style={{
-                        width: 202,
-                        height: 40,
-                        alignItems: "center",
-                        alignContent: "center",
-                        textAlign: "center",
-                        backgroundColor: "tomato",
-                        color: "white",
-                        paddingLeft: "10%",
-                        paddingRight: "10%",
-                      }}
+            {permiso === "admin" ? (
+              <ButtonGroup>
+                <Button
+                  endIcon={<ExportIcon />}
+                  variant="outlined"
+                  onClick={exportCSV}
+                >
+                  Exportar
+                </Button>
+                <ImportAssetButton
+                  ClickHandler={() => {
+                    updateAssets();
+                  }}
+                  //Autosize={setAutosize}
+                  Loading={setLoading}
+                />
+                {
+                  // Aquí se cambia de un botón de ETIQUETAS a otro dependiendo de los Assets seleccionados
+                  // Si no se selecciona nada entonces se descargan todas las etiquetas
+                  // Si se seleccionan entonces se ejecuta la función downloadSelectedPages y se
+                  // descargan solo las etiquetas seleccionadas en un mismo PDF
+                  IDAsset[0] === -1 || IDAsset.length === 0 ? (
+                    <a href={PDF} download>
+                      <Paper
+                        style={{
+                          width: 202,
+                          height: 40,
+                          alignItems: "center",
+                          alignContent: "center",
+                          textAlign: "center",
+                          backgroundColor: "tomato",
+                          color: "white",
+                          paddingLeft: "10%",
+                          paddingRight: "10%",
+                        }}
+                      >
+                        <Stack direction="row" spacing={2}>
+                          <ImportIcon />
+                          <div>ETIQUETAS</div>
+                          <PDFIcon />
+                        </Stack>
+                      </Paper>
+                    </a>
+                  ) : (
+                    <button
+                      onClick={() => downloadSelectedPages(pages)}
+                      style={{ width: 202 }}
                     >
-                      <Stack direction="row" spacing={2}>
-                        <ImportIcon />
-                        <div>ETIQUETAS</div>
-                        <PDFIcon />
-                      </Stack>
-                    </Paper>
-                  </a>
-                ) : (
-                  <button
-                    onClick={() => downloadSelectedPages(pages)}
-                    style={{ width: 202 }}
-                  >
-                    <Paper
-                      style={{
-                        height: 40,
-                        alignItems: "center",
-                        alignContent: "center",
-                        textAlign: "center",
-                        backgroundColor: "brown",
-                        color: "white",
-                        paddingLeft: "10%",
-                        paddingRight: "10%",
-                      }}
-                    >
-                      <Stack direction="row" spacing={2}>
-                        <ImportIcon />
-                        <div>ETIQUETAS</div>
-                        <PDFIcon />
-                      </Stack>
-                    </Paper>
-                  </button>
-                )
-              }
-            </ButtonGroup>) : <></>}
+                      <Paper
+                        style={{
+                          height: 40,
+                          alignItems: "center",
+                          alignContent: "center",
+                          textAlign: "center",
+                          backgroundColor: "orangered",
+                          color: "white",
+                          paddingLeft: "10%",
+                          paddingRight: "10%",
+                        }}
+                      >
+                        <Stack direction="row" spacing={2}>
+                          <ImportIcon />
+                          <div>ETIQUETAS</div>
+                          <PDFIcon />
+                        </Stack>
+                      </Paper>
+                    </button>
+                  )
+                }
+              </ButtonGroup>
+            ) : (
+              <></>
+            )}
           </Box>
           <DataGrid
             rows={rows}
@@ -443,6 +449,8 @@ export default function Assets() {
                       No_Factura: row.noFactura,
                       Number_Serie: row.numero_serie,
                       Tipo_Compra: row.tipo_compra,
+                      noPedimento: row.noPedimento,
+                      pais_origen: row.pais_origen,
                     });
                   }
                 });
@@ -462,6 +470,8 @@ export default function Assets() {
                   No_Factura: "",
                   Number_Serie: "",
                   Tipo_Compra: "",
+                  noPedimento: "",
+                  pais_origen: "",
                 });
               }
             }}
@@ -520,7 +530,9 @@ function AddAssetDialogButton(props: resetInterface) {
   const [users, setUsers] = useState<Options[]>([]);
   const [areas, setAreas] = useState<Options[]>([]);
   const [file, setFile] = useState<string>("");
+  const [pdf, setPDF] = useState<string>("");
   const [image, setImage] = useState<File | undefined>();
+  const [filePDF, setFilePDF] = useState<File | undefined>();
   // const [imageURL, setImageURL] = useState<string>("");
 
   function handleImage(e: React.FormEvent<HTMLInputElement>) {
@@ -532,6 +544,16 @@ function AddAssetDialogButton(props: resetInterface) {
     // setImageURL(blop);
     // console.log(blop);
     setImage(file);
+  }
+  function handlePDF(e: React.FormEvent<HTMLInputElement>) {
+    const target = e.target as HTMLInputElement & {
+      files: FileList;
+    };
+    const file = target.files[0];
+    // const blop = URL.createObjectURL(file);
+    // setImageURL(blop);
+    // console.log(blop);
+    setFilePDF(file);
   }
 
   useEffect(() => {
@@ -629,7 +651,7 @@ function AddAssetDialogButton(props: resetInterface) {
 
             const data = {
               descripcion: formJson.descripcion,
-              factura_pedimientoPDF: formJson.factura_pedimientoPDF,
+              factura_pedimientoPDF: pdf,
               id_area: formJson.id_area,
               id_categoria: formJson.id_categoria,
               id_estatus: formJson.id_estatus,
@@ -640,6 +662,8 @@ function AddAssetDialogButton(props: resetInterface) {
               noFactura: formJson.noFactura,
               numero_serie: formJson.numero_serie,
               tipo_compra: formJson.tipo_compra,
+              noPedimento: formJson.noPedimento,
+              pais_origen: formJson.pais_origen,
             };
 
             props.Loading(true);
@@ -649,9 +673,17 @@ function AddAssetDialogButton(props: resetInterface) {
               const imageData = new FormData();
               imageData.append("image", image);
 
-              // falta endpoint para subir imagenes a directorio local
-
               const { data } = await API.post("/api/upload_file/", imageData);
+              console.log(data);
+            } catch (error: any) {
+              console.log(error.response?.data);
+            }
+            try {
+              if (!filePDF) return;
+              const pdfData = new FormData();
+              pdfData.append("pdf", filePDF);
+
+              const { data } = await API.post("/api/upload_file/", pdfData);
               console.log(data);
             } catch (error: any) {
               console.log(error.response?.data);
@@ -691,6 +723,22 @@ function AddAssetDialogButton(props: resetInterface) {
               helperText="Escribe el número de serie."
               margin="normal"
               name="numero_serie"
+            />
+            <TextField
+              label="Número de pedimento"
+              fullWidth
+              helperText="Escribe el número de pedimento."
+              margin="normal"
+              name="noPedimento"
+            />
+            <TextField
+              label="País de origen"
+              fullWidth
+              required
+              helperText="Escribe el país de origen."
+              multiline
+              margin="normal"
+              name="pais_origen"
             />
             <TextField
               label="Modelo"
@@ -773,16 +821,31 @@ function AddAssetDialogButton(props: resetInterface) {
               aria-labelledby="Modelo"
               name="noFactura"
             />
-            <TextField
-              label="Factura PDF"
-              fullWidth
-              required
-              helperText="Adjunta la factura."
-              multiline
-              margin="normal"
-              aria-labelledby="Modelo"
-              name="factura_pedimientoPDF"
-            />
+            <InputLabel>Factura PDF: </InputLabel>
+            <Box>
+              <input
+                type="file"
+                name="factura_pedimientoPDF"
+                onChange={(e) => {
+                  const pathPDF = e.target.value;
+                  var titlePDF = pathPDF.slice(pathPDF.indexOf("h") + 2);
+
+                  var fileName = titlePDF;
+                  var idxDot = fileName.lastIndexOf(".") + 1;
+                  var extFile = fileName.slice(idxDot).toLowerCase();
+                  if (
+                    extFile == "pdf"
+                  ) {
+                    setPDF(titlePDF);
+                    console.log(titlePDF);
+                    handlePDF(e);
+                    console.log(pdf);
+                  } else {
+                    alert("Solo pdf es permitido.");
+                  }
+                }}
+              />
+            </Box>
             <TextField
               select
               label="Usuario"
@@ -1042,6 +1105,8 @@ function EditAssetDialogButton(props: editProps) {
               noFactura: formJson.noFactura,
               numero_serie: formJson.numero_serie,
               tipo_compra: formJson.tipo_compra,
+              noPedimento: formJson.noPedimento,
+              pais_origen: formJson.pais_origen,
             };
 
             console.log(data);
@@ -1120,6 +1185,25 @@ function EditAssetDialogButton(props: editProps) {
                   margin="normal"
                   name="numero_serie"
                   defaultValue={asset.Number_Serie}
+                />
+                <TextField
+                  label="Número de pedimento"
+                  fullWidth
+                  required
+                  helperText="Escribe el número de pedimento."
+                  margin="normal"
+                  name="noPedimento"
+                  defaultValue={asset.noPedimento}
+                />
+                <TextField
+                  label="País de origen"
+                  fullWidth
+                  required
+                  helperText="Escribe el país de origen."
+                  multiline
+                  margin="normal"
+                  name="pais_origen"
+                  defaultValue={asset.pais_origen}
                 />
                 <TextField
                   label="Modelo"

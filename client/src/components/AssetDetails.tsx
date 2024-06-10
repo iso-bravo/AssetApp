@@ -51,6 +51,8 @@ export default function AssetDetails(props: PropsDetail) {
     setOpen(false);
   };
 
+  console.log(props.asset.Imagen);
+
   return (
     <>
       <Button
@@ -96,7 +98,8 @@ export default function AssetDetails(props: PropsDetail) {
                         <b>Número de serie:&nbsp;</b> {props.asset.Number_Serie}
                       </ListItem>
                       <ListItem>
-                        <b>Número de pedimento:&nbsp;</b> {props.asset.noPedimento}
+                        <b>Número de pedimento:&nbsp;</b>{" "}
+                        {props.asset.noPedimento}
                       </ListItem>
                       <ListItem>
                         <b>País de origen:&nbsp;</b> {props.asset.pais_origen}

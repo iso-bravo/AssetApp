@@ -651,7 +651,7 @@ function AddAssetDialogButton(props: resetInterface) {
 
             const data = {
               descripcion: formJson.descripcion,
-              factura_pedimientoPDF: pdf,
+              factura_pedimentoPDF: pdf,
               id_area: formJson.id_area,
               id_categoria: formJson.id_categoria,
               id_estatus: formJson.id_estatus,
@@ -825,7 +825,7 @@ function AddAssetDialogButton(props: resetInterface) {
             <Box>
               <input
                 type="file"
-                name="factura_pedimientoPDF"
+                name="factura_pedimentoPDF"
                 onChange={(e) => {
                   const pathPDF = e.target.value;
                   var titlePDF = pathPDF.slice(pathPDF.indexOf("h") + 2);
@@ -1094,7 +1094,7 @@ function EditAssetDialogButton(props: editProps) {
             const data = {
               id: formJson.id,
               descripcion: formJson.descripcion,
-              factura_pedimientoPDF: formJson.factura_pedimientoPDF,
+              factura_pedimentoPDF: formJson.factura_pedimentoPDF,
               id_area: formJson.id_area,
               id_categoria: formJson.id_categoria,
               id_estatus: formJson.id_estatus,
@@ -1297,7 +1297,7 @@ function EditAssetDialogButton(props: editProps) {
                   multiline
                   margin="normal"
                   aria-labelledby="Modelo"
-                  name="factura_pedimientoPDF"
+                  name="factura_pedimentoPDF"
                   defaultValue={asset.Factura}
                 />
                 <TextField

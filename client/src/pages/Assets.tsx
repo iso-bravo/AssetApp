@@ -533,16 +533,12 @@ function AddAssetDialogButton(props: resetInterface) {
   const [pdf, setPDF] = useState<string>("");
   const [image, setImage] = useState<File | undefined>();
   const [filePDF, setFilePDF] = useState<File | undefined>();
-  // const [imageURL, setImageURL] = useState<string>("");
 
   function handleImage(e: React.FormEvent<HTMLInputElement>) {
     const target = e.target as HTMLInputElement & {
       files: FileList;
     };
     const file = target.files[0];
-    // const blop = URL.createObjectURL(file);
-    // setImageURL(blop);
-    // console.log(blop);
     setImage(file);
   }
   function handlePDF(e: React.FormEvent<HTMLInputElement>) {
@@ -550,9 +546,6 @@ function AddAssetDialogButton(props: resetInterface) {
       files: FileList;
     };
     const file = target.files[0];
-    // const blop = URL.createObjectURL(file);
-    // setImageURL(blop);
-    // console.log(blop);
     setFilePDF(file);
   }
 
@@ -620,6 +613,10 @@ function AddAssetDialogButton(props: resetInterface) {
 
   const handleClickOpen = () => {
     setOpen(true);
+    setFile("");
+    setPDF("");
+    setImage(undefined);
+    setFilePDF(undefined);
   };
 
   const handleClose = () => {
@@ -647,16 +644,28 @@ function AddAssetDialogButton(props: resetInterface) {
             event.preventDefault();
             const formData = new FormData(event.currentTarget);
             const formJson = Object.fromEntries((formData as any).entries());
-            //console.log(formJson);
 
-            const data = {
+            let data: {
+              descripcion: string;
+              factura_pedimentoPDF?: string;
+              id_area: string;
+              id_categoria: string;
+              id_estatus: string;
+              id_usuario: string;
+              imagen?: string;
+              marca: string;
+              modelo: string;
+              noFactura: string;
+              numero_serie: string;
+              tipo_compra: string;
+              noPedimento: string;
+              pais_origen: string;
+            } = {
               descripcion: formJson.descripcion,
-              factura_pedimentoPDF: pdf,
               id_area: formJson.id_area,
               id_categoria: formJson.id_categoria,
               id_estatus: formJson.id_estatus,
               id_usuario: formJson.id_usuario,
-              imagen: file,
               marca: formJson.marca,
               modelo: formJson.modelo,
               noFactura: formJson.noFactura,
@@ -665,26 +674,38 @@ function AddAssetDialogButton(props: resetInterface) {
               noPedimento: formJson.noPedimento,
               pais_origen: formJson.pais_origen,
             };
+            if (image !== undefined) data = { ...data, imagen: file };
+            if (filePDF !== undefined)
+              data = { ...data, factura_pedimentoPDF: pdf };
+
+            console.log(data);
 
             props.Loading(true);
 
             try {
-              if (!image) return;
-              const imageData = new FormData();
-              imageData.append("image", image);
+              if (!image) {
+                console.log("No image");
+              } else {
+                const imageData = new FormData();
+                imageData.append("image", image);
+                imageData.append("filename" , "NOMBRE DE PRUEBA");
 
-              const { data } = await API.post("/api/upload_file/", imageData);
-              console.log(data);
+                const { data } = await API.post("/api/upload_file/", imageData);
+                console.log(data);
+              }
             } catch (error: any) {
               console.log(error.response?.data);
             }
             try {
-              if (!filePDF) return;
-              const pdfData = new FormData();
-              pdfData.append("pdf", filePDF);
+              if (!filePDF) {
+                console.log("No PDF");
+              } else {
+                const pdfData = new FormData();
+                pdfData.append("pdf", filePDF);
 
-              const { data } = await API.post("/api/upload_file/", pdfData);
-              console.log(data);
+                const { data } = await API.post("/api/upload_file/", pdfData);
+                console.log(data);
+              }
             } catch (error: any) {
               console.log(error.response?.data);
             }
@@ -833,9 +854,7 @@ function AddAssetDialogButton(props: resetInterface) {
                   var fileName = titlePDF;
                   var idxDot = fileName.lastIndexOf(".") + 1;
                   var extFile = fileName.slice(idxDot).toLowerCase();
-                  if (
-                    extFile == "pdf"
-                  ) {
+                  if (extFile == "pdf") {
                     setPDF(titlePDF);
                     console.log(titlePDF);
                     handlePDF(e);
@@ -929,7 +948,9 @@ function EditAssetDialogButton(props: editProps) {
   const [users, setUsers] = useState<Options[]>([]);
   const [areas, setAreas] = useState<Options[]>([]);
   const [file, setFile] = useState<string>("");
+  const [pdf, setPDF] = useState<string>("");
   const [image, setImage] = useState<File | undefined>();
+  const [filePDF, setFilePDF] = useState<File | undefined>();
   const [categorySelectedValue, setCategorySelectedValue] = useState("");
   const [userSelectedValue, setUserSelectedValue] = useState("");
   const [stateSelectedValue, setStateSelectedValue] = useState("");
@@ -942,7 +963,13 @@ function EditAssetDialogButton(props: editProps) {
     const file = target.files[0];
     setImage(file);
   }
-
+  function handlePDF(e: React.FormEvent<HTMLInputElement>) {
+    const target = e.target as HTMLInputElement & {
+      files: FileList;
+    };
+    const file = target.files[0];
+    setFilePDF(file);
+  }
   const asset = props.data;
 
   useEffect(() => {
@@ -1061,6 +1088,10 @@ function EditAssetDialogButton(props: editProps) {
 
   const handleClickOpen = () => {
     setOpen(true);
+    setFile("");
+    setPDF("");
+    setImage(undefined);
+    setFilePDF(undefined);
   };
 
   const handleClose = () => {
@@ -1091,15 +1122,29 @@ function EditAssetDialogButton(props: editProps) {
             const formData = new FormData(event.currentTarget);
             const formJson = Object.fromEntries((formData as any).entries());
 
-            const data = {
+            let data: {
+              id: string;
+              descripcion: string;
+              factura_pedimentoPDF?: string;
+              id_area: string;
+              id_categoria: string;
+              id_estatus: string;
+              id_usuario: string;
+              marca: string;
+              modelo: string;
+              noFactura: string;
+              numero_serie: string;
+              tipo_compra: string;
+              noPedimento: string;
+              pais_origen: string;
+              imagen?: string;
+            } = {
               id: formJson.id,
               descripcion: formJson.descripcion,
-              factura_pedimentoPDF: formJson.factura_pedimentoPDF,
               id_area: formJson.id_area,
               id_categoria: formJson.id_categoria,
               id_estatus: formJson.id_estatus,
               id_usuario: formJson.id_usuario,
-              imagen: file,
               marca: formJson.marca,
               modelo: formJson.modelo,
               noFactura: formJson.noFactura,
@@ -1108,6 +1153,9 @@ function EditAssetDialogButton(props: editProps) {
               noPedimento: formJson.noPedimento,
               pais_origen: formJson.pais_origen,
             };
+            if (image !== undefined) data = { ...data, imagen: file };
+            if (filePDF !== undefined)
+              data = { ...data, factura_pedimentoPDF: pdf };
 
             console.log(data);
 
@@ -1121,6 +1169,19 @@ function EditAssetDialogButton(props: editProps) {
                 imageData.append("image", image);
 
                 const { data } = await API.post("/api/upload_file/", imageData);
+                console.log(data);
+              }
+            } catch (error: any) {
+              console.log(error.response?.data);
+            }
+            try {
+              if (!filePDF) {
+                console.log("No PDF");
+              } else {
+                const pdfData = new FormData();
+                pdfData.append("pdf", filePDF);
+
+                const { data } = await API.post("/api/upload_file/", pdfData);
                 console.log(data);
               }
             } catch (error: any) {
@@ -1290,16 +1351,29 @@ function EditAssetDialogButton(props: editProps) {
                   name="noFactura"
                   defaultValue={asset.No_Factura}
                 />
-                <TextField
-                  label="Factura PDF"
-                  fullWidth
-                  helperText="Adjunta la factura."
-                  multiline
-                  margin="normal"
-                  aria-labelledby="Modelo"
-                  name="factura_pedimentoPDF"
-                  defaultValue={asset.Factura}
-                />
+                <InputLabel>Factura PDF: </InputLabel>
+                <Box>
+                  <input
+                    type="file"
+                    name="factura_pedimentoPDF"
+                    onChange={(e) => {
+                      const pathPDF = e.target.value;
+                      var titlePDF = pathPDF.slice(pathPDF.indexOf("h") + 2);
+
+                      var fileName = titlePDF;
+                      var idxDot = fileName.lastIndexOf(".") + 1;
+                      var extFile = fileName.slice(idxDot).toLowerCase();
+                      if (extFile == "pdf") {
+                        setPDF(titlePDF);
+                        console.log(titlePDF);
+                        handlePDF(e);
+                        console.log(pdf);
+                      } else {
+                        alert("Solo pdf es permitido.");
+                      }
+                    }}
+                  />
+                </Box>
                 <TextField
                   select
                   label="Usuario"

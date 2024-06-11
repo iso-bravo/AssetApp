@@ -3,18 +3,20 @@ import {
   List,
   ListItem,
   Dialog,
-  DialogTitle,
+  //DialogTitle,
   Button,
   DialogContent,
-  IconButton,
+  //IconButton,
   DialogActions,
   Typography,
   Paper,
-  Stack,
+  //Stack,
+  Grid,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+//import CloseIcon from "@mui/icons-material/Close";
 import React from "react";
 import DetailsIcon from "@mui/icons-material/Info";
+import FileOpenIcon from "@mui/icons-material/FileOpen";
 
 export interface Details {
   pais_origen: string;
@@ -42,6 +44,7 @@ export interface PropsDetail {
 export default function AssetDetails(props: PropsDetail) {
   const [open, setOpen] = React.useState(false);
   const ImageSRC = "http://127.0.0.1:8000/api" + props.asset.Imagen;
+  const FacturaSRC = "http://127.0.0.1:8000/api/files/" + props.asset.Factura;
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -51,7 +54,9 @@ export default function AssetDetails(props: PropsDetail) {
     setOpen(false);
   };
 
-  console.log(props.asset.Imagen);
+  const openPDF = (url: string) => {
+    window.open(url, "_blank");
+  };
 
   return (
     <>
@@ -64,7 +69,7 @@ export default function AssetDetails(props: PropsDetail) {
         Detalles
       </Button>
       <Dialog open={open} onClose={handleClose} scroll="paper" fullScreen>
-        <IconButton
+        {/*<IconButton
           aria-label="close"
           onClick={handleClose}
           sx={{
@@ -77,83 +82,117 @@ export default function AssetDetails(props: PropsDetail) {
           <CloseIcon />
         </IconButton>
         <DialogTitle
-          style={{ backgroundColor: "steelblue", textAlign: "center" }}
+          style={{
+            backgroundColor: "steelblue",
+            textAlign: "center",
+            fontSize: 30,
+          }}
           color="white"
         >
           Detalles
-        </DialogTitle>
+        </DialogTitle>*/}
         <DialogContent draggable>
-          <Box marginLeft={20} marginRight={20} marginTop={4} marginBottom={4}>
+          <Box marginLeft={10} marginRight={10} marginBottom={4}>
             <Paper elevation={12}>
               <Box paddingLeft={12} paddingTop={4} paddingBottom={4}>
                 {props.asset.id === 0 ? (
                   <Typography>No se ha seleccionado ningún ID.</Typography>
                 ) : (
-                  <Stack direction="row" useFlexGap flexWrap="wrap">
-                    <List>
-                      <ListItem>
-                        <b>ID:&nbsp;</b> {props.asset.id}
-                      </ListItem>
-                      <ListItem>
-                        <b>Número de serie:&nbsp;</b> {props.asset.Number_Serie}
-                      </ListItem>
-                      <ListItem>
-                        <b>Número de pedimento:&nbsp;</b>{" "}
-                        {props.asset.noPedimento}
-                      </ListItem>
-                      <ListItem>
-                        <b>País de origen:&nbsp;</b> {props.asset.pais_origen}
-                      </ListItem>
-                      <ListItem>
-                        <b>Modelo:&nbsp;</b>
-                        {props.asset.Modelo}
-                      </ListItem>
-                      <ListItem>
-                        <b>Descripción:&nbsp;</b> {props.asset.Description}
-                      </ListItem>
-                      <ListItem>
-                        <b>Marca:&nbsp;</b> {props.asset.Marca}
-                      </ListItem>
-                      <ListItem>
-                        <b>Categoría:&nbsp;</b> {props.asset.ID_Categoria}
-                      </ListItem>
-                      <ListItem>
-                        <b>Fecha de registro:&nbsp;</b>{" "}
-                        {props.asset.Fecha_Registro}
-                      </ListItem>
-                      <ListItem>
-                        <b>Tipo de compra:&nbsp;</b> {props.asset.Tipo_Compra}
-                      </ListItem>
-                      <ListItem>
-                        <b>No. de factura:&nbsp;</b> {props.asset.No_Factura}
-                      </ListItem>
-                      <ListItem>
-                        <b>Factura:&nbsp;</b> {props.asset.Factura}
-                      </ListItem>
-                      <ListItem>
-                        <b>Usuario:&nbsp;</b> {props.asset.ID_Usuario}
-                      </ListItem>
-                      <ListItem>
-                        <b>Área:&nbsp;</b> {props.asset.ID_Area}
-                      </ListItem>
-                      <ListItem>
-                        <b>Estatus:&nbsp;</b> {props.asset.ID_Estatus}
-                      </ListItem>
-                      <ListItem>
-                        <b>Título de Imagen:&nbsp;</b> {props.asset.Imagen}
-                      </ListItem>
-                    </List>
-                    <Box height={420} width={400}>
-                      <img src={ImageSRC} height={400} width={400} />
-                    </Box>
-                  </Stack>
+                  <>
+                    <Typography variant="h3" margin={2}>
+                      Detalles
+                    </Typography>
+                    <Grid container spacing={2}>
+                      <Grid item xs={6}>
+                        <List>
+                          <ListItem>
+                            <b>ID:&nbsp;</b> {props.asset.id}
+                          </ListItem>
+                          <ListItem>
+                            <b>Número de serie:&nbsp;</b>{" "}
+                            {props.asset.Number_Serie}
+                          </ListItem>
+                          <ListItem>
+                            <b>Número de pedimento:&nbsp;</b>{" "}
+                            {props.asset.noPedimento}
+                          </ListItem>
+                          <ListItem>
+                            <b>País de origen:&nbsp;</b>{" "}
+                            {props.asset.pais_origen}
+                          </ListItem>
+                          <ListItem>
+                            <b>Modelo:&nbsp;</b> {props.asset.Modelo}
+                          </ListItem>
+                          <ListItem>
+                            <b>Descripción:&nbsp;</b> {props.asset.Description}
+                          </ListItem>
+                          <ListItem>
+                            <b>Marca:&nbsp;</b> {props.asset.Marca}
+                          </ListItem>
+                          <ListItem>
+                            <b>Categoría:&nbsp;</b> {props.asset.ID_Categoria}
+                          </ListItem>
+                          <ListItem>
+                            <b>Fecha de registro:&nbsp;</b>{" "}
+                            {props.asset.Fecha_Registro}
+                          </ListItem>
+                          <ListItem>
+                            <b>Tipo de compra:&nbsp;</b>{" "}
+                            {props.asset.Tipo_Compra}
+                          </ListItem>
+                          <ListItem>
+                            <b>No. de factura:&nbsp;</b>{" "}
+                            {props.asset.No_Factura}
+                          </ListItem>
+                          <ListItem>
+                            <b>Usuario:&nbsp;</b> {props.asset.ID_Usuario}
+                          </ListItem>
+                          <ListItem>
+                            <b>Área:&nbsp;</b> {props.asset.ID_Area}
+                          </ListItem>
+                          <ListItem>
+                            <b>Estatus:&nbsp;</b> {props.asset.ID_Estatus}
+                          </ListItem>
+                        </List>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Box height={400} width={400}>
+                          <img
+                            src={ImageSRC}
+                            alt="Asset"
+                            style={{
+                              objectFit: "cover",
+                              width: "100%",
+                              height: "100%",
+                            }}
+                          />
+                          <Button
+                            size="large"
+                            sx={{ marginTop: 2 }}
+                            variant="contained"
+                            color="secondary"
+                            onClick={() => {
+                              props.asset.Factura !== null
+                                ? openPDF(FacturaSRC)
+                                : alert(
+                                    "No se ha subido la factura de este asset."
+                                  );
+                            }}
+                          >
+                            <b>VER FACTURA</b>
+                            <FileOpenIcon sx={{ marginLeft: 1 }} />
+                          </Button>
+                        </Box>
+                      </Grid>
+                    </Grid>
+                  </>
                 )}
               </Box>
             </Paper>
           </Box>
         </DialogContent>
         <DialogActions
-          style={{ justifyContent: "center", backgroundColor: "ButtonFace" }}
+          style={{ justifyContent: "center", backgroundColor: "lightgray" }}
         >
           <Box paddingBottom={2} paddingTop={2} width={200}>
             <Button

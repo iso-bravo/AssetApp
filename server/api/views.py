@@ -497,6 +497,9 @@ class UploadFile(APIView):
                 try:
                     file = request.FILES[file_key]
                     fs = FileSystemStorage()
+                    custom_filename = request.data.get('filename', file.name)
+                    print("NOMBRE MANDADO: " + custom_filename)
+                    print("NOMBRE ORIGINAL: " + file.name)
                     filename = fs.save(file.name, file)
                     uploaded_file_url = fs.url(filename)
                     return Response({

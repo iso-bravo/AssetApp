@@ -48,9 +48,27 @@ const downloadSelectedPages = async (pages: Array<number>) => {
   const existingPdfBytes = await fetch(PDF).then((res) => res.arrayBuffer());
   const pdfDoc = await PDFDocument.load(existingPdfBytes);
   const newPdfDoc = await PDFDocument.create();
-  const copiedPages = await newPdfDoc.copyPages(pdfDoc, pages);
 
-  copiedPages.forEach((page) => newPdfDoc.addPage(page));
+  const scaleFactor = 4.5; // Factor de escala para redimensionar
+
+  for (const pageIndex of pages) {
+    const [copiedPage] = await newPdfDoc.copyPages(pdfDoc, [pageIndex]);
+    const { width, height } = copiedPage.getSize();
+
+    // Definir las nuevas dimensiones
+    const newWidth = width * scaleFactor;
+    const newHeight = height * scaleFactor;
+
+    // Cambiar el tamaño de la página
+    copiedPage.setSize(newWidth, newHeight);
+    copiedPage.scaleContent(scaleFactor, scaleFactor);
+
+    // Escalar el contenido de la página (nota: ajuste manual requerido)
+    // Aquí puedes agregar una función personalizada para ajustar cada elemento si es necesario.
+    // Ejemplo teórico: adjustPageContent(copiedPage, scaleFactor);
+
+    newPdfDoc.addPage(copiedPage);
+  }
 
   const pdfBytes = await newPdfDoc.save();
   const blob = new Blob([pdfBytes], { type: "application/pdf" });
@@ -65,7 +83,7 @@ const modifyAndDownloadPDF = async () => {
   // Cargar el PDF en pdf-lib
   const pdfDoc = await PDFDocument.load(existingPdfBytes);
 
-  // Definir el factor de escala (por ejemplo, 1.5x el tamaño original)
+  // Definir el factor de escala
   const scaleFactor = 3.5;
 
   // Iterar sobre todas las páginas del PDF

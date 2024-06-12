@@ -3,6 +3,7 @@ from datetime import datetime
 import csv
 from dotenv import load_dotenv
 import os, re
+import uuid
 
 from django.contrib.auth import login
 from django.http import HttpResponse
@@ -485,16 +486,37 @@ def asset_info_qr(request, id):
 # Upload and Import
 class UploadFile(APIView):
     def post(self, request):
-        if request.method == 'POST' and request.FILES['image']:
-            try:
-                image = request.FILES['image']
-                fs = FileSystemStorage()
-                filename = fs.save(image.name, image)
-                uploaded_file_url = fs.url(filename)
-                return Response({'mensaje': 'Imagen subida exitosamente.', 'file': uploaded_file_url}, status=200)
-            except Exception as e:
-                return Response("Error: {}".format(str(e)))
+        if request.method == 'POST':
+            file_key = None
+            if 'image' in request.FILES:
+                file_key = 'image'
+            elif 'pdf' in request.FILES:
+                file_key = 'pdf'
 
+            if file_key:
+                try:
+                    file = request.FILES[file_key]
+                    fs = FileSystemStorage()
+                    custom_filename = request.data.get('filename', file.name)
+
+                    # Eliminar archivo existente si tiene el mismo nombre
+                    if fs.exists(custom_filename):
+                        file_path = fs.path(custom_filename)
+                        os.remove(file_path)
+
+                    filename = fs.save(custom_filename, file)
+                    uploaded_file_url = fs.url(filename)
+                    return Response({
+                        'mensaje': f'{file_key.upper()} subido exitosamente.',
+                        'file': uploaded_file_url
+                    }, status=200)
+                except Exception as e:
+                    return Response({'error': str(e)}, status=400)
+            else:
+                return Response({'error': 'No se ha enviado ningún archivo.'}, status=400)
+        else:
+            return Response({'error': 'Método no permitido.'}, status=405)
+        
 class ImportCSV(APIView):
     def post(self, request):
         if request.method == 'POST' and request.FILES['csv']:
@@ -524,8 +546,8 @@ class ImportCSV(APIView):
                             fecha_registro = date,
                             #id_estatus = "",
                             tipo_compra = "",
-                            noFactura = fields[0],
-                            noPedimento = fields[6],
+                            noFactura = fields[6],
+                            noPedimento = fields[0],
                             #factura_pedimentoPDF = "",
                             #id_usuario = "",
                             #id_area = "",

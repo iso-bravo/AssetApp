@@ -16,7 +16,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import AuthContext from '../auth/Auth';
 
 // Asegúrate de que la ruta de la imagen sea correcta
-import BackgroundImage from '../assets/destinos-playa.jpg';
+import BackgroundImage from '../assets/fondo.jpg';
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);

@@ -48,13 +48,69 @@ const downloadSelectedPages = async (pages: Array<number>) => {
   const existingPdfBytes = await fetch(PDF).then((res) => res.arrayBuffer());
   const pdfDoc = await PDFDocument.load(existingPdfBytes);
   const newPdfDoc = await PDFDocument.create();
-  const copiedPages = await newPdfDoc.copyPages(pdfDoc, pages);
 
-  copiedPages.forEach((page) => newPdfDoc.addPage(page));
+  const scaleFactor = 4.5; // Factor de escala para redimensionar
+
+  for (const pageIndex of pages) {
+    const [copiedPage] = await newPdfDoc.copyPages(pdfDoc, [pageIndex]);
+    const { width, height } = copiedPage.getSize();
+
+    // Definir las nuevas dimensiones
+    const newWidth = width * scaleFactor;
+    const newHeight = height * scaleFactor;
+
+    // Cambiar el tamaño de la página
+    copiedPage.setSize(newWidth, newHeight);
+    copiedPage.scaleContent(scaleFactor, scaleFactor);
+
+    // Escalar el contenido de la página (nota: ajuste manual requerido)
+    // Aquí puedes agregar una función personalizada para ajustar cada elemento si es necesario.
+    // Ejemplo teórico: adjustPageContent(copiedPage, scaleFactor);
+
+    newPdfDoc.addPage(copiedPage);
+  }
 
   const pdfBytes = await newPdfDoc.save();
   const blob = new Blob([pdfBytes], { type: "application/pdf" });
   saveAs(blob, "Etiquetas_seleccionadas.pdf");
+};
+
+// Descargar PDF con tamaño específico
+const modifyAndDownloadPDF = async () => {
+  // Obtener el contenido del PDF importado
+  const existingPdfBytes = await fetch(PDF).then((res) => res.arrayBuffer());
+
+  // Cargar el PDF en pdf-lib
+  const pdfDoc = await PDFDocument.load(existingPdfBytes);
+
+  // Definir el factor de escala
+  const scaleFactor = 3.5;
+
+  // Iterar sobre todas las páginas del PDF
+  const pages = pdfDoc.getPages();
+  pages.forEach((page) => {
+    const { width, height } = page.getSize();
+    const newWidth = width * scaleFactor;
+    const newHeight = height * scaleFactor;
+
+    // Cambiar el tamaño de la página
+    page.setSize(newWidth, newHeight);
+
+    // Redimensionar el contenido de la página
+    page.scaleContent(scaleFactor, scaleFactor);
+  });
+
+  // Serializar el documento modificado a bytes
+  const pdfBytes = await pdfDoc.save();
+
+  // Crear un enlace blob para descargar el PDF
+  const blob = new Blob([pdfBytes], { type: "application/pdf" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "Etiquetas_modificado.pdf";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 };
 
 // Definir columnas para la tabla de datos
@@ -128,6 +184,8 @@ export default function Assets() {
     No_Factura: "",
     Number_Serie: "",
     Tipo_Compra: "",
+    noPedimento: "",
+    pais_origen: "",
   });
 
   function updateAssets() {
@@ -335,75 +393,79 @@ export default function Assets() {
               )}
             </ButtonGroup>
 
-            { permiso === "admin" ? (<ButtonGroup>
-              <Button
-                endIcon={<ExportIcon />}
-                variant="outlined"
-                onClick={exportCSV}
-              >
-                Exportar
-              </Button>
-              <ImportAssetButton
-                ClickHandler={() => {
-                  updateAssets();
-                }}
-                //Autosize={setAutosize}
-                Loading={setLoading}
-              />
-              {
-                // Aquí se cambia de un botón de ETIQUETAS a otro dependiendo de los Assets seleccionados
-                // Si no se selecciona nada entonces se descargan todas las etiquetas
-                // Si se seleccionan entonces se ejecuta la función downloadSelectedPages y se
-                // descargan solo las etiquetas seleccionadas en un mismo PDF
-                IDAsset[0] === -1 || IDAsset.length === 0 ? (
-                  <a href={PDF} download>
-                    <Paper
-                      style={{
-                        width: 202,
-                        height: 40,
-                        alignItems: "center",
-                        alignContent: "center",
-                        textAlign: "center",
-                        backgroundColor: "tomato",
-                        color: "white",
-                        paddingLeft: "10%",
-                        paddingRight: "10%",
-                      }}
+            {permiso === "admin" ? (
+              <ButtonGroup>
+                <Button
+                  endIcon={<ExportIcon />}
+                  variant="outlined"
+                  onClick={exportCSV}
+                >
+                  Exportar
+                </Button>
+                <ImportAssetButton
+                  ClickHandler={() => {
+                    updateAssets();
+                  }}
+                  //Autosize={setAutosize}
+                  Loading={setLoading}
+                />
+                {
+                  // Aquí se cambia de un botón de ETIQUETAS a otro dependiendo de los Assets seleccionados
+                  // Si no se selecciona nada entonces se descargan todas las etiquetas
+                  // Si se seleccionan entonces se ejecuta la función downloadSelectedPages y se
+                  // descargan solo las etiquetas seleccionadas en un mismo PDF
+                  IDAsset[0] === -1 || IDAsset.length === 0 ? (
+                    <a onClick={modifyAndDownloadPDF}>
+                      <Paper
+                        style={{
+                          width: 202,
+                          height: 40,
+                          alignItems: "center",
+                          alignContent: "center",
+                          textAlign: "center",
+                          backgroundColor: "tomato",
+                          color: "white",
+                          paddingLeft: "10%",
+                          paddingRight: "10%",
+                        }}
+                      >
+                        <Stack direction="row" spacing={2}>
+                          <ImportIcon />
+                          <div>ETIQUETAS</div>
+                          <PDFIcon />
+                        </Stack>
+                      </Paper>
+                    </a>
+                  ) : (
+                    <button
+                      onClick={() => downloadSelectedPages(pages)}
+                      style={{ width: 202 }}
                     >
-                      <Stack direction="row" spacing={2}>
-                        <ImportIcon />
-                        <div>ETIQUETAS</div>
-                        <PDFIcon />
-                      </Stack>
-                    </Paper>
-                  </a>
-                ) : (
-                  <button
-                    onClick={() => downloadSelectedPages(pages)}
-                    style={{ width: 202 }}
-                  >
-                    <Paper
-                      style={{
-                        height: 40,
-                        alignItems: "center",
-                        alignContent: "center",
-                        textAlign: "center",
-                        backgroundColor: "brown",
-                        color: "white",
-                        paddingLeft: "10%",
-                        paddingRight: "10%",
-                      }}
-                    >
-                      <Stack direction="row" spacing={2}>
-                        <ImportIcon />
-                        <div>ETIQUETAS</div>
-                        <PDFIcon />
-                      </Stack>
-                    </Paper>
-                  </button>
-                )
-              }
-            </ButtonGroup>) : <></>}
+                      <Paper
+                        style={{
+                          height: 40,
+                          alignItems: "center",
+                          alignContent: "center",
+                          textAlign: "center",
+                          backgroundColor: "orangered",
+                          color: "white",
+                          paddingLeft: "10%",
+                          paddingRight: "10%",
+                        }}
+                      >
+                        <Stack direction="row" spacing={2}>
+                          <ImportIcon />
+                          <div>ETIQUETAS</div>
+                          <PDFIcon />
+                        </Stack>
+                      </Paper>
+                    </button>
+                  )
+                }
+              </ButtonGroup>
+            ) : (
+              <></>
+            )}
           </Box>
           <DataGrid
             rows={rows}
@@ -443,6 +505,8 @@ export default function Assets() {
                       No_Factura: row.noFactura,
                       Number_Serie: row.numero_serie,
                       Tipo_Compra: row.tipo_compra,
+                      noPedimento: row.noPedimento,
+                      pais_origen: row.pais_origen,
                     });
                   }
                 });
@@ -462,6 +526,8 @@ export default function Assets() {
                   No_Factura: "",
                   Number_Serie: "",
                   Tipo_Compra: "",
+                  noPedimento: "",
+                  pais_origen: "",
                 });
               }
             }}
@@ -519,19 +585,24 @@ function AddAssetDialogButton(props: resetInterface) {
   const [status, setStatus] = useState<Options[]>([]);
   const [users, setUsers] = useState<Options[]>([]);
   const [areas, setAreas] = useState<Options[]>([]);
-  const [file, setFile] = useState<string>("");
+  const [pdf, setPDF] = useState<string>("");
   const [image, setImage] = useState<File | undefined>();
-  // const [imageURL, setImageURL] = useState<string>("");
+  const [filePDF, setFilePDF] = useState<File | undefined>();
+  const [ext, setExt] = useState<string>("");
 
   function handleImage(e: React.FormEvent<HTMLInputElement>) {
     const target = e.target as HTMLInputElement & {
       files: FileList;
     };
     const file = target.files[0];
-    // const blop = URL.createObjectURL(file);
-    // setImageURL(blop);
-    // console.log(blop);
     setImage(file);
+  }
+  function handlePDF(e: React.FormEvent<HTMLInputElement>) {
+    const target = e.target as HTMLInputElement & {
+      files: FileList;
+    };
+    const file = target.files[0];
+    setFilePDF(file);
   }
 
   useEffect(() => {
@@ -598,6 +669,9 @@ function AddAssetDialogButton(props: resetInterface) {
 
   const handleClickOpen = () => {
     setOpen(true);
+    setPDF("");
+    setImage(undefined);
+    setFilePDF(undefined);
   };
 
   const handleClose = () => {
@@ -625,34 +699,71 @@ function AddAssetDialogButton(props: resetInterface) {
             event.preventDefault();
             const formData = new FormData(event.currentTarget);
             const formJson = Object.fromEntries((formData as any).entries());
-            //console.log(formJson);
 
-            const data = {
+            let data: {
+              descripcion: string;
+              factura_pedimentoPDF?: string;
+              id_area: string;
+              id_categoria: string;
+              id_estatus: string;
+              id_usuario: string;
+              imagen?: string;
+              marca: string;
+              modelo: string;
+              noFactura: string;
+              numero_serie: string;
+              tipo_compra: string;
+              noPedimento: string;
+              pais_origen: string;
+            } = {
               descripcion: formJson.descripcion,
-              factura_pedimientoPDF: formJson.factura_pedimientoPDF,
               id_area: formJson.id_area,
               id_categoria: formJson.id_categoria,
               id_estatus: formJson.id_estatus,
               id_usuario: formJson.id_usuario,
-              imagen: file,
               marca: formJson.marca,
               modelo: formJson.modelo,
               noFactura: formJson.noFactura,
               numero_serie: formJson.numero_serie,
               tipo_compra: formJson.tipo_compra,
+              noPedimento: formJson.noPedimento,
+              pais_origen: formJson.pais_origen,
             };
+            let imageName = formJson.numero_serie + "." + ext;
+            if (image !== undefined) data = { ...data, imagen: imageName };
+            let pdfName = formJson.numero_serie + ".pdf";
+            if (filePDF !== undefined)
+              data = { ...data, factura_pedimentoPDF: pdfName };
+
+            console.log(data);
 
             props.Loading(true);
 
             try {
-              if (!image) return;
-              const imageData = new FormData();
-              imageData.append("image", image);
+              if (!image) {
+                console.log("No image");
+              } else {
+                const imageData = new FormData();
+                imageData.append("image", image);
+                imageData.append("filename", imageName);
 
-              // falta endpoint para subir imagenes a directorio local
+                const { data } = await API.post("/api/upload_file/", imageData);
+                console.log(data);
+              }
+            } catch (error: any) {
+              console.log(error.response?.data);
+            }
+            try {
+              if (!filePDF) {
+                console.log("No PDF");
+              } else {
+                const pdfData = new FormData();
+                pdfData.append("pdf", filePDF);
+                pdfData.append("filename", pdfName);
 
-              const { data } = await API.post("/api/upload_file/", imageData);
-              console.log(data);
+                const { data } = await API.post("/api/upload_file/", pdfData);
+                console.log(data);
+              }
             } catch (error: any) {
               console.log(error.response?.data);
             }
@@ -691,6 +802,22 @@ function AddAssetDialogButton(props: resetInterface) {
               helperText="Escribe el número de serie."
               margin="normal"
               name="numero_serie"
+            />
+            <TextField
+              label="Número de pedimento"
+              fullWidth
+              helperText="Escribe el número de pedimento."
+              margin="normal"
+              name="noPedimento"
+            />
+            <TextField
+              label="País de origen"
+              fullWidth
+              required
+              helperText="Escribe el país de origen."
+              multiline
+              margin="normal"
+              name="pais_origen"
             />
             <TextField
               label="Modelo"
@@ -773,16 +900,29 @@ function AddAssetDialogButton(props: resetInterface) {
               aria-labelledby="Modelo"
               name="noFactura"
             />
-            <TextField
-              label="Factura PDF"
-              fullWidth
-              required
-              helperText="Adjunta la factura."
-              multiline
-              margin="normal"
-              aria-labelledby="Modelo"
-              name="factura_pedimientoPDF"
-            />
+            <InputLabel>Factura PDF: </InputLabel>
+            <Box>
+              <input
+                type="file"
+                name="factura_pedimentoPDF"
+                onChange={(e) => {
+                  const pathPDF = e.target.value;
+                  var titlePDF = pathPDF.slice(pathPDF.indexOf("h") + 2);
+
+                  var fileName = titlePDF;
+                  var idxDot = fileName.lastIndexOf(".") + 1;
+                  var extFile = fileName.slice(idxDot).toLowerCase();
+                  if (extFile == "pdf") {
+                    setPDF(titlePDF);
+                    console.log(titlePDF);
+                    handlePDF(e);
+                    console.log(pdf);
+                  } else {
+                    alert("Solo pdf es permitido.");
+                  }
+                }}
+              />
+            </Box>
             <TextField
               select
               label="Usuario"
@@ -830,12 +970,12 @@ function AddAssetDialogButton(props: resetInterface) {
                   var fileName = titleImage;
                   var idxDot = fileName.lastIndexOf(".") + 1;
                   var extFile = fileName.slice(idxDot).toLowerCase();
+                  setExt(extFile);
                   if (
                     extFile == "jpg" ||
                     extFile == "jpeg" ||
                     extFile == "png"
                   ) {
-                    setFile(titleImage);
                     console.log(titleImage);
                     handleImage(e);
                     console.log(image);
@@ -865,12 +1005,14 @@ function EditAssetDialogButton(props: editProps) {
   const [status, setStatus] = useState<Options[]>([]);
   const [users, setUsers] = useState<Options[]>([]);
   const [areas, setAreas] = useState<Options[]>([]);
-  const [file, setFile] = useState<string>("");
+  const [pdf, setPDF] = useState<string>("");
   const [image, setImage] = useState<File | undefined>();
+  const [filePDF, setFilePDF] = useState<File | undefined>();
   const [categorySelectedValue, setCategorySelectedValue] = useState("");
   const [userSelectedValue, setUserSelectedValue] = useState("");
   const [stateSelectedValue, setStateSelectedValue] = useState("");
   const [areaSelectedValue, setAreaSelectedValue] = useState("");
+  const [ext, setExt] = useState<string>("");
 
   function handleImage(e: React.FormEvent<HTMLInputElement>) {
     const target = e.target as HTMLInputElement & {
@@ -879,7 +1021,13 @@ function EditAssetDialogButton(props: editProps) {
     const file = target.files[0];
     setImage(file);
   }
-
+  function handlePDF(e: React.FormEvent<HTMLInputElement>) {
+    const target = e.target as HTMLInputElement & {
+      files: FileList;
+    };
+    const file = target.files[0];
+    setFilePDF(file);
+  }
   const asset = props.data;
 
   useEffect(() => {
@@ -998,6 +1146,9 @@ function EditAssetDialogButton(props: editProps) {
 
   const handleClickOpen = () => {
     setOpen(true);
+    setPDF("");
+    setImage(undefined);
+    setFilePDF(undefined);
   };
 
   const handleClose = () => {
@@ -1028,21 +1179,42 @@ function EditAssetDialogButton(props: editProps) {
             const formData = new FormData(event.currentTarget);
             const formJson = Object.fromEntries((formData as any).entries());
 
-            const data = {
+            let data: {
+              id: string;
+              descripcion: string;
+              factura_pedimentoPDF?: string;
+              id_area: string;
+              id_categoria: string;
+              id_estatus: string;
+              id_usuario: string;
+              marca: string;
+              modelo: string;
+              noFactura: string;
+              numero_serie: string;
+              tipo_compra: string;
+              noPedimento: string;
+              pais_origen: string;
+              imagen?: string;
+            } = {
               id: formJson.id,
               descripcion: formJson.descripcion,
-              factura_pedimientoPDF: formJson.factura_pedimientoPDF,
               id_area: formJson.id_area,
               id_categoria: formJson.id_categoria,
               id_estatus: formJson.id_estatus,
               id_usuario: formJson.id_usuario,
-              imagen: file,
               marca: formJson.marca,
               modelo: formJson.modelo,
               noFactura: formJson.noFactura,
               numero_serie: formJson.numero_serie,
               tipo_compra: formJson.tipo_compra,
+              noPedimento: formJson.noPedimento,
+              pais_origen: formJson.pais_origen,
             };
+            let imageName = formJson.numero_serie + "." + ext;
+            if (image !== undefined) data = { ...data, imagen: imageName };
+            let pdfName = formJson.numero_serie + ".pdf";
+            if (filePDF !== undefined)
+              data = { ...data, factura_pedimentoPDF: pdfName };
 
             console.log(data);
 
@@ -1054,8 +1226,23 @@ function EditAssetDialogButton(props: editProps) {
               } else {
                 const imageData = new FormData();
                 imageData.append("image", image);
+                imageData.append("filename", imageName);
 
                 const { data } = await API.post("/api/upload_file/", imageData);
+                console.log(data);
+              }
+            } catch (error: any) {
+              console.log(error.response?.data);
+            }
+            try {
+              if (!filePDF) {
+                console.log("No PDF");
+              } else {
+                const pdfData = new FormData();
+                pdfData.append("pdf", filePDF);
+                pdfData.append("filename", pdfName);
+
+                const { data } = await API.post("/api/upload_file/", pdfData);
                 console.log(data);
               }
             } catch (error: any) {
@@ -1120,6 +1307,25 @@ function EditAssetDialogButton(props: editProps) {
                   margin="normal"
                   name="numero_serie"
                   defaultValue={asset.Number_Serie}
+                />
+                <TextField
+                  label="Número de pedimento"
+                  fullWidth
+                  required
+                  helperText="Escribe el número de pedimento."
+                  margin="normal"
+                  name="noPedimento"
+                  defaultValue={asset.noPedimento}
+                />
+                <TextField
+                  label="País de origen"
+                  fullWidth
+                  required
+                  helperText="Escribe el país de origen."
+                  multiline
+                  margin="normal"
+                  name="pais_origen"
+                  defaultValue={asset.pais_origen}
                 />
                 <TextField
                   label="Modelo"
@@ -1206,16 +1412,29 @@ function EditAssetDialogButton(props: editProps) {
                   name="noFactura"
                   defaultValue={asset.No_Factura}
                 />
-                <TextField
-                  label="Factura PDF"
-                  fullWidth
-                  helperText="Adjunta la factura."
-                  multiline
-                  margin="normal"
-                  aria-labelledby="Modelo"
-                  name="factura_pedimientoPDF"
-                  defaultValue={asset.Factura}
-                />
+                <InputLabel>Factura PDF: </InputLabel>
+                <Box>
+                  <input
+                    type="file"
+                    name="factura_pedimentoPDF"
+                    onChange={(e) => {
+                      const pathPDF = e.target.value;
+                      var titlePDF = pathPDF.slice(pathPDF.indexOf("h") + 2);
+
+                      var fileName = titlePDF;
+                      var idxDot = fileName.lastIndexOf(".") + 1;
+                      var extFile = fileName.slice(idxDot).toLowerCase();
+                      if (extFile == "pdf") {
+                        setPDF(titlePDF);
+                        console.log(titlePDF);
+                        handlePDF(e);
+                        console.log(pdf);
+                      } else {
+                        alert("Solo pdf es permitido.");
+                      }
+                    }}
+                  />
+                </Box>
                 <TextField
                   select
                   label="Usuario"
@@ -1265,12 +1484,12 @@ function EditAssetDialogButton(props: editProps) {
                       var fileName = titleImage;
                       var idxDot = fileName.lastIndexOf(".") + 1;
                       var extFile = fileName.slice(idxDot).toLowerCase();
+                      setExt(extFile);
                       if (
                         extFile == "jpg" ||
                         extFile == "jpeg" ||
                         extFile == "png"
                       ) {
-                        setFile(titleImage);
                         console.log(titleImage);
                         handleImage(e);
                         console.log(image);

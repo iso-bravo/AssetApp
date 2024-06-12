@@ -57,6 +57,44 @@ const downloadSelectedPages = async (pages: Array<number>) => {
   saveAs(blob, "Etiquetas_seleccionadas.pdf");
 };
 
+// Descargar PDF con tamaño específico
+const modifyAndDownloadPDF = async () => {
+  // Obtener el contenido del PDF importado
+  const existingPdfBytes = await fetch(PDF).then((res) => res.arrayBuffer());
+
+  // Cargar el PDF en pdf-lib
+  const pdfDoc = await PDFDocument.load(existingPdfBytes);
+
+  // Definir el factor de escala (por ejemplo, 1.5x el tamaño original)
+  const scaleFactor = 3.5;
+
+  // Iterar sobre todas las páginas del PDF
+  const pages = pdfDoc.getPages();
+  pages.forEach((page) => {
+    const { width, height } = page.getSize();
+    const newWidth = width * scaleFactor;
+    const newHeight = height * scaleFactor;
+
+    // Cambiar el tamaño de la página
+    page.setSize(newWidth, newHeight);
+
+    // Redimensionar el contenido de la página
+    page.scaleContent(scaleFactor, scaleFactor);
+  });
+
+  // Serializar el documento modificado a bytes
+  const pdfBytes = await pdfDoc.save();
+
+  // Crear un enlace blob para descargar el PDF
+  const blob = new Blob([pdfBytes], { type: "application/pdf" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "Etiquetas_modificado.pdf";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
 // Definir columnas para la tabla de datos
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 100 },
@@ -359,7 +397,7 @@ export default function Assets() {
                   // Si se seleccionan entonces se ejecuta la función downloadSelectedPages y se
                   // descargan solo las etiquetas seleccionadas en un mismo PDF
                   IDAsset[0] === -1 || IDAsset.length === 0 ? (
-                    <a href={PDF} download>
+                    <a onClick={modifyAndDownloadPDF}>
                       <Paper
                         style={{
                           width: 202,
@@ -529,10 +567,10 @@ function AddAssetDialogButton(props: resetInterface) {
   const [status, setStatus] = useState<Options[]>([]);
   const [users, setUsers] = useState<Options[]>([]);
   const [areas, setAreas] = useState<Options[]>([]);
-  const [file, setFile] = useState<string>("");
   const [pdf, setPDF] = useState<string>("");
   const [image, setImage] = useState<File | undefined>();
   const [filePDF, setFilePDF] = useState<File | undefined>();
+  const [ext, setExt] = useState<string>("");
 
   function handleImage(e: React.FormEvent<HTMLInputElement>) {
     const target = e.target as HTMLInputElement & {
@@ -613,7 +651,6 @@ function AddAssetDialogButton(props: resetInterface) {
 
   const handleClickOpen = () => {
     setOpen(true);
-    setFile("");
     setPDF("");
     setImage(undefined);
     setFilePDF(undefined);
@@ -674,9 +711,11 @@ function AddAssetDialogButton(props: resetInterface) {
               noPedimento: formJson.noPedimento,
               pais_origen: formJson.pais_origen,
             };
-            if (image !== undefined) data = { ...data, imagen: file };
+            let imageName = formJson.numero_serie + "." + ext;
+            if (image !== undefined) data = { ...data, imagen: imageName };
+            let pdfName = formJson.numero_serie + ".pdf";
             if (filePDF !== undefined)
-              data = { ...data, factura_pedimentoPDF: pdf };
+              data = { ...data, factura_pedimentoPDF: pdfName };
 
             console.log(data);
 
@@ -688,7 +727,7 @@ function AddAssetDialogButton(props: resetInterface) {
               } else {
                 const imageData = new FormData();
                 imageData.append("image", image);
-                imageData.append("filename" , "NOMBRE DE PRUEBA");
+                imageData.append("filename", imageName);
 
                 const { data } = await API.post("/api/upload_file/", imageData);
                 console.log(data);
@@ -702,6 +741,7 @@ function AddAssetDialogButton(props: resetInterface) {
               } else {
                 const pdfData = new FormData();
                 pdfData.append("pdf", filePDF);
+                pdfData.append("filename", pdfName);
 
                 const { data } = await API.post("/api/upload_file/", pdfData);
                 console.log(data);
@@ -912,12 +952,12 @@ function AddAssetDialogButton(props: resetInterface) {
                   var fileName = titleImage;
                   var idxDot = fileName.lastIndexOf(".") + 1;
                   var extFile = fileName.slice(idxDot).toLowerCase();
+                  setExt(extFile);
                   if (
                     extFile == "jpg" ||
                     extFile == "jpeg" ||
                     extFile == "png"
                   ) {
-                    setFile(titleImage);
                     console.log(titleImage);
                     handleImage(e);
                     console.log(image);
@@ -947,7 +987,6 @@ function EditAssetDialogButton(props: editProps) {
   const [status, setStatus] = useState<Options[]>([]);
   const [users, setUsers] = useState<Options[]>([]);
   const [areas, setAreas] = useState<Options[]>([]);
-  const [file, setFile] = useState<string>("");
   const [pdf, setPDF] = useState<string>("");
   const [image, setImage] = useState<File | undefined>();
   const [filePDF, setFilePDF] = useState<File | undefined>();
@@ -955,6 +994,7 @@ function EditAssetDialogButton(props: editProps) {
   const [userSelectedValue, setUserSelectedValue] = useState("");
   const [stateSelectedValue, setStateSelectedValue] = useState("");
   const [areaSelectedValue, setAreaSelectedValue] = useState("");
+  const [ext, setExt] = useState<string>("");
 
   function handleImage(e: React.FormEvent<HTMLInputElement>) {
     const target = e.target as HTMLInputElement & {
@@ -1088,7 +1128,6 @@ function EditAssetDialogButton(props: editProps) {
 
   const handleClickOpen = () => {
     setOpen(true);
-    setFile("");
     setPDF("");
     setImage(undefined);
     setFilePDF(undefined);
@@ -1153,9 +1192,11 @@ function EditAssetDialogButton(props: editProps) {
               noPedimento: formJson.noPedimento,
               pais_origen: formJson.pais_origen,
             };
-            if (image !== undefined) data = { ...data, imagen: file };
+            let imageName = formJson.numero_serie + "." + ext;
+            if (image !== undefined) data = { ...data, imagen: imageName };
+            let pdfName = formJson.numero_serie + ".pdf";
             if (filePDF !== undefined)
-              data = { ...data, factura_pedimentoPDF: pdf };
+              data = { ...data, factura_pedimentoPDF: pdfName };
 
             console.log(data);
 
@@ -1167,6 +1208,7 @@ function EditAssetDialogButton(props: editProps) {
               } else {
                 const imageData = new FormData();
                 imageData.append("image", image);
+                imageData.append("filename", imageName);
 
                 const { data } = await API.post("/api/upload_file/", imageData);
                 console.log(data);
@@ -1180,6 +1222,7 @@ function EditAssetDialogButton(props: editProps) {
               } else {
                 const pdfData = new FormData();
                 pdfData.append("pdf", filePDF);
+                pdfData.append("filename", pdfName);
 
                 const { data } = await API.post("/api/upload_file/", pdfData);
                 console.log(data);
@@ -1423,12 +1466,12 @@ function EditAssetDialogButton(props: editProps) {
                       var fileName = titleImage;
                       var idxDot = fileName.lastIndexOf(".") + 1;
                       var extFile = fileName.slice(idxDot).toLowerCase();
+                      setExt(extFile);
                       if (
                         extFile == "jpg" ||
                         extFile == "jpeg" ||
                         extFile == "png"
                       ) {
-                        setFile(titleImage);
                         console.log(titleImage);
                         handleImage(e);
                         console.log(image);

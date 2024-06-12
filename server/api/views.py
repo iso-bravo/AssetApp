@@ -492,18 +492,22 @@ class UploadFile(APIView):
                 file_key = 'image'
             elif 'pdf' in request.FILES:
                 file_key = 'pdf'
-            
+
             if file_key:
                 try:
                     file = request.FILES[file_key]
                     fs = FileSystemStorage()
                     custom_filename = request.data.get('filename', file.name)
-                    print("NOMBRE MANDADO: " + custom_filename)
-                    print("NOMBRE ORIGINAL: " + file.name)
-                    filename = fs.save(file.name, file)
+
+                    # Eliminar archivo existente si tiene el mismo nombre
+                    if fs.exists(custom_filename):
+                        file_path = fs.path(custom_filename)
+                        os.remove(file_path)
+
+                    filename = fs.save(custom_filename, file)
                     uploaded_file_url = fs.url(filename)
                     return Response({
-                        'mensaje': f'{file_key.upper()} subido exitosamente.', 
+                        'mensaje': f'{file_key.upper()} subido exitosamente.',
                         'file': uploaded_file_url
                     }, status=200)
                 except Exception as e:
@@ -512,7 +516,7 @@ class UploadFile(APIView):
                 return Response({'error': 'No se ha enviado ningún archivo.'}, status=400)
         else:
             return Response({'error': 'Método no permitido.'}, status=405)
-
+        
 class ImportCSV(APIView):
     def post(self, request):
         if request.method == 'POST' and request.FILES['csv']:

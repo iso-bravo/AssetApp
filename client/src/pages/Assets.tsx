@@ -16,6 +16,11 @@ import {
   MenuItem,
   Paper,
   Stack,
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
 } from "@mui/material";
 import {
   DataGrid,
@@ -42,76 +47,7 @@ import PDF from "../../../server/api/labels_pdf/Etiquetas.pdf";
 import { saveAs } from "file-saver";
 import { PDFDocument } from "pdf-lib";
 import AuthContext from "../auth/Auth";
-
-// Función para descargar solo las etiquetas de los Assets seleccionados en un PDF
-const downloadSelectedPages = async (pages: Array<number>) => {
-  const existingPdfBytes = await fetch(PDF).then((res) => res.arrayBuffer());
-  const pdfDoc = await PDFDocument.load(existingPdfBytes);
-  const newPdfDoc = await PDFDocument.create();
-
-  const scaleFactor = 4.5; // Factor de escala para redimensionar
-
-  for (const pageIndex of pages) {
-    const [copiedPage] = await newPdfDoc.copyPages(pdfDoc, [pageIndex]);
-    const { width, height } = copiedPage.getSize();
-
-    // Definir las nuevas dimensiones
-    const newWidth = width * scaleFactor;
-    const newHeight = height * scaleFactor;
-
-    // Cambiar el tamaño de la página
-    copiedPage.setSize(newWidth, newHeight);
-    copiedPage.scaleContent(scaleFactor, scaleFactor);
-
-    // Escalar el contenido de la página (nota: ajuste manual requerido)
-    // Aquí puedes agregar una función personalizada para ajustar cada elemento si es necesario.
-    // Ejemplo teórico: adjustPageContent(copiedPage, scaleFactor);
-
-    newPdfDoc.addPage(copiedPage);
-  }
-
-  const pdfBytes = await newPdfDoc.save();
-  const blob = new Blob([pdfBytes], { type: "application/pdf" });
-  saveAs(blob, "Etiquetas_seleccionadas.pdf");
-};
-
-// Descargar PDF con tamaño específico
-const modifyAndDownloadPDF = async () => {
-  // Obtener el contenido del PDF importado
-  const existingPdfBytes = await fetch(PDF).then((res) => res.arrayBuffer());
-
-  // Cargar el PDF en pdf-lib
-  const pdfDoc = await PDFDocument.load(existingPdfBytes);
-
-  // Definir el factor de escala
-  const scaleFactor = 3.5;
-
-  // Iterar sobre todas las páginas del PDF
-  const pages = pdfDoc.getPages();
-  pages.forEach((page) => {
-    const { width, height } = page.getSize();
-    const newWidth = width * scaleFactor;
-    const newHeight = height * scaleFactor;
-
-    // Cambiar el tamaño de la página
-    page.setSize(newWidth, newHeight);
-
-    // Redimensionar el contenido de la página
-    page.scaleContent(scaleFactor, scaleFactor);
-  });
-
-  // Serializar el documento modificado a bytes
-  const pdfBytes = await pdfDoc.save();
-
-  // Crear un enlace blob para descargar el PDF
-  const blob = new Blob([pdfBytes], { type: "application/pdf" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "Etiquetas_modificado.pdf";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
+import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
 
 // Definir columnas para la tabla de datos
 const columns: GridColDef[] = [
@@ -140,6 +76,79 @@ interface Permiso {
 export default function Assets() {
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [IDAsset, setIDAsset] = useState<GridRowSelectionModel>([-1]);
+  const [heightWidth, setHeightWidth] = useState<Array<number>>([1, 1]);
+
+  // Función para descargar solo las etiquetas de los Assets seleccionados en un PDF
+  const downloadSelectedPages = async (pages: Array<number>) => {
+    const existingPdfBytes = await fetch(PDF).then((res) => res.arrayBuffer());
+    const pdfDoc = await PDFDocument.load(existingPdfBytes);
+    const newPdfDoc = await PDFDocument.create();
+
+    const scaleFactorHeight = heightWidth[0];
+    const scaleFactorWidth = heightWidth[1];
+
+    for (const pageIndex of pages) {
+      const [copiedPage] = await newPdfDoc.copyPages(pdfDoc, [pageIndex]);
+      const { width, height } = copiedPage.getSize();
+
+      // Definir las nuevas dimensiones
+      const newWidth = width * scaleFactorWidth;
+      const newHeight = height * scaleFactorHeight;
+
+      // Cambiar el tamaño de la página
+      copiedPage.setSize(newWidth, newHeight);
+      copiedPage.scaleContent(scaleFactorWidth, scaleFactorHeight);
+
+      // Escalar el contenido de la página (nota: ajuste manual requerido)
+      // Aquí puedes agregar una función personalizada para ajustar cada elemento si es necesario.
+      // Ejemplo teórico: adjustPageContent(copiedPage, scaleFactor);
+
+      newPdfDoc.addPage(copiedPage);
+    }
+
+    const pdfBytes = await newPdfDoc.save();
+    const blob = new Blob([pdfBytes], { type: "application/pdf" });
+    saveAs(blob, "Etiquetas_seleccionadas.pdf");
+  };
+
+  // Descargar PDF con tamaño específico
+  const modifyAndDownloadPDF = async () => {
+    // Obtener el contenido del PDF importado
+    const existingPdfBytes = await fetch(PDF).then((res) => res.arrayBuffer());
+
+    // Cargar el PDF en pdf-lib
+    const pdfDoc = await PDFDocument.load(existingPdfBytes);
+
+    // Definir el factor de escala
+    const scaleFactorHeight = heightWidth[0];
+    const scaleFactorWidth = heightWidth[1];
+
+    // Iterar sobre todas las páginas del PDF
+    const pages = pdfDoc.getPages();
+    pages.forEach((page) => {
+      const { width, height } = page.getSize();
+      const newWidth = width * scaleFactorWidth;
+      const newHeight = height * scaleFactorHeight;
+
+      // Cambiar el tamaño de la página
+      page.setSize(newWidth, newHeight);
+
+      // Redimensionar el contenido de la página
+      page.scaleContent(scaleFactorWidth, scaleFactorHeight);
+    });
+
+    // Serializar el documento modificado a bytes
+    const pdfBytes = await pdfDoc.save();
+
+    // Crear un enlace blob para descargar el PDF
+    const blob = new Blob([pdfBytes], { type: "application/pdf" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "Etiquetas.pdf";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // Ocupo los IDs en una lista de este tipo para descargar las etiquetas
   const IDS: Array<Number> = [];
@@ -343,129 +352,145 @@ export default function Assets() {
             Assets
           </Typography>
           <Box marginBottom={2}>
-            <ButtonGroup>
-              {/* Grupo de botones para manipular y visualizar los datos */}
-              {permiso === "admin" || permiso === "register" ? (
-                <AddAssetDialogButton
-                  ClickHandler={() => {
-                    updateAssets();
-                  }}
-                  //Autosize={setAutosize}
-                  Loading={setLoading}
-                />
-              ) : (
-                <></>
-              )}
-              <EditAssetDialogButton
-                data={details}
-                ids={IDAsset}
-                ClickHandler={() => {
-                  updateAssets();
-                }}
-                //Autosize={setAutosize}
-                Loading={setLoading}
-              />
-              {permiso === "admin" ? (
-                <DeleteAssetButton
-                  ids={IDAsset}
-                  Loading={setLoading}
-                  ClickHandler={() => {
-                    updateAssets();
-                  }}
-                  //Autosize={setAutosize}
-                />
-              ) : (
-                <></>
-              )}
-              {!(IDAsset.length > 1) ? (
-                <AssetDetails asset={details} />
-              ) : (
-                <Button
-                  variant="contained"
-                  onClick={() =>
-                    alert("No se pueden seleccionar multiples assets.")
-                  }
-                  color="info"
-                  endIcon={<DetailsIcon />}
-                >
-                  Detalles
-                </Button>
-              )}
-            </ButtonGroup>
+            <Grid2 container spacing={2}>
+              <Grid2 xs={8}>
+                <Stack spacing={2}>
+                  <ButtonGroup>
+                    {/* Grupo de botones para manipular y visualizar los datos */}
+                    {permiso === "admin" || permiso === "register" ? (
+                      <AddAssetDialogButton
+                        ClickHandler={() => {
+                          updateAssets();
+                        }}
+                        //Autosize={setAutosize}
+                        Loading={setLoading}
+                      />
+                    ) : (
+                      <></>
+                    )}
+                    <EditAssetDialogButton
+                      data={details}
+                      ids={IDAsset}
+                      ClickHandler={() => {
+                        updateAssets();
+                      }}
+                      //Autosize={setAutosize}
+                      Loading={setLoading}
+                    />
+                    {permiso === "admin" ? (
+                      <DeleteAssetButton
+                        ids={IDAsset}
+                        Loading={setLoading}
+                        ClickHandler={() => {
+                          updateAssets();
+                        }}
+                        //Autosize={setAutosize}
+                      />
+                    ) : (
+                      <></>
+                    )}
+                    {!(IDAsset.length > 1) ? (
+                      <AssetDetails asset={details} />
+                    ) : (
+                      <Button
+                        variant="contained"
+                        onClick={() =>
+                          alert("No se pueden seleccionar multiples assets.")
+                        }
+                        color="info"
+                        endIcon={<DetailsIcon />}
+                      >
+                        Detalles
+                      </Button>
+                    )}
+                    {permiso === "admin" ? (
+                      <button
+                        onClick={() => {
+                          IDAsset[0] === -1 || IDAsset.length === 0
+                            ? modifyAndDownloadPDF()
+                            : downloadSelectedPages(pages);
+                        }}
+                        style={{ width: 202 }}
+                      >
+                        <Paper
+                          style={{
+                            height: 40,
+                            alignItems: "center",
+                            alignContent: "center",
+                            textAlign: "center",
+                            backgroundColor: "orangered",
+                            color: "white",
+                            paddingLeft: "10%",
+                            paddingRight: "10%",
+                          }}
+                        >
+                          <Stack direction="row" spacing={2}>
+                            <ImportIcon />
+                            <div>ETIQUETAS</div>
+                            <PDFIcon />
+                          </Stack>
+                        </Paper>
+                      </button>
+                    ) : (
+                      <></>
+                    )}
+                  </ButtonGroup>
 
-            {permiso === "admin" ? (
-              <ButtonGroup>
-                <Button
-                  endIcon={<ExportIcon />}
-                  variant="outlined"
-                  onClick={exportCSV}
-                >
-                  Exportar
-                </Button>
-                <ImportAssetButton
-                  ClickHandler={() => {
-                    updateAssets();
-                  }}
-                  //Autosize={setAutosize}
-                  Loading={setLoading}
-                />
-                {
-                  // Aquí se cambia de un botón de ETIQUETAS a otro dependiendo de los Assets seleccionados
-                  // Si no se selecciona nada entonces se descargan todas las etiquetas
-                  // Si se seleccionan entonces se ejecuta la función downloadSelectedPages y se
-                  // descargan solo las etiquetas seleccionadas en un mismo PDF
-                  IDAsset[0] === -1 || IDAsset.length === 0 ? (
-                    <a onClick={modifyAndDownloadPDF}>
-                      <Paper
-                        style={{
-                          width: 202,
-                          height: 40,
-                          alignItems: "center",
-                          alignContent: "center",
-                          textAlign: "center",
-                          backgroundColor: "tomato",
-                          color: "white",
-                          paddingLeft: "10%",
-                          paddingRight: "10%",
-                        }}
+                  {permiso === "admin" ? (
+                    <ButtonGroup>
+                      <Button
+                        endIcon={<ExportIcon />}
+                        variant="outlined"
+                        onClick={exportCSV}
                       >
-                        <Stack direction="row" spacing={2}>
-                          <ImportIcon />
-                          <div>ETIQUETAS</div>
-                          <PDFIcon />
-                        </Stack>
-                      </Paper>
-                    </a>
+                        Exportar
+                      </Button>
+                      <ImportAssetButton
+                        ClickHandler={() => {
+                          updateAssets();
+                        }}
+                        //Autosize={setAutosize}
+                        Loading={setLoading}
+                      />
+                    </ButtonGroup>
                   ) : (
-                    <button
-                      onClick={() => downloadSelectedPages(pages)}
-                      style={{ width: 202 }}
+                    <></>
+                  )}
+                </Stack>
+              </Grid2>
+              {permiso === "admin" ? (
+                <Grid2 xs={4} >
+                  <FormControl>
+                    <FormLabel id="demo-radio-buttons-group-label">
+                      Medidas de etiquetas
+                    </FormLabel>
+                    <RadioGroup
+                      aria-labelledby="demo-radio-buttons-group-label"
+                      defaultValue="1"
+                      name="radio-buttons-group"
+                      row
                     >
-                      <Paper
-                        style={{
-                          height: 40,
-                          alignItems: "center",
-                          alignContent: "center",
-                          textAlign: "center",
-                          backgroundColor: "orangered",
-                          color: "white",
-                          paddingLeft: "10%",
-                          paddingRight: "10%",
-                        }}
-                      >
-                        <Stack direction="row" spacing={2}>
-                          <ImportIcon />
-                          <div>ETIQUETAS</div>
-                          <PDFIcon />
-                        </Stack>
-                      </Paper>
-                    </button>
-                  )
-                }
-              </ButtonGroup>
-            ) : (
-              <></>
-            )}
+                      <FormControlLabel
+                        value="1"
+                        control={
+                          <Radio onChange={() => setHeightWidth([1, 1])} />
+                        }
+                        label="1x2"
+                      />
+                      <FormControlLabel
+                        value="2"
+                        control={
+                          <Radio onChange={() => setHeightWidth([4, 3])} />
+                        }
+                        label="4x6"
+                      />
+                    </RadioGroup>
+                  </FormControl>
+                </Grid2>
+              ) : (
+                <></>
+              )}
+            </Grid2>
           </Box>
           <DataGrid
             rows={rows}

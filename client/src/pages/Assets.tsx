@@ -348,12 +348,44 @@ export default function Assets() {
           minWidth={500}
           maxWidth={2000}
         >
-          <Typography variant="h4" margin={2} align="center">
-            Assets
-          </Typography>
           <Box marginBottom={2}>
-            <Grid2 container spacing={2}>
-              <Grid2 xs={8}>
+            <Grid2 container spacing={0}>
+              <Grid2 xs={9}>
+                <Typography variant="h4" margin={2} align="center">
+                  Assets
+                </Typography>
+              </Grid2>
+              {permiso === "admin" ? (
+                <Grid2 xs={3}>
+                  <FormControl>
+                    <FormLabel>Medidas de etiquetas</FormLabel>
+                    <RadioGroup
+                      aria-labelledby="demo-radio-buttons-group-label"
+                      defaultValue="1"
+                      name="radio-buttons-group"
+                      row
+                    >
+                      <FormControlLabel
+                        value="1"
+                        control={
+                          <Radio onChange={() => setHeightWidth([1, 1])} />
+                        }
+                        label="1x2"
+                      />
+                      <FormControlLabel
+                        value="2"
+                        control={
+                          <Radio onChange={() => setHeightWidth([4, 3])} />
+                        }
+                        label="4x6"
+                      />
+                    </RadioGroup>
+                  </FormControl>
+                </Grid2>
+              ) : (
+                <></>
+              )}
+              <Grid2 xs={12}>
                 <Stack spacing={2}>
                   <ButtonGroup>
                     {/* Grupo de botones para manipular y visualizar los datos */}
@@ -403,93 +435,61 @@ export default function Assets() {
                         Detalles
                       </Button>
                     )}
+
                     {permiso === "admin" ? (
-                      <button
-                        onClick={() => {
-                          IDAsset[0] === -1 || IDAsset.length === 0
-                            ? modifyAndDownloadPDF()
-                            : downloadSelectedPages(pages);
-                        }}
-                        style={{ width: 202 }}
-                      >
-                        <Paper
-                          style={{
-                            height: 40,
-                            alignItems: "center",
-                            alignContent: "center",
-                            textAlign: "center",
-                            backgroundColor: "orangered",
-                            color: "white",
-                            paddingLeft: "10%",
-                            paddingRight: "10%",
-                          }}
+                      <ButtonGroup>
+                        <Button
+                          endIcon={<ExportIcon />}
+                          variant="outlined"
+                          onClick={exportCSV}
                         >
-                          <Stack direction="row" spacing={2}>
-                            <ImportIcon />
-                            <div>ETIQUETAS</div>
-                            <PDFIcon />
-                          </Stack>
-                        </Paper>
-                      </button>
+                          Exportar
+                        </Button>
+                        <ImportAssetButton
+                          ClickHandler={() => {
+                            updateAssets();
+                          }}
+                          //Autosize={setAutosize}
+                          Loading={setLoading}
+                        />
+                        {permiso === "admin" ? (
+                          <button
+                            onClick={() => {
+                              IDAsset[0] === -1 || IDAsset.length === 0
+                                ? modifyAndDownloadPDF()
+                                : downloadSelectedPages(pages);
+                            }}
+                            style={{ width: 202 }}
+                          >
+                            <Paper
+                              style={{
+                                height: 40,
+                                alignItems: "center",
+                                alignContent: "center",
+                                textAlign: "center",
+                                backgroundColor: "orangered",
+                                color: "white",
+                                paddingLeft: "10%",
+                                paddingRight: "10%",
+                              }}
+                            >
+                              <Stack direction="row" spacing={2}>
+                                <ImportIcon />
+                                <div>ETIQUETAS</div>
+                                <PDFIcon />
+                              </Stack>
+                            </Paper>
+                          </button>
+                        ) : (
+                          <></>
+                        )}
+                      </ButtonGroup>
                     ) : (
                       <></>
                     )}
                   </ButtonGroup>
-
-                  {permiso === "admin" ? (
-                    <ButtonGroup>
-                      <Button
-                        endIcon={<ExportIcon />}
-                        variant="outlined"
-                        onClick={exportCSV}
-                      >
-                        Exportar
-                      </Button>
-                      <ImportAssetButton
-                        ClickHandler={() => {
-                          updateAssets();
-                        }}
-                        //Autosize={setAutosize}
-                        Loading={setLoading}
-                      />
-                    </ButtonGroup>
-                  ) : (
-                    <></>
-                  )}
                 </Stack>
               </Grid2>
-              {permiso === "admin" ? (
-                <Grid2 xs={4} >
-                  <FormControl>
-                    <FormLabel id="demo-radio-buttons-group-label">
-                      Medidas de etiquetas
-                    </FormLabel>
-                    <RadioGroup
-                      aria-labelledby="demo-radio-buttons-group-label"
-                      defaultValue="1"
-                      name="radio-buttons-group"
-                      row
-                    >
-                      <FormControlLabel
-                        value="1"
-                        control={
-                          <Radio onChange={() => setHeightWidth([1, 1])} />
-                        }
-                        label="1x2"
-                      />
-                      <FormControlLabel
-                        value="2"
-                        control={
-                          <Radio onChange={() => setHeightWidth([4, 3])} />
-                        }
-                        label="4x6"
-                      />
-                    </RadioGroup>
-                  </FormControl>
-                </Grid2>
-              ) : (
-                <></>
-              )}
             </Grid2>
           </Box>
           <DataGrid

@@ -45,7 +45,7 @@ import DetailsIcon from "@mui/icons-material/Info";
 // Solución si Etiquetas.pdf existe
 import PDF from "../../../server/api/labels_pdf/Etiquetas.pdf";
 import { saveAs } from "file-saver";
-import { PDFDocument } from "pdf-lib";
+import { degrees, PDFDocument } from "pdf-lib";
 import AuthContext from "../auth/Auth";
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
 
@@ -96,12 +96,11 @@ export default function Assets() {
       const newHeight = height * scaleFactorHeight;
 
       // Cambiar el tamaño de la página
-      copiedPage.setSize(newWidth, newHeight);
       copiedPage.scaleContent(scaleFactorWidth, scaleFactorHeight);
-
-      // Escalar el contenido de la página (nota: ajuste manual requerido)
-      // Aquí puedes agregar una función personalizada para ajustar cada elemento si es necesario.
-      // Ejemplo teórico: adjustPageContent(copiedPage, scaleFactor);
+      if (newHeight !== 72 || newWidth !== 144) {
+        copiedPage.setRotation(degrees(90)); // Rotar 90 grados
+      }
+      copiedPage.setSize(newWidth, newHeight);
 
       newPdfDoc.addPage(copiedPage);
     }
@@ -135,6 +134,10 @@ export default function Assets() {
 
       // Redimensionar el contenido de la página
       page.scaleContent(scaleFactorWidth, scaleFactorHeight);
+
+      if (newHeight !== 72 || newWidth !== 144) {
+        page.setRotation(degrees(90)); // Rotar 90 grados
+      }
     });
 
     // Serializar el documento modificado a bytes

@@ -493,6 +493,7 @@ export default function Assets() {
             </Grid2>
           </Box>
           <DataGrid
+            autoHeight
             rows={rows}
             columns={columns}
             checkboxSelection

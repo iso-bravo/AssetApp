@@ -189,6 +189,7 @@ export default function CatalogsPage() {
                 <ReloadIcon />
               </IconButton>
               <DataGrid
+                autoHeight
                 rows={categorias}
                 columns={categoriaCols}
                 checkboxSelection
@@ -227,6 +228,7 @@ export default function CatalogsPage() {
                 <ReloadIcon />
               </IconButton>
               <DataGrid
+                autoHeight
                 rows={estados}
                 columns={estadosCols}
                 checkboxSelection
@@ -265,6 +267,7 @@ export default function CatalogsPage() {
                 <ReloadIcon />
               </IconButton>
               <DataGrid
+                autoHeight
                 rows={areas}
                 columns={areasCols}
                 checkboxSelection

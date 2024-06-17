@@ -1,3 +1,4 @@
+import io
 import logging
 from datetime import datetime
 import csv
@@ -519,50 +520,56 @@ class UploadFile(APIView):
         
 class ImportCSV(APIView):
     def post(self, request):
-        if request.method == 'POST' and request.FILES['csv']:
+        if request.method == 'POST' and 'csv' in request.FILES:
             try:
                 fileCSV = request.FILES['csv']
                 if not fileCSV.name.endswith('.csv'):
-                    return Response({"mensaje" : "El archivo no es CSV."})
+                    return Response({"mensaje": "El archivo no es CSV."}, status=400)
 
+                # Leer el archivo CSV
                 file_data = fileCSV.read().decode('utf-8')
-                csv_data = file_data.split('\n')
+                csv_data = csv.reader(io.StringIO(file_data))
+
+                columns = {
+                    'Número de Serie': None,
+                    'Modelo': None,
+                    'Descripción Español': None,
+                    'Marca': None,
+                    'Número de Factura': None,
+                    'Número de Pedimento': None
+                }
 
                 isFirstCycle = True
-                columns = []
 
-                for x in csv_data:
-                    fields = x.split(',')
-                    
-                    date = datetime.now().date()
-                    if isFirstCycle == False:
-                        data = Asset.objects.create(
-                            numero_serie = fields[17],
-                            modelo = fields[16],
-                            descripcion = fields[2],
-                            marca = fields[15],
-                            #id_categoria = "",
-                            #imagen = "",
-                            fecha_registro = date,
-                            #id_estatus = "",
-                            tipo_compra = "",
-                            noFactura = fields[6],
-                            noPedimento = fields[0],
-                            #factura_pedimentoPDF = "",
-                            #id_usuario = "",
-                            #id_area = "",
-                        )
-                    else:
-                        index = 0
-                        for y in fields:
-                            if y == 'Número de Serie' or y == 'Modelo' or y == 'Descripción Español' or y == 'Marca' or y == 'Número de Factura' or y == 'Número de Pedimento':
-                                dic =  {'nombre': y, 'index': index}
-                                columns.append(dic)
-                            index += 1
-                        columns
+                for row in csv_data:
+                    if isFirstCycle:
+                        # Verificar los índices de las columnas requeridas
+                        for index, column_name in enumerate(row):
+                            if column_name in columns:
+                                columns[column_name] = index
+                        # Verificar que todos los campos requeridos están presentes
+                        if None in columns.values():
+                            missing_columns = [key for key, value in columns.items() if value is None]
+                            return Response({"mensaje": f"Faltan columnas requeridas en el CSV: {', '.join(missing_columns)}"}, status=400)
                         isFirstCycle = False
+                    else:
+                        # Crear la instancia de Asset usando los índices dinámicos
+                        Asset.objects.create(
+                            numero_serie=row[columns['Número de Serie']],
+                            modelo=row[columns['Modelo']],
+                            descripcion=row[columns['Descripción Español']],
+                            marca=row[columns['Marca']],
+                            fecha_registro=datetime.now().date(),
+                            tipo_compra="",
+                            noFactura=row[columns['Número de Factura']],
+                            noPedimento=row[columns['Número de Pedimento']],
+                        )
+
+                # Llamar a la función make_pdf si es necesario
                 make_pdf()   
-                return Response({'mensaje': 'CSV enviado exitosamente.'}, status=200) 
+                return Response({'mensaje': 'CSV enviado exitosamente.'}, status=200)
+                
             except Exception as e:
-                return Response("Error: {}".format(str(e)))
-        return Response({"mensaje" : "Error mágico"})
+                return Response({"mensaje": f"Error: {str(e)}"}, status=500)
+        
+        return Response({"mensaje": "Error mágico"}, status=400)

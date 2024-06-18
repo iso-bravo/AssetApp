@@ -536,7 +536,10 @@ class ImportCSV(APIView):
                     'Descripción Español': None,
                     'Marca': None,
                     'Número de Factura': None,
-                    'Número de Pedimento': None
+                    'Número de Pedimento': None,
+                    'Descripción Ingles': None,
+                    'País Origen': None,
+                    'Fecha Pedimento': None,
                 }
 
                 isFirstCycle = True
@@ -563,13 +566,16 @@ class ImportCSV(APIView):
                             tipo_compra="",
                             noFactura=row[columns['Número de Factura']],
                             noPedimento=row[columns['Número de Pedimento']],
+                            descripcion_ingles=row[columns['Descripción Ingles']],
+                            pais_origen=row[columns['País Origen']],
                         )
 
                 # Llamar a la función make_pdf si es necesario
-                make_pdf()   
+                make_pdf()
                 return Response({'mensaje': 'CSV enviado exitosamente.'}, status=200)
                 
             except Exception as e:
-                return Response({"mensaje": f"Error: {str(e)}"}, status=500)
+                # Capturar más detalles sobre el error para depuración
+                return Response({"mensaje": f"Error procesando el archivo CSV: {str(e)}"}, status=500)
         
-        return Response({"mensaje": "Error mágico"}, status=400)
+        return Response({"mensaje": "Solicitud inválida o archivo CSV no encontrado."}, status=400)

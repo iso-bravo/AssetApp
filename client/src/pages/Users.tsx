@@ -172,6 +172,7 @@ export default function UsersPage() {
               <ReloadIcon />
             </IconButton>
             <DataGrid
+              autoHeight
               rows={user}
               columns={columns}
               checkboxSelection

@@ -53,6 +53,15 @@ def make_pdf():
 
     df_asset = pd.DataFrame(list(assets.values()))
     
+    if df_asset.empty:
+        # Crear un PDF con el texto "No hay etiquetas" en la misma ruta
+        direccion_etiquetas_pdf = os.path.join(direccion_labels_pdf, "Etiquetas.pdf")
+        c = canvas.Canvas(direccion_etiquetas_pdf)
+        c.setPageSize(letter)
+        c.drawString(100, 750, "No hay etiquetas")
+        c.save()
+        return
+
     _id = list(df_asset['id'])
     
     generate_qr_list(_id)

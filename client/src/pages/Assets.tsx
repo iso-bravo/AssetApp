@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext } from "react";
-import axios from "axios";
 import {
   Box,
   Container,
@@ -201,8 +200,8 @@ export default function Assets() {
   });
 
   function updateAssets() {
-    axios
-      .get("http://127.0.0.1:8000/api/asset_all/")
+    API
+      .get("/api/asset_all/")
       .then(async (response) => {
         let composeData: GridRowsProp = response.data;
 
@@ -347,48 +346,18 @@ export default function Assets() {
           minHeight={0}
           marginTop={4}
           marginBottom={10}
-          marginLeft={20}
-          minWidth={500}
+          marginLeft={30}
+          minWidth={200}
           maxWidth={2000}
         >
           <Box marginBottom={2}>
             <Grid2 container spacing={0}>
-              <Grid2 xs={9}>
-                <Typography variant="h4" margin={2} align="center">
+              <Grid2 xs={12}>
+                <Typography variant="h4" margin={2} align="left">
                   Assets
                 </Typography>
               </Grid2>
-              {permiso === "admin" ? (
-                <Grid2 xs={3}>
-                  <FormControl>
-                    <FormLabel>Medidas de etiquetas</FormLabel>
-                    <RadioGroup
-                      aria-labelledby="demo-radio-buttons-group-label"
-                      defaultValue="1"
-                      name="radio-buttons-group"
-                      row
-                    >
-                      <FormControlLabel
-                        value="1"
-                        control={
-                          <Radio onChange={() => setHeightWidth([1, 1])} />
-                        }
-                        label="1x2"
-                      />
-                      <FormControlLabel
-                        value="2"
-                        control={
-                          <Radio onChange={() => setHeightWidth([4, 3])} />
-                        }
-                        label="4x6"
-                      />
-                    </RadioGroup>
-                  </FormControl>
-                </Grid2>
-              ) : (
-                <></>
-              )}
-              <Grid2 xs={12}>
+              <Grid2 xs={9}>
                 <Stack spacing={2}>
                   <ButtonGroup>
                     {/* Grupo de botones para manipular y visualizar los datos */}
@@ -438,7 +407,7 @@ export default function Assets() {
                         Detalles
                       </Button>
                     )}
-
+                    </ButtonGroup>
                     {permiso === "admin" ? (
                       <ButtonGroup>
                         <Button
@@ -490,9 +459,39 @@ export default function Assets() {
                     ) : (
                       <></>
                     )}
-                  </ButtonGroup>
+                  
                 </Stack>
               </Grid2>
+              {permiso === "admin" ? (
+                <Grid2 xs={3}>
+                  <FormControl>
+                    <FormLabel>Medidas de etiquetas</FormLabel>
+                    <RadioGroup
+                      aria-labelledby="demo-radio-buttons-group-label"
+                      defaultValue="1"
+                      name="radio-buttons-group"
+                      row
+                    >
+                      <FormControlLabel
+                        value="1"
+                        control={
+                          <Radio onChange={() => setHeightWidth([1, 1])} />
+                        }
+                        label="1x2"
+                      />
+                      <FormControlLabel
+                        value="2"
+                        control={
+                          <Radio onChange={() => setHeightWidth([4, 3])} />
+                        }
+                        label="4x6"
+                      />
+                    </RadioGroup>
+                  </FormControl>
+                </Grid2>
+              ) : (
+                <></>
+              )}
             </Grid2>
           </Box>
           <DataGrid
@@ -635,8 +634,8 @@ function AddAssetDialogButton(props: resetInterface) {
   }
 
   useEffect(() => {
-    axios
-      .get("http://127.0.0.1:8000/api/categories/")
+    API
+      .get("/api/categories/")
       .then((response) => {
         const mappedCategories = response.data.map((item: ServerCategory) => ({
           value: item.id.toString(),
@@ -650,8 +649,8 @@ function AddAssetDialogButton(props: resetInterface) {
   }, []);
 
   useEffect(() => {
-    axios
-      .get("http://127.0.0.1:8000/api/states/")
+    API
+      .get("/api/states/")
       .then((response) => {
         const mappedStates = response.data.map((item: ServerStatus) => ({
           value: item.id.toString(),
@@ -665,8 +664,8 @@ function AddAssetDialogButton(props: resetInterface) {
   }, []);
 
   useEffect(() => {
-    axios
-      .get("http://127.0.0.1:8000/api/users/")
+    API
+      .get("/api/users/")
       .then((response) => {
         const mappedUsers = response.data.map((item: ServerUser) => ({
           value: item.id.toString(),
@@ -680,8 +679,8 @@ function AddAssetDialogButton(props: resetInterface) {
   }, []);
 
   useEffect(() => {
-    axios
-      .get("http://127.0.0.1:8000/api/areas/")
+    API
+      .get("/api/areas/")
       .then((response) => {
         const mappedAreas = response.data.map((item: ServerArea) => ({
           value: item.id.toString(),

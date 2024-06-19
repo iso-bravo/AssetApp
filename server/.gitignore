@@ -6,3 +6,6 @@ venv/
 Asset/__pycache__/
 api/qr_imgs/
 files
+Lib
+Scripts
+api/labels_pdf

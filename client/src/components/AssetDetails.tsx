@@ -43,8 +43,8 @@ export interface PropsDetail {
 
 export default function AssetDetails(props: PropsDetail) {
   const [open, setOpen] = React.useState(false);
-  const ImageSRC = "http://127.0.0.1:8000/api" + props.asset.Imagen;
-  const FacturaSRC = "http://127.0.0.1:8000/api/files/" + props.asset.Factura;
+  const ImageSRC = "http://localhost:8080/api" + props.asset.Imagen;
+  const FacturaSRC = "http://localhost:8080/api/files/" + props.asset.Factura;
 
   const handleClickOpen = () => {
     setOpen(true);

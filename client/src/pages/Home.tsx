@@ -5,15 +5,15 @@ import AssetIcon from "../assets/asset_icon.png";
 import { Box, Container } from "@mui/material";
 import NavegatorDrawer from "../components/NavegatorDrawer";
 
-export const API = axios.create({ baseURL: "http://localhost:8000" });
+export const API = axios.create({ baseURL: "http://localhost:8080" });
 
 function Home() {
   const [assetCount, setAssetCount] = useState(0);
   const [employeeCount, setEmployeeCount] = useState(0);
 
   useEffect(() => {
-    axios
-      .get("http://127.0.0.1:8000/api/asset_employee_count/")
+    API
+      .get("/api/asset_employee_count/")
       .then((response) => {
         const { asset_count, employee_count } = response.data;
         setAssetCount(asset_count);

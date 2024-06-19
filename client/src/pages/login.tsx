@@ -10,13 +10,11 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import FormControl from '@mui/material/FormControl';
 import Button from '@mui/material/Button';
-import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AuthContext from '../auth/Auth';
-
-// Asegúrate de que la ruta de la imagen sea correcta
 import BackgroundImage from '../assets/fondo.jpg';
+import { API } from './Home';
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -33,7 +31,7 @@ const Login: React.FC = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/login/', {
+      const response = await API.post('/api/login/', {
         nombre: username,
         contraseña: password
       });

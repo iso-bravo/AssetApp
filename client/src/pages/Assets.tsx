@@ -51,11 +51,12 @@ import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
 // Definir columnas para la tabla de datos
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 80 },
-  { field: "numero_serie", headerName: "Número de serie", width: 150 },
   { field: "pais_origen", headerName: "País", width: 150 },
   { field: "modelo", headerName: "Modelo", width: 150 },
   { field: "descripcion", headerName: "Descripción", width: 200 },
+  { field: "noPedimento", headerName: "Pedimento", width: 150 },
   { field: "marca", headerName: "Marca", width: 150 },
+  { field: "numero_serie", headerName: "Número de serie", width: 150 },
   { field: "id_categoria", headerName: "Categoría", width: 150 },
   { field: "id_estatus", headerName: "Estatus", width: 150 },
 ];

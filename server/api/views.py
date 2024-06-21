@@ -417,7 +417,7 @@ class ExportAssetsCsvView(APIView):
             
             writer.writerow([asset.id, asset.numero_serie, asset.modelo, asset.descripcion,
                             asset.marca, category, asset.fecha_registro, status,
-                            asset.tipo_compra, asset.noFactura_pedimento,
+                            asset.tipo_compra, asset.noFactura,
                             user, area])
 
         return response
@@ -465,7 +465,6 @@ def asset_info_qr(request, id):
     area = get_object_or_404(Areas, id=asset.id_area)
     imageName = asset.imagen
     image = 'api/assets_imgs/' + str(imageName) + '.jpg'
-    countryOrigin
     
     context = {
         'Id': asset.id,

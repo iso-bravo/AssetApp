@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import {
   Box,
-  Container,
   Typography,
   ButtonGroup,
   TextField,
@@ -51,14 +50,14 @@ import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
 // Definir columnas para la tabla de datos
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 80 },
-  { field: "pais_origen", headerName: "País", width: 150 },
-  { field: "modelo", headerName: "Modelo", width: 150 },
+  { field: "noPedimento", headerName: "Pedimento", width: 200 },
+  { field: "marca", headerName: "Marca", width: 200 },
+  { field: "modelo", headerName: "Modelo", width: 200 },
+  { field: "numero_serie", headerName: "Número de serie", width: 200 },
+  { field: "pais_origen", headerName: "País", width: 200 },
   { field: "descripcion", headerName: "Descripción", width: 200 },
-  { field: "noPedimento", headerName: "Pedimento", width: 150 },
-  { field: "marca", headerName: "Marca", width: 150 },
-  { field: "numero_serie", headerName: "Número de serie", width: 150 },
-  { field: "id_categoria", headerName: "Categoría", width: 150 },
-  { field: "id_estatus", headerName: "Estatus", width: 150 },
+  { field: "id_categoria", headerName: "Categoría", width: 200 },
+  { field: "id_estatus", headerName: "Estatus", width: 200 },
 ];
 
 interface Usuario {
@@ -203,8 +202,7 @@ export default function Assets() {
   });
 
   function updateAssets() {
-    API
-      .get("/api/asset_all/")
+    API.get("/api/asset_all/")
       .then(async (response) => {
         let composeData: GridRowsProp = response.data;
 
@@ -343,160 +341,139 @@ export default function Assets() {
   return (
     <>
       <NavegatorDrawer />
-      <Container>
-        <Box
-          maxHeight={2000}
-          minHeight={0}
-          marginTop={4}
-          marginBottom={10}
-          marginLeft={30}
-          minWidth={200}
-          maxWidth={2000}
-        >
-          <Box marginBottom={2}>
-            <Grid2 container spacing={0}>
-              <Grid2 xs={12}>
-                <Typography variant="h4" margin={2} align="left">
-                  Assets
-                </Typography>
-              </Grid2>
-              <Grid2 xs={9}>
-                <Stack spacing={2}>
-                  <ButtonGroup>
-                    {/* Grupo de botones para manipular y visualizar los datos */}
-                    {permiso === "admin" || permiso === "register" ? (
-                      <AddAssetDialogButton
-                        ClickHandler={() => {
-                          updateAssets();
-                        }}
-                        //Autosize={setAutosize}
-                        Loading={setLoading}
-                      />
-                    ) : (
-                      <></>
-                    )}
-                    <EditAssetDialogButton
-                      data={details}
-                      ids={IDAsset}
-                      ClickHandler={() => {
-                        updateAssets();
-                      }}
-                      //Autosize={setAutosize}
-                      Loading={setLoading}
-                    />
-                    {permiso === "admin" ? (
-                      <DeleteAssetButton
-                        ids={IDAsset}
-                        Loading={setLoading}
-                        ClickHandler={() => {
-                          updateAssets();
-                        }}
-                        //Autosize={setAutosize}
-                      />
-                    ) : (
-                      <></>
-                    )}
-                    {!(IDAsset.length > 1) ? (
-                      <AssetDetails asset={details} />
-                    ) : (
-                      <Button
-                        variant="contained"
-                        onClick={() =>
-                          alert("No se pueden seleccionar multiples assets.")
-                        }
-                        color="info"
-                        endIcon={<DetailsIcon />}
-                      >
-                        Detalles
-                      </Button>
-                    )}
-                    </ButtonGroup>
-                    {permiso === "admin" ? (
-                      <ButtonGroup>
-                        <Button
-                          endIcon={<ExportIcon />}
-                          variant="outlined"
-                          onClick={exportCSV}
-                        >
-                          Exportar
-                        </Button>
-                        <ImportAssetButton
-                          ClickHandler={() => {
-                            updateAssets();
-                          }}
-                          //Autosize={setAutosize}
-                          Loading={setLoading}
-                        />
-                        {permiso === "admin" ? (
-                          <button
-                            onClick={() => {
-                              IDAsset[0] === -1 || IDAsset.length === 0
-                                ? modifyAndDownloadPDF()
-                                : downloadSelectedPages(pages);
-                            }}
-                            style={{ width: 202 }}
-                          >
-                            <Paper
-                              style={{
-                                height: 40,
-                                alignItems: "center",
-                                alignContent: "center",
-                                textAlign: "center",
-                                backgroundColor: "orangered",
-                                color: "white",
-                                paddingLeft: "10%",
-                                paddingRight: "10%",
-                              }}
-                            >
-                              <Stack direction="row" spacing={2}>
-                                <ImportIcon />
-                                <div>ETIQUETAS</div>
-                                <PDFIcon />
-                              </Stack>
-                            </Paper>
-                          </button>
-                        ) : (
-                          <></>
-                        )}
-                      </ButtonGroup>
-                    ) : (
-                      <></>
-                    )}
-                  
-                </Stack>
-              </Grid2>
-              {permiso === "admin" ? (
-                <Grid2 xs={3}>
-                  <FormControl>
-                    <FormLabel>Medidas de etiquetas</FormLabel>
-                    <RadioGroup
-                      aria-labelledby="demo-radio-buttons-group-label"
-                      defaultValue="1"
-                      name="radio-buttons-group"
-                      row
-                    >
-                      <FormControlLabel
-                        value="1"
-                        control={
-                          <Radio onChange={() => setHeightWidth([1, 1])} />
-                        }
-                        label="1x2"
-                      />
-                      <FormControlLabel
-                        value="2"
-                        control={
-                          <Radio onChange={() => setHeightWidth([4, 3])} />
-                        }
-                        label="4x6"
-                      />
-                    </RadioGroup>
-                  </FormControl>
-                </Grid2>
+      <Grid2 container spacing={2} marginLeft={30} marginRight={5}>
+        <Grid2 xs={12}>
+          <Typography variant="h4" margin={2} align="left">
+            Assets
+          </Typography>
+        </Grid2>
+        <Grid2 xs={9}>
+          <Stack spacing={2}>
+            <ButtonGroup>
+              {/* Grupo de botones para manipular y visualizar los datos */}
+              {permiso === "admin" || permiso === "register" ? (
+                <AddAssetDialogButton
+                  ClickHandler={() => {
+                    updateAssets();
+                  }}
+                  //Autosize={setAutosize}
+                  Loading={setLoading}
+                />
               ) : (
                 <></>
               )}
-            </Grid2>
-          </Box>
+              <EditAssetDialogButton
+                data={details}
+                ids={IDAsset}
+                ClickHandler={() => {
+                  updateAssets();
+                }}
+                //Autosize={setAutosize}
+                Loading={setLoading}
+              />
+              {permiso === "admin" ? (
+                <DeleteAssetButton
+                  ids={IDAsset}
+                  Loading={setLoading}
+                  ClickHandler={() => {
+                    updateAssets();
+                  }}
+                  //Autosize={setAutosize}
+                />
+              ) : (
+                <></>
+              )}
+              {!(IDAsset.length > 1) ? (
+                <AssetDetails asset={details} />
+              ) : (
+                <Button
+                  variant="contained"
+                  onClick={() =>
+                    alert("No se pueden seleccionar multiples assets.")
+                  }
+                  color="info"
+                  endIcon={<DetailsIcon />}
+                >
+                  Detalles
+                </Button>
+              )}
+            </ButtonGroup>
+            {permiso === "admin" ? (
+              <ButtonGroup>
+                <Button
+                  endIcon={<ExportIcon />}
+                  variant="outlined"
+                  onClick={exportCSV}
+                >
+                  Exportar
+                </Button>
+                <ImportAssetButton
+                  ClickHandler={() => {
+                    updateAssets();
+                  }}
+                  //Autosize={setAutosize}
+                  Loading={setLoading}
+                />
+              </ButtonGroup>
+            ) : (
+              <></>
+            )}
+          </Stack>
+        </Grid2>
+        {permiso === "admin" ? (
+          <Grid2 xs={3}>
+            <button
+              onClick={() => {
+                IDAsset[0] === -1 || IDAsset.length === 0
+                  ? modifyAndDownloadPDF()
+                  : downloadSelectedPages(pages);
+              }}
+              style={{ width: 202 }}
+            >
+              <Paper
+                style={{
+                  height: 40,
+                  alignItems: "center",
+                  alignContent: "center",
+                  textAlign: "center",
+                  backgroundColor: "orangered",
+                  color: "white",
+                  paddingLeft: "10%",
+                  paddingRight: "10%",
+                }}
+              >
+                <Stack direction="row" spacing={2}>
+                  <ImportIcon />
+                  <div>ETIQUETAS</div>
+                  <PDFIcon />
+                </Stack>
+              </Paper>
+            </button>
+            <FormControl style={{margin: 12}}>
+              <FormLabel>Medidas de etiquetas</FormLabel>
+              <RadioGroup
+                aria-labelledby="demo-radio-buttons-group-label"
+                defaultValue="1"
+                name="radio-buttons-group"
+                row
+              >
+                <FormControlLabel
+                  value="1"
+                  control={<Radio onChange={() => setHeightWidth([1, 1])} />}
+                  label="1x2"
+                />
+                <FormControlLabel
+                  value="2"
+                  control={<Radio onChange={() => setHeightWidth([4, 3])} />}
+                  label="4x6"
+                />
+              </RadioGroup>
+            </FormControl>
+          </Grid2>
+        ) : (
+          <></>
+        )}
+        <Grid2 xs={12}>
           <DataGrid
             autoHeight
             rows={rows}
@@ -563,8 +540,8 @@ export default function Assets() {
               }
             }}
           />
-        </Box>
-      </Container>
+        </Grid2>
+      </Grid2>
     </>
   );
 }
@@ -637,8 +614,7 @@ function AddAssetDialogButton(props: resetInterface) {
   }
 
   useEffect(() => {
-    API
-      .get("/api/categories/")
+    API.get("/api/categories/")
       .then((response) => {
         const mappedCategories = response.data.map((item: ServerCategory) => ({
           value: item.id.toString(),
@@ -652,8 +628,7 @@ function AddAssetDialogButton(props: resetInterface) {
   }, []);
 
   useEffect(() => {
-    API
-      .get("/api/states/")
+    API.get("/api/states/")
       .then((response) => {
         const mappedStates = response.data.map((item: ServerStatus) => ({
           value: item.id.toString(),
@@ -667,8 +642,7 @@ function AddAssetDialogButton(props: resetInterface) {
   }, []);
 
   useEffect(() => {
-    API
-      .get("/api/users/")
+    API.get("/api/users/")
       .then((response) => {
         const mappedUsers = response.data.map((item: ServerUser) => ({
           value: item.id.toString(),
@@ -682,8 +656,7 @@ function AddAssetDialogButton(props: resetInterface) {
   }, []);
 
   useEffect(() => {
-    API
-      .get("/api/areas/")
+    API.get("/api/areas/")
       .then((response) => {
         const mappedAreas = response.data.map((item: ServerArea) => ({
           value: item.id.toString(),
@@ -837,6 +810,7 @@ function AddAssetDialogButton(props: resetInterface) {
             <TextField
               label="Número de pedimento"
               fullWidth
+              required
               helperText="Escribe el número de pedimento."
               margin="normal"
               name="noPedimento"
@@ -844,7 +818,6 @@ function AddAssetDialogButton(props: resetInterface) {
             <TextField
               label="País de origen"
               fullWidth
-              required
               helperText="Escribe el país de origen."
               multiline
               margin="normal"
@@ -853,7 +826,6 @@ function AddAssetDialogButton(props: resetInterface) {
             <TextField
               label="Modelo"
               fullWidth
-              required
               helperText="Escribe el modelo del producto."
               multiline
               margin="normal"
@@ -862,7 +834,6 @@ function AddAssetDialogButton(props: resetInterface) {
             <TextField
               label="Descripción"
               fullWidth
-              required
               helperText="Agrega una descripción."
               multiline
               margin="normal"
@@ -871,7 +842,6 @@ function AddAssetDialogButton(props: resetInterface) {
             <TextField
               label="Marca"
               fullWidth
-              required
               helperText="Indica la marca."
               multiline
               margin="normal"
@@ -881,7 +851,6 @@ function AddAssetDialogButton(props: resetInterface) {
               select
               label="Estatus"
               fullWidth
-              required
               helperText="Indica el estatus."
               multiline
               margin="normal"
@@ -898,7 +867,6 @@ function AddAssetDialogButton(props: resetInterface) {
               select
               label="Categoría"
               fullWidth
-              required
               helperText="Indica la categoria."
               multiline
               margin="normal"
@@ -914,7 +882,6 @@ function AddAssetDialogButton(props: resetInterface) {
             <TextField
               label="Tipo de compra"
               fullWidth
-              required
               helperText="Selecciona el tipo de compra."
               multiline
               margin="normal"
@@ -958,7 +925,6 @@ function AddAssetDialogButton(props: resetInterface) {
               select
               label="Usuario"
               fullWidth
-              required
               helperText="Indica el usuario."
               multiline
               margin="normal"
@@ -975,7 +941,6 @@ function AddAssetDialogButton(props: resetInterface) {
               select
               label="Area"
               fullWidth
-              required
               helperText="Indica el area."
               multiline
               margin="normal"
@@ -1351,7 +1316,6 @@ function EditAssetDialogButton(props: editProps) {
                 <TextField
                   label="País de origen"
                   fullWidth
-                  required
                   helperText="Escribe el país de origen."
                   multiline
                   margin="normal"
@@ -1361,7 +1325,6 @@ function EditAssetDialogButton(props: editProps) {
                 <TextField
                   label="Modelo"
                   fullWidth
-                  required
                   helperText="Escribe el modelo del producto."
                   multiline
                   margin="normal"
@@ -1371,7 +1334,6 @@ function EditAssetDialogButton(props: editProps) {
                 <TextField
                   label="Descripción"
                   fullWidth
-                  required
                   helperText="Agrega una descripción."
                   multiline
                   margin="normal"
@@ -1381,7 +1343,6 @@ function EditAssetDialogButton(props: editProps) {
                 <TextField
                   label="Marca"
                   fullWidth
-                  required
                   helperText="Indica la marca."
                   multiline
                   margin="normal"
@@ -1392,7 +1353,6 @@ function EditAssetDialogButton(props: editProps) {
                   select
                   label="Estatus"
                   fullWidth
-                  required
                   helperText="Indica el estatus."
                   multiline
                   margin="normal"
@@ -1409,7 +1369,6 @@ function EditAssetDialogButton(props: editProps) {
                   select
                   label="Categoría"
                   fullWidth
-                  required
                   helperText="Indica la categoria."
                   multiline
                   margin="normal"
@@ -1425,7 +1384,6 @@ function EditAssetDialogButton(props: editProps) {
                 <TextField
                   label="Tipo de compra"
                   fullWidth
-                  required
                   helperText="Selecciona el tipo de compra."
                   multiline
                   margin="normal"
@@ -1470,7 +1428,6 @@ function EditAssetDialogButton(props: editProps) {
                   select
                   label="Usuario"
                   fullWidth
-                  required
                   helperText="Indica el usuario."
                   multiline
                   margin="normal"
@@ -1487,7 +1444,6 @@ function EditAssetDialogButton(props: editProps) {
                   select
                   label="Area"
                   fullWidth
-                  required
                   helperText="Indica el area."
                   multiline
                   margin="normal"

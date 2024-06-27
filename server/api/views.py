@@ -481,6 +481,9 @@ def asset_info_qr(request, id):
         'Image':  image,
     }
 
+    # Depurar el contenido del contexto
+    print(context)
+
     return render(request, 'asset_info.html', context)
 
 # Upload and Import

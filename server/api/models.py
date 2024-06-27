@@ -44,15 +44,15 @@ def upload_path(filename):
 
 class Asset(models.Model):
     numero_serie = models.CharField(max_length=100)
-    modelo = models.CharField(max_length=100)
+    modelo = models.CharField(max_length=100, null=True, blank=True)
     descripcion = models.TextField(null=True, blank=True)
     descripcion_ingles = models.TextField(null=True, blank=True)
-    marca = models.CharField(max_length=100)
+    marca = models.CharField(max_length=100, null=True, blank=True)
     id_categoria = models.IntegerField(null=True)
     imagen = models.ImageField(upload_to=upload_path, null=True, blank=True)
     fecha_registro = models.DateField()
     id_estatus = models.IntegerField(null=True)
-    tipo_compra = models.CharField(max_length=100)
+    tipo_compra = models.CharField(max_length=100, null=True, blank=True)
     noFactura = models.TextField(null=True, blank=True)
     noPedimento = models.TextField(null=True, blank=True)
     factura_pedimentoPDF = models.TextField(null=True, blank=True)

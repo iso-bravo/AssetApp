@@ -851,6 +851,7 @@ function AddAssetDialogButton(props: resetInterface) {
               select
               label="Estatus"
               fullWidth
+              required
               helperText="Indica el estatus."
               multiline
               margin="normal"
@@ -867,6 +868,7 @@ function AddAssetDialogButton(props: resetInterface) {
               select
               label="Categoría"
               fullWidth
+              required
               helperText="Indica la categoria."
               multiline
               margin="normal"
@@ -927,6 +929,7 @@ function AddAssetDialogButton(props: resetInterface) {
               fullWidth
               helperText="Indica el usuario."
               multiline
+              required
               margin="normal"
               name="id_usuario"
               defaultValue={""}
@@ -943,6 +946,7 @@ function AddAssetDialogButton(props: resetInterface) {
               fullWidth
               helperText="Indica el area."
               multiline
+              required
               margin="normal"
               name="id_area"
               defaultValue={""}
@@ -1353,6 +1357,7 @@ function EditAssetDialogButton(props: editProps) {
                   select
                   label="Estatus"
                   fullWidth
+                  required
                   helperText="Indica el estatus."
                   multiline
                   margin="normal"
@@ -1369,6 +1374,7 @@ function EditAssetDialogButton(props: editProps) {
                   select
                   label="Categoría"
                   fullWidth
+                  required
                   helperText="Indica la categoria."
                   multiline
                   margin="normal"
@@ -1428,6 +1434,7 @@ function EditAssetDialogButton(props: editProps) {
                   select
                   label="Usuario"
                   fullWidth
+                  required
                   helperText="Indica el usuario."
                   multiline
                   margin="normal"
@@ -1444,6 +1451,7 @@ function EditAssetDialogButton(props: editProps) {
                   select
                   label="Area"
                   fullWidth
+                  required
                   helperText="Indica el area."
                   multiline
                   margin="normal"

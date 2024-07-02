@@ -40,6 +40,7 @@ urlpatterns = [
     path('delete_area/', views.DeleteAreaByIDView.as_view(), name='delete_area'),
     
     path('export_csv/', views.ExportAssetsCsvView.as_view(), name='export_csv'),
+    path('create_pdf/', views.CreatePDF.as_view(), name='create_pdf'),
     
     path('generate_labels_pdf/', views.GenerateLabelsPDFView.as_view(), name='generate_labels_pdf'),
     path('generate_label_id/', views.GenerateLabelByIDView.as_view(), name='generate_label_id'),

@@ -484,7 +484,7 @@ def asset_info_qr(request, id):
     # Depurar el contenido del contexto
     print(context)
 
-    return render(request, 'asset_info.html', context)
+    return render(request, str(asset_info_html), context)
 
 # Upload and Import
 class UploadFile(APIView):

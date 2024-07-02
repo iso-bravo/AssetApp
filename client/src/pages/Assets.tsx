@@ -425,8 +425,12 @@ export default function Assets() {
             <button
               onClick={() => {
                 IDAsset[0] === -1 || IDAsset.length === 0
-                  ? modifyAndDownloadPDF()
-                  : downloadSelectedPages(pages);
+                  ? API.get("/api/create_pdf/").then(() => {
+                      modifyAndDownloadPDF();
+                    })
+                  : API.get("/api/create_pdf/").then(() => {
+                      downloadSelectedPages(pages);
+                    });
               }}
               style={{ width: 202 }}
             >
@@ -449,7 +453,7 @@ export default function Assets() {
                 </Stack>
               </Paper>
             </button>
-            <FormControl style={{margin: 12}}>
+            <FormControl style={{ margin: 12 }}>
               <FormLabel>Medidas de etiquetas</FormLabel>
               <RadioGroup
                 aria-labelledby="demo-radio-buttons-group-label"

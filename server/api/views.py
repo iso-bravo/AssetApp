@@ -130,9 +130,7 @@ class CreateAssetView(APIView):
                 
         new_asset = Asset(**new_asset_data)
         new_asset.save()
-        
-        make_pdf()
-        
+                
         return Response({'mensaje': 'Registro exitoso'}, status=200)
 
 class DeleteAssetView(APIView):
@@ -141,8 +139,6 @@ class DeleteAssetView(APIView):
         
         asset = Asset.objects.get(id=asset_id)
         asset.delete()
-        
-        make_pdf()
         
         return Response({'mensaje': 'Eliminado correctamente'}, status=200)
     
@@ -156,9 +152,7 @@ class EditAssetView(APIView):
             if field.name in data:
                     setattr(asset, field.name, data[field.name])
         asset.save()
-        
-        make_pdf()
-                
+                        
         return Response({'mensaje': 'Editado correctamente'}, status=200)
 
 class GetStatusCategoriesView(APIView):
@@ -520,6 +514,14 @@ class UploadFile(APIView):
         else:
             return Response({'error': 'Método no permitido.'}, status=405)
         
+class CreatePDF(APIView):
+    def get(self, request):
+        try:
+            make_pdf()
+            return Response({'mensaje': 'Subido exitosamente.'}, status=200)
+        except Exception as e:
+            return Response({'error': str(e)}, status=400)
+
 class ImportCSV(APIView):
     def post(self, request):
         if request.method == 'POST' and 'csv' in request.FILES:

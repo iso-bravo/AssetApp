@@ -14,8 +14,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.core.exceptions import ObjectDoesNotExist
 
-from .models import (Areas, Asset, Categorias, Departamento, Estados, Permiso, Usuario)
-from .serializers import (AreasSerializer, AssetSerializer, CategoriasSerializer, EstadosSerializer, UsuarioSerializer, DepartamentoSerializer, 
+from .models import (Areas, Asset, Categorias, Departamento, EstadoPedimento, Estados, Permiso, UnidadMedida, Usuario)
+from .serializers import (AreasSerializer, AssetSerializer, CategoriasSerializer, EstadosSerializer, UnidadMedidaSerializer, UsuarioSerializer, DepartamentoSerializer, 
 PermisoSerializer)
 
 from .labels_logic import generate_qr_list, make_pdf, asset_df, get_page_pdf, get_pages_pdf
@@ -371,6 +371,96 @@ class DeleteAreaByIDView(APIView):
         
         return Response({'mensaje': 'Eliminado correctamente'}, status=200)
 
+# Unidades de Medida
+class GetUnidadMedidaAllView(APIView):
+    def get(self, request):
+        unidad_medida = UnidadMedida.objects.all()
+        
+        serializer = UnidadMedidaSerializer(unidad_medida, many=True)
+        return Response(serializer.data, status=200)
+
+class CreateUnidadMedidaView(APIView):
+    def post(self, request):
+        data = request.data
+        new_unidad_medida_data = {}
+        
+        for field in UnidadMedida._meta.fields:
+            if field.name in data:
+                    new_unidad_medida_data[field.name] = data[field.name]
+                
+        new_unidad_medida = UnidadMedida(**new_unidad_medida_data)
+        new_unidad_medida.save()
+        
+        return Response({'mensaje': 'Registro exitoso'}, status=200)
+
+class EditUnidadMedidaByIDView(APIView):
+    def post(self, request):
+        data = request.data
+        id_unidad_medida = request.data.get('id')
+        unidad_medida = UnidadMedida.objects.get(id=id_unidad_medida)
+        
+        for field in UnidadMedida._meta.fields:
+            if field.name in data:
+                    setattr(unidad_medida, field.name, data[field.name])
+                
+        unidad_medida.save()
+                
+        return Response({'mensaje': 'Editado correctamente'}, status=200)
+
+class DeleteUnidadMedidaByIDView(APIView):
+    def post(self, request):
+        id_unidad_medida = request.data.get('id')
+        
+        unidad_medida = UnidadMedida.objects.get(id=id_unidad_medida)
+        unidad_medida.delete()
+        
+        return Response({'mensaje': 'Eliminado correctamente'}, status=200)
+    
+# Estado de Pedimento
+class GetEstadoPedimentoAllView(APIView):
+    def get(self, request):
+        estado_pedimento = EstadoPedimento.objects.all()
+        
+        serializer = UnidadMedidaSerializer(estado_pedimento, many=True)
+        return Response(serializer.data, status=200)
+
+class CreateEstadoPedimentoView(APIView):
+    def post(self, request):
+        data = request.data
+        new_estado_pedimento_data = {}
+        
+        for field in EstadoPedimento._meta.fields:
+            if field.name in data:
+                    new_estado_pedimento_data[field.name] = data[field.name]
+                
+        new_estado_pedimento = EstadoPedimento(**new_estado_pedimento_data)
+        new_estado_pedimento.save()
+        
+        return Response({'mensaje': 'Registro exitoso'}, status=200)
+
+class EditEstadoPedimentoByIDView(APIView):
+    def post(self, request):
+        data = request.data
+        id_estado_pedimento = request.data.get('id')
+        estado_pedimento = EstadoPedimento.objects.get(id=id_estado_pedimento)
+        
+        for field in EstadoPedimento._meta.fields:
+            if field.name in data:
+                    setattr(estado_pedimento, field.name, data[field.name])
+                
+        estado_pedimento.save()
+                
+        return Response({'mensaje': 'Editado correctamente'}, status=200)
+
+class DeleteEstadoPedimentoByIDView(APIView):
+    def post(self, request):
+        id_estado_pedimento = request.data.get('id')
+        
+        estado_pedimento = EstadoPedimento.objects.get(id=id_estado_pedimento)
+        estado_pedimento.delete()
+        
+        return Response({'mensaje': 'Eliminado correctamente'}, status=200)
+
 # Export to csv
 class ExportAssetsCsvView(APIView):
     def get(self, request):
@@ -461,9 +551,9 @@ def asset_info_qr(request, id):
     area = Areas.objects.filter(id=asset.id_area).first()
 
     # Establecer valores por defecto si no se encuentran los objetos
-    categoria_nombre = categoria.categoria if categoria else "Categoría no encontrada"
-    estado_nombre = estado.estatus if estado else "Estado no encontrado"
-    area_nombre = area.area if area else "Área no encontrada"
+    categoria_nombre = categoria.categoria if categoria else "Sin asignar"
+    estado_nombre = estado.estatus if estado else "Sin asignar"
+    area_nombre = area.area if area else "Sin asignar"
     imageName = asset.imagen
     image = 'api/assets_imgs/' + str(imageName) + '.jpg'
     

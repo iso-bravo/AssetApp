@@ -12,6 +12,18 @@ class Permiso(models.Model):
     def __str__(self):
         return self.permiso
 
+class UnidadMedida(models.Model):
+    unidad_medida = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.unidad_medida
+
+class EstadoPedimento(models.Model):
+    estado_pedimento = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.estado_pedimento
+
 class Usuario(models.Model):
     nombre = models.CharField(max_length=100)
     contraseña = models.CharField(max_length=100)
@@ -51,6 +63,7 @@ class Asset(models.Model):
     id_categoria = models.IntegerField(null=True)
     imagen = models.ImageField(upload_to=upload_path, null=True, blank=True)
     fecha_registro = models.DateField()
+    fecha_factura = models.DateField(null=True, blank=True)
     id_estatus = models.IntegerField(null=True)
     tipo_compra = models.CharField(max_length=100, null=True, blank=True)
     noFactura = models.TextField(null=True, blank=True)
@@ -59,6 +72,10 @@ class Asset(models.Model):
     id_usuario = models.IntegerField(null=True)
     id_area = models.IntegerField(null=True)
     pais_origen = models.TextField(null=True, blank=True)
+    comentarios = models.TextField(null=True, blank=True)
+    unidad_medida = models.CharField(max_length=100, null=True, blank=True)
+    estado_pedimento = models.CharField(max_length=100, null=True, blank=True)
+    
     
     def __str__(self):
         return self.numero_serie

@@ -423,14 +423,17 @@ export default function Assets() {
         {permiso === "admin" ? (
           <Grid2 xs={3}>
             <button
-              onClick={() => {
-                IDAsset[0] === -1 || IDAsset.length === 0
-                  ? API.get("/api/create_pdf/").then(() => {
-                      modifyAndDownloadPDF();
-                    })
-                  : API.get("/api/create_pdf/").then(() => {
-                      downloadSelectedPages(pages);
-                    });
+              onClick={async () => {
+                try {
+                  await API.get("/api/create_pdf/");
+                  if (IDAsset[0] === -1 || IDAsset.length === 0) {
+                    modifyAndDownloadPDF();
+                  } else {
+                    downloadSelectedPages(pages);
+                  }
+                } catch (error) {
+                  console.error("Error al hacer la solicitud:", error);
+                }
               }}
               style={{ width: 202 }}
             >

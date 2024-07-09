@@ -454,9 +454,16 @@ class GenerateSelectLabelsPDFView(APIView):
         
 def asset_info_qr(request, id):
     asset = get_object_or_404(Asset, id=id)
-    categoria = get_object_or_404(Categorias, id=asset.id_categoria)
-    estado = get_object_or_404(Estados, id=asset.id_estatus)
-    area = get_object_or_404(Areas, id=asset.id_area)
+
+    # Obtener categoria, estado y area sin lanzar error 404
+    categoria = Categorias.objects.filter(id=asset.id_categoria).first()
+    estado = Estados.objects.filter(id=asset.id_estatus).first()
+    area = Areas.objects.filter(id=asset.id_area).first()
+
+    # Establecer valores por defecto si no se encuentran los objetos
+    categoria_nombre = categoria.categoria if categoria else "Categoría no encontrada"
+    estado_nombre = estado.estatus if estado else "Estado no encontrado"
+    area_nombre = area.area if area else "Área no encontrada"
     imageName = asset.imagen
     image = 'api/assets_imgs/' + str(imageName) + '.jpg'
     
@@ -465,10 +472,10 @@ def asset_info_qr(request, id):
         'NoSerie': asset.numero_serie,
         'AssetModelNo': asset.modelo,
         'Description': asset.descripcion,
-        'Category': categoria.categoria,
+        'Category': categoria_nombre,
         'UnitPrice': asset.tipo_compra,
-        'Area': area.area,
-        'AssetStatus': estado.estatus,
+        'Area': area_nombre,
+        'AssetStatus': estado_nombre,
         'NoPedimento': asset.noPedimento,
         'NoFactura': asset.noFactura,
         'Mark': asset.marca,

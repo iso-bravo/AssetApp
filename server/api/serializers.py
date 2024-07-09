@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Usuario, Departamento, Permiso, Asset, Areas, Estados, Categorias
+from .models import EstadoPedimento, UnidadMedida, Usuario, Departamento, Permiso, Asset, Areas, Estados, Categorias
 
 class PermisoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -36,6 +36,16 @@ class CategoriasSerializer(serializers.ModelSerializer):
         model = Categorias
         fields = '__all__'
         
+class UnidadMedidaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UnidadMedida
+        fields = '__all__'
+
+class EstadoPedimentoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EstadoPedimento
+        fields = '__all__'
+
 class AssetSerializerInformation(serializers.ModelSerializer):
     class Meta:
         model = Asset

@@ -39,6 +39,16 @@ urlpatterns = [
     path('edit_area/', views.EditAreaByIDView.as_view(), name='edit_area'),
     path('delete_area/', views.DeleteAreaByIDView.as_view(), name='delete_area'),
     
+    path('unidad_medida/', views.GetUnidadMedidaAllView.as_view(), name='unidad_medida'),
+    path('create_unidad_medida/', views.CreateUnidadMedidaView.as_view(), name='create_unidad_medida'),
+    path('edit_unidad_medida/', views.EditUnidadMedidaByIDView.as_view(), name='edit_unidad_medida'),
+    path('delete_unidad_medida/', views.DeleteUnidadMedidaByIDView.as_view(), name='delete_unidad_medida'),
+
+    path('estado_pedimento/', views.GetEstadoPedimentoAllView.as_view(), name='estado_pedimento'),
+    path('create_estado_pedimento/', views.CreateEstadoPedimentoView.as_view(), name='create_estado_pedimento'),
+    path('edit_estado_pedimento/', views.EditEstadoPedimentoByIDView.as_view(), name='edit_estado_pedimento'),
+    path('delete_estado_pedimento/', views.DeleteEstadoPedimentoByIDView.as_view(), name='delete_estado_pedimento'),
+
     path('export_csv/', views.ExportAssetsCsvView.as_view(), name='export_csv'),
     path('create_pdf/', views.CreatePDF.as_view(), name='create_pdf'),
     

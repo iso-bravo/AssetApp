@@ -15,7 +15,7 @@ from rest_framework.views import APIView
 from django.core.exceptions import ObjectDoesNotExist
 
 from .models import (Areas, Asset, Categorias, Departamento, EstadoPedimento, Estados, Permiso, UnidadMedida, Usuario)
-from .serializers import (AreasSerializer, AssetSerializer, CategoriasSerializer, EstadosSerializer, UnidadMedidaSerializer, UsuarioSerializer, DepartamentoSerializer, 
+from .serializers import (AreasSerializer, AssetSerializer, CategoriasSerializer, EstadoPedimentoSerializer, EstadosSerializer, UnidadMedidaSerializer, UsuarioSerializer, DepartamentoSerializer, 
 PermisoSerializer)
 
 from .labels_logic import generate_qr_list, make_pdf, asset_df, get_page_pdf, get_pages_pdf
@@ -421,7 +421,7 @@ class GetEstadoPedimentoAllView(APIView):
     def get(self, request):
         estado_pedimento = EstadoPedimento.objects.all()
         
-        serializer = UnidadMedidaSerializer(estado_pedimento, many=True)
+        serializer = EstadoPedimentoSerializer(estado_pedimento, many=True)
         return Response(serializer.data, status=200)
 
 class CreateEstadoPedimentoView(APIView):

@@ -180,7 +180,6 @@ export default function Assets() {
   // TEST
   //console.log(pages);
 
-  //const [autosize, setAutosize] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [details, setDetails] = useState<Details>({
     Description: "",
@@ -191,6 +190,8 @@ export default function Assets() {
     ID_Categoria: "0",
     ID_Estatus: "0",
     ID_Usuario: "0",
+    ID_Estado_Pedimento: "0",
+    ID_Unidad_Medida: "0",
     Imagen: "",
     Marca: "",
     Modelo: "",
@@ -199,7 +200,20 @@ export default function Assets() {
     Tipo_Compra: "",
     noPedimento: "",
     pais_origen: "",
+    comentarios: "",
+    fecha_factura: "",
+    descripcion_ingles: "",
   });
+
+  // Lista de opciones para formularios de agregar y editar assets
+  const [categoriesOptions, setCategoriesOptions] = useState<Options[]>([]);
+  const [statusOptions, setStatusOptions] = useState<Options[]>([]);
+  const [areasOptions, setAreasOptions] = useState<Options[]>([]);
+  const [unidadMedidaOptions, setUnidadMedidaOptions] = useState<Options[]>([]);
+  const [estadoPedimentoOptions, setEstadoPedimentoOptions] = useState<
+    Options[]
+  >([]);
+  const [usersOptions, setUsersOptions] = useState<Options[]>([]);
 
   function updateAssets() {
     API.get("/api/asset_all/")
@@ -209,6 +223,11 @@ export default function Assets() {
         // Get categories
         const categories: GridRowsProp = await API.get("/api/categories/")
           .then((response) => {
+            const options = response.data.map((item: ServerCategory) => ({
+              value: item.id.toString(),
+              label: item.categoria,
+            }));
+            setCategoriesOptions(options);
             return response.data;
           })
           .catch((error) => {
@@ -218,6 +237,11 @@ export default function Assets() {
         // Get states
         const states: GridRowsProp = await API.get("/api/states/")
           .then((response) => {
+            const options = response.data.map((item: ServerStatus) => ({
+              value: item.id.toString(),
+              label: item.estatus,
+            }));
+            setStatusOptions(options);
             return response.data;
           })
           .catch((error) => {
@@ -227,6 +251,11 @@ export default function Assets() {
         // Get areas
         const areas: GridRowsProp = await API.get("/api/areas/")
           .then((response) => {
+            const options = response.data.map((item: ServerArea) => ({
+              value: item.id.toString(),
+              label: item.area,
+            }));
+            setAreasOptions(options);
             return response.data;
           })
           .catch((error) => {
@@ -236,6 +265,11 @@ export default function Assets() {
         // Get usuarios
         const usuarios: GridRowsProp = await API.get("/api/users/")
           .then((response) => {
+            const options = response.data.map((item: ServerUser) => ({
+              value: item.id.toString(),
+              label: item.nombre,
+            }));
+            setUsersOptions(options);
             return response.data;
           })
           .catch((error) => {
@@ -288,6 +322,34 @@ export default function Assets() {
   // Asignación de la información que se despliega en la tabla
   useEffect(() => {
     updateAssets();
+    API.get("/api/unidad_medida/")
+      .then((response) => {
+        const options = response.data.map((item: ServerUnidadMedida) => ({
+          value: item.id.toString(),
+          label: item.unidad_medida,
+        }));
+        setUnidadMedidaOptions(options);
+      })
+      .catch((error) => {
+        console.error(
+          "Error al obtener unidades de medida del servidor:",
+          error
+        );
+      });
+    API.get("/api/estado_pedimento/")
+      .then((response) => {
+        const options = response.data.map((item: ServerEstadosPedimento) => ({
+          value: item.id.toString(),
+          label: item.estado_pedimento,
+        }));
+        setEstadoPedimentoOptions(options);
+      })
+      .catch((error) => {
+        console.error(
+          "Error al obtener estados de pedimento del servidor:",
+          error
+        );
+      });
   }, []);
 
   const exportCSV = () => {
@@ -358,6 +420,12 @@ export default function Assets() {
                   }}
                   //Autosize={setAutosize}
                   Loading={setLoading}
+                  categoriesOptions={categoriesOptions}
+                  statusOptions={statusOptions}
+                  areasOptions={areasOptions}
+                  unidadMedidaOptions={unidadMedidaOptions}
+                  estadoPedimentoOptions={estadoPedimentoOptions}
+                  usersOptions={usersOptions}
                 />
               ) : (
                 <></>
@@ -368,8 +436,13 @@ export default function Assets() {
                 ClickHandler={() => {
                   updateAssets();
                 }}
-                //Autosize={setAutosize}
                 Loading={setLoading}
+                categoriesOptions={categoriesOptions}
+                statusOptions={statusOptions}
+                areasOptions={areasOptions}
+                unidadMedidaOptions={unidadMedidaOptions}
+                estadoPedimentoOptions={estadoPedimentoOptions}
+                usersOptions={usersOptions}
               />
               {permiso === "admin" ? (
                 <DeleteAssetButton
@@ -522,6 +595,11 @@ export default function Assets() {
                       Tipo_Compra: row.tipo_compra,
                       noPedimento: row.noPedimento,
                       pais_origen: row.pais_origen,
+                      ID_Estado_Pedimento: row.estado_pedimento,
+                      ID_Unidad_Medida: row.unidad_medida,
+                      comentarios: row.comentarios,
+                      fecha_factura: row.fecha_factura,
+                      descripcion_ingles: row.descripcion_ingles,
                     });
                   }
                 });
@@ -535,6 +613,8 @@ export default function Assets() {
                   ID_Categoria: "0",
                   ID_Estatus: "0",
                   ID_Usuario: "0",
+                  ID_Estado_Pedimento: "0",
+                  ID_Unidad_Medida: "0",
                   Imagen: "",
                   Marca: "",
                   Modelo: "",
@@ -543,6 +623,9 @@ export default function Assets() {
                   Tipo_Compra: "",
                   noPedimento: "",
                   pais_origen: "",
+                  comentarios: "",
+                  fecha_factura: "",
+                  descripcion_ingles: "",
                 });
               }
             }}
@@ -579,32 +662,62 @@ type ServerArea = {
   area: string;
 };
 
-interface resetInterface {
+type ServerUnidadMedida = {
+  id: number;
+  unidad_medida: string;
+};
+
+type ServerEstadosPedimento = {
+  id: number;
+  estado_pedimento: string;
+};
+
+interface AllProps {
   ClickHandler: Function;
-  //Autosize: Function;
   Loading: Function;
 }
 
-interface IDProps extends resetInterface {
+interface AddProps extends AllProps {
+  categoriesOptions: Options[];
+  statusOptions: Options[];
+  areasOptions: Options[];
+  unidadMedidaOptions: Options[];
+  estadoPedimentoOptions: Options[];
+  usersOptions: Options[];
+}
+
+interface DeleteProps extends AllProps {
   ids: GridRowSelectionModel;
   data?: GridRowsProp;
 }
 
-interface editProps extends resetInterface {
+interface editProps extends AllProps {
+  categoriesOptions: Options[];
+  statusOptions: Options[];
+  areasOptions: Options[];
+  unidadMedidaOptions: Options[];
+  estadoPedimentoOptions: Options[];
+  usersOptions: Options[];
   ids: GridRowSelectionModel;
   data: Details;
 }
 
-function AddAssetDialogButton(props: resetInterface) {
-  const [categories, setCategories] = useState<Options[]>([]);
-  const [status, setStatus] = useState<Options[]>([]);
-  const [users, setUsers] = useState<Options[]>([]);
-  const [areas, setAreas] = useState<Options[]>([]);
+function AddAssetDialogButton(props: AddProps) {
+  // Hooks para campos de opciones
+  const categories: Options[] = props.categoriesOptions;
+  const status: Options[] = props.statusOptions;
+  const users: Options[] = props.usersOptions;
+  const areas: Options[] = props.areasOptions;
+  const unidadMedida: Options[] = props.unidadMedidaOptions;
+  const estadosPedimento: Options[] = props.estadoPedimentoOptions;
+
+  // Hooks para manejar archivos de imagen y pdf
   const [pdf, setPDF] = useState<string>("");
   const [image, setImage] = useState<File | undefined>();
   const [filePDF, setFilePDF] = useState<File | undefined>();
   const [ext, setExt] = useState<string>("");
 
+  // Funciones para manejar archivos
   function handleImage(e: React.FormEvent<HTMLInputElement>) {
     const target = e.target as HTMLInputElement & {
       files: FileList;
@@ -620,62 +733,7 @@ function AddAssetDialogButton(props: resetInterface) {
     setFilePDF(file);
   }
 
-  useEffect(() => {
-    API.get("/api/categories/")
-      .then((response) => {
-        const mappedCategories = response.data.map((item: ServerCategory) => ({
-          value: item.id.toString(),
-          label: item.categoria,
-        }));
-        setCategories(mappedCategories);
-      })
-      .catch((error) => {
-        console.error("Error al obtener categorías del servidor:", error);
-      });
-  }, []);
-
-  useEffect(() => {
-    API.get("/api/states/")
-      .then((response) => {
-        const mappedStates = response.data.map((item: ServerStatus) => ({
-          value: item.id.toString(),
-          label: item.estatus,
-        }));
-        setStatus(mappedStates);
-      })
-      .catch((error) => {
-        console.error("Error al obtener estados del servidor:", error);
-      });
-  }, []);
-
-  useEffect(() => {
-    API.get("/api/users/")
-      .then((response) => {
-        const mappedUsers = response.data.map((item: ServerUser) => ({
-          value: item.id.toString(),
-          label: item.nombre,
-        }));
-        setUsers(mappedUsers);
-      })
-      .catch((error) => {
-        console.error("Error al obtener usuarios del servidor:", error);
-      });
-  }, []);
-
-  useEffect(() => {
-    API.get("/api/areas/")
-      .then((response) => {
-        const mappedAreas = response.data.map((item: ServerArea) => ({
-          value: item.id.toString(),
-          label: item.area,
-        }));
-        setAreas(mappedAreas);
-      })
-      .catch((error) => {
-        console.error("Error al obtener areas del servidor:", error);
-      });
-  }, []);
-
+  // Manejar estado de dialog
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -711,8 +769,10 @@ function AddAssetDialogButton(props: resetInterface) {
             const formData = new FormData(event.currentTarget);
             const formJson = Object.fromEntries((formData as any).entries());
 
+            console.log(formJson.fecha_factura);
             let data: {
               descripcion: string;
+              descripcion_ingles: string;
               factura_pedimentoPDF?: string;
               id_area: string;
               id_categoria: string;
@@ -726,8 +786,13 @@ function AddAssetDialogButton(props: resetInterface) {
               tipo_compra: string;
               noPedimento: string;
               pais_origen: string;
+              comentarios: string;
+              estado_pedimento: string;
+              fecha_factura?: string;
+              unidad_medida: string;
             } = {
               descripcion: formJson.descripcion,
+              descripcion_ingles: formJson.descripcion_ingles,
               id_area: formJson.id_area,
               id_categoria: formJson.id_categoria,
               id_estatus: formJson.id_estatus,
@@ -739,6 +804,11 @@ function AddAssetDialogButton(props: resetInterface) {
               tipo_compra: formJson.tipo_compra,
               noPedimento: formJson.noPedimento,
               pais_origen: formJson.pais_origen,
+              comentarios: formJson.comentarios,
+              estado_pedimento: formJson.estado_pedimento,
+              fecha_factura:
+                formJson.fecha_factura === "" ? null : formJson.fecha_factura,
+              unidad_medida: formJson.unidad_medida,
             };
             let imageName = formJson.numero_serie + "." + ext;
             if (image !== undefined) data = { ...data, imagen: imageName };
@@ -823,6 +893,40 @@ function AddAssetDialogButton(props: resetInterface) {
               name="noPedimento"
             />
             <TextField
+              select
+              label="Estado del pedimento"
+              fullWidth
+              required
+              helperText="Indica el estado del pedimento."
+              multiline
+              margin="normal"
+              name="estado_pedimento"
+              defaultValue={""}
+            >
+              {estadosPedimento.map((stat) => (
+                <MenuItem key={stat.value} value={stat.value}>
+                  {stat.label}
+                </MenuItem>
+              ))}
+            </TextField>
+            <TextField
+              select
+              label="Unidad de medida"
+              fullWidth
+              required
+              helperText="Indica la unidad de medida."
+              multiline
+              margin="normal"
+              name="unidad_medida"
+              defaultValue={""}
+            >
+              {unidadMedida.map((stat) => (
+                <MenuItem key={stat.value} value={stat.value}>
+                  {stat.label}
+                </MenuItem>
+              ))}
+            </TextField>
+            <TextField
               label="País de origen"
               fullWidth
               helperText="Escribe el país de origen."
@@ -845,6 +949,14 @@ function AddAssetDialogButton(props: resetInterface) {
               multiline
               margin="normal"
               name="descripcion"
+            />
+            <TextField
+              label="Descripción en inglés"
+              fullWidth
+              helperText="Agrega una descripción en inglés."
+              multiline
+              margin="normal"
+              name="descripcion_ingles"
             />
             <TextField
               label="Marca"
@@ -907,6 +1019,15 @@ function AddAssetDialogButton(props: resetInterface) {
               aria-labelledby="Modelo"
               name="noFactura"
             />
+            <InputLabel>Fecha de factura: </InputLabel>
+            <TextField
+              fullWidth
+              helperText="Indica la fecha de factura."
+              type="date"
+              margin="normal"
+              aria-labelledby="Fecha de factura"
+              name="fecha_factura"
+            />
             <InputLabel>Factura PDF: </InputLabel>
             <Box>
               <input
@@ -964,6 +1085,14 @@ function AddAssetDialogButton(props: resetInterface) {
                 </MenuItem>
               ))}
             </TextField>
+            <TextField
+              label="Comentarios"
+              fullWidth
+              helperText="Escribe tus comentarios adicionales."
+              multiline
+              margin="normal"
+              name="comentarios"
+            />
             <InputLabel>Imagen: </InputLabel>
             <Box>
               <input
@@ -1008,17 +1137,9 @@ function AddAssetDialogButton(props: resetInterface) {
 }
 
 function EditAssetDialogButton(props: editProps) {
-  const [categories, setCategories] = useState<Options[]>([]);
-  const [status, setStatus] = useState<Options[]>([]);
-  const [users, setUsers] = useState<Options[]>([]);
-  const [areas, setAreas] = useState<Options[]>([]);
   const [pdf, setPDF] = useState<string>("");
   const [image, setImage] = useState<File | undefined>();
   const [filePDF, setFilePDF] = useState<File | undefined>();
-  const [categorySelectedValue, setCategorySelectedValue] = useState("");
-  const [userSelectedValue, setUserSelectedValue] = useState("");
-  const [stateSelectedValue, setStateSelectedValue] = useState("");
-  const [areaSelectedValue, setAreaSelectedValue] = useState("");
   const [ext, setExt] = useState<string>("");
 
   function handleImage(e: React.FormEvent<HTMLInputElement>) {
@@ -1037,117 +1158,55 @@ function EditAssetDialogButton(props: editProps) {
   }
   const asset = props.data;
 
-  useEffect(() => {
-    API.get("/api/categories/")
-      .then((response) => {
-        const mappedCategories = response.data.map((item: ServerCategory) => ({
-          value: item.id.toString(),
-          label: item.categoria,
-        }));
-        setCategories(mappedCategories);
-      })
-      .catch((error) => {
-        console.error("Error al obtener categorías del servidor:", error);
-      });
-  }, []);
+  // Asignar valores por defecto a optiones de campos de catalogos en el formulario
 
-  API.get("/api/categories/")
-    .then((response) => {
-      var categorySelected = "";
-      response.data.map((category: ServerCategory) => {
-        if (asset.ID_Categoria === category.categoria) {
-          categorySelected = category.id.toString();
-        }
-      });
-      setCategorySelectedValue(categorySelected);
-    })
-    .catch((error) => {
-      console.error("Error fetching departments:", error);
-    });
+  // Valor de categoria
+  let categoryValue: string = "";
+  props.categoriesOptions.map((cat) => {
+    if (asset.ID_Categoria === cat.label) {
+      categoryValue = cat.value;
+    }
+  });
 
-  useEffect(() => {
-    API.get("/api/states/")
-      .then((response) => {
-        const mappedStates = response.data.map((item: ServerStatus) => ({
-          value: item.id.toString(),
-          label: item.estatus,
-        }));
-        setStatus(mappedStates);
-      })
-      .catch((error) => {
-        console.error("Error al obtener estados del servidor:", error);
-      });
-  }, []);
+  // Valor de status
+  let stateValue: string = "";
+  props.statusOptions.map((state) => {
+    if (asset.ID_Estatus === state.label) {
+      stateValue = state.value;
+    }
+  });
 
-  API.get("/api/states/")
-    .then((response) => {
-      var stateSelected = "";
-      response.data.map((state: ServerStatus) => {
-        if (asset.ID_Estatus === state.estatus) {
-          stateSelected = state.id.toString();
-        }
-      });
-      setStateSelectedValue(stateSelected);
-    })
-    .catch((error) => {
-      console.error("Error fetching departments:", error);
-    });
+  // Valor de area
+  let areasValue: string = "";
+  props.areasOptions.map((area) => {
+    if (asset.ID_Area === area.label) {
+      areasValue = area.value;
+    }
+  });
 
-  useEffect(() => {
-    API.get("/api/users/")
-      .then((response) => {
-        const mappedUsers = response.data.map((item: ServerUser) => ({
-          value: item.id.toString(),
-          label: item.nombre,
-        }));
-        setUsers(mappedUsers);
-      })
-      .catch((error) => {
-        console.error("Error al obtener usuarios del servidor:", error);
-      });
-  }, []);
+  // Valor de user
+  let userValue: string = "";
+  props.usersOptions.map((user) => {
+    if (asset.ID_Usuario === user.label) {
+      userValue = user.value;
+    }
+  });
 
-  API.get("/api/users/")
-    .then((response) => {
-      var userSelected = "";
-      response.data.map((user: ServerUser) => {
-        if (asset.ID_Usuario === user.nombre) {
-          userSelected = user.id.toString();
-        }
-      });
-      setUserSelectedValue(userSelected);
-    })
-    .catch((error) => {
-      console.error("Error fetching departments:", error);
-    });
+  // Valor de estado pedimento
+  let estadoPedimentoValue: string = "";
+  props.estadoPedimentoOptions.map((estPed) => {
+    if (asset.ID_Estado_Pedimento === estPed.value) {
+      estadoPedimentoValue = estPed.value;
+    }
+  });
 
-  useEffect(() => {
-    API.get("/api/areas/")
-      .then((response) => {
-        const mappedAreas = response.data.map((item: ServerArea) => ({
-          value: item.id.toString(),
-          label: item.area,
-        }));
-        setAreas(mappedAreas);
-      })
-      .catch((error) => {
-        console.error("Error al obtener areas del servidor:", error);
-      });
-  }, []);
-
-  API.get("/api/areas/")
-    .then((response) => {
-      var areaSelected = "";
-      response.data.map((area: ServerArea) => {
-        if (asset.ID_Area === area.area) {
-          areaSelected = area.id.toString();
-        }
-      });
-      setAreaSelectedValue(areaSelected);
-    })
-    .catch((error) => {
-      console.error("Error fetching departments:", error);
-    });
+  // Valor de unidad medida
+  let unidadMedidaValue: string = "";
+  props.unidadMedidaOptions.map((uniMed) => {
+    if (asset.ID_Unidad_Medida === uniMed.value) {
+      unidadMedidaValue = uniMed.value;
+    }
+  });
 
   const [open, setOpen] = React.useState(false);
 
@@ -1189,11 +1248,13 @@ function EditAssetDialogButton(props: editProps) {
             let data: {
               id: string;
               descripcion: string;
+              descripcion_ingles: string;
               factura_pedimentoPDF?: string;
               id_area: string;
               id_categoria: string;
               id_estatus: string;
               id_usuario: string;
+              imagen?: string;
               marca: string;
               modelo: string;
               noFactura: string;
@@ -1201,10 +1262,14 @@ function EditAssetDialogButton(props: editProps) {
               tipo_compra: string;
               noPedimento: string;
               pais_origen: string;
-              imagen?: string;
+              comentarios: string;
+              estado_pedimento: string;
+              fecha_factura?: string;
+              unidad_medida: string;
             } = {
               id: formJson.id,
               descripcion: formJson.descripcion,
+              descripcion_ingles: formJson.descripcion_ingles,
               id_area: formJson.id_area,
               id_categoria: formJson.id_categoria,
               id_estatus: formJson.id_estatus,
@@ -1216,6 +1281,11 @@ function EditAssetDialogButton(props: editProps) {
               tipo_compra: formJson.tipo_compra,
               noPedimento: formJson.noPedimento,
               pais_origen: formJson.pais_origen,
+              comentarios: formJson.comentarios,
+              estado_pedimento: formJson.estado_pedimento,
+              fecha_factura:
+                formJson.fecha_factura === "" ? null : formJson.fecha_factura,
+              unidad_medida: formJson.unidad_medida,
             };
             let imageName = formJson.numero_serie + "." + ext;
             if (image !== undefined) data = { ...data, imagen: imageName };
@@ -1325,6 +1395,40 @@ function EditAssetDialogButton(props: editProps) {
                   defaultValue={asset.noPedimento}
                 />
                 <TextField
+                  select
+                  label="Estado del pedimento"
+                  fullWidth
+                  required
+                  helperText="Indica el estado del pedimento."
+                  multiline
+                  margin="normal"
+                  name="estado_pedimento"
+                  defaultValue={estadoPedimentoValue}
+                >
+                  {props.estadoPedimentoOptions.map((stat) => (
+                    <MenuItem key={stat.value} value={stat.value}>
+                      {stat.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <TextField
+                  select
+                  label="Unidad de Medida"
+                  fullWidth
+                  required
+                  helperText="Selecciona la unidad de medida."
+                  multiline
+                  margin="normal"
+                  name="unidad_medida"
+                  defaultValue={unidadMedidaValue}
+                >
+                  {props.unidadMedidaOptions.map((stat) => (
+                    <MenuItem key={stat.value} value={stat.value}>
+                      {stat.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <TextField
                   label="País de origen"
                   fullWidth
                   helperText="Escribe el país de origen."
@@ -1352,6 +1456,15 @@ function EditAssetDialogButton(props: editProps) {
                   defaultValue={asset.Description}
                 />
                 <TextField
+                  label="Descripción en inglés"
+                  fullWidth
+                  helperText="Agrega una descripción en inglés."
+                  multiline
+                  margin="normal"
+                  name="descripcion_ingles"
+                  defaultValue={asset.descripcion_ingles}
+                />
+                <TextField
                   label="Marca"
                   fullWidth
                   helperText="Indica la marca."
@@ -1369,9 +1482,9 @@ function EditAssetDialogButton(props: editProps) {
                   multiline
                   margin="normal"
                   name="id_estatus"
-                  defaultValue={stateSelectedValue}
+                  defaultValue={stateValue}
                 >
-                  {status.map((stat) => (
+                  {props.statusOptions.map((stat) => (
                     <MenuItem key={stat.value} value={stat.value}>
                       {stat.label}
                     </MenuItem>
@@ -1386,9 +1499,9 @@ function EditAssetDialogButton(props: editProps) {
                   multiline
                   margin="normal"
                   name="id_categoria"
-                  defaultValue={categorySelectedValue}
+                  defaultValue={categoryValue}
                 >
-                  {categories.map((category) => (
+                  {props.categoriesOptions.map((category) => (
                     <MenuItem key={category.value} value={category.value}>
                       {category.label}
                     </MenuItem>
@@ -1413,6 +1526,16 @@ function EditAssetDialogButton(props: editProps) {
                   aria-labelledby="Modelo"
                   name="noFactura"
                   defaultValue={asset.No_Factura}
+                />
+                <InputLabel>Fecha de factura: </InputLabel>
+                <TextField
+                  fullWidth
+                  helperText="Indica la fecha de factura."
+                  type="date"
+                  margin="normal"
+                  aria-labelledby="Fecha de factura"
+                  name="fecha_factura"
+                  defaultValue={asset.fecha_factura}
                 />
                 <InputLabel>Factura PDF: </InputLabel>
                 <Box>
@@ -1446,9 +1569,9 @@ function EditAssetDialogButton(props: editProps) {
                   multiline
                   margin="normal"
                   name="id_usuario"
-                  defaultValue={userSelectedValue}
+                  defaultValue={userValue}
                 >
-                  {users.map((user) => (
+                  {props.usersOptions.map((user) => (
                     <MenuItem key={user.value} value={user.value}>
                       {user.label}
                     </MenuItem>
@@ -1463,14 +1586,23 @@ function EditAssetDialogButton(props: editProps) {
                   multiline
                   margin="normal"
                   name="id_area"
-                  defaultValue={areaSelectedValue}
+                  defaultValue={areasValue}
                 >
-                  {areas.map((area) => (
+                  {props.areasOptions.map((area) => (
                     <MenuItem key={area.value} value={area.value}>
                       {area.label}
                     </MenuItem>
                   ))}
                 </TextField>
+                <TextField
+                  label="Comentarios"
+                  fullWidth
+                  helperText="Escribe tus comentarios adicionales."
+                  multiline
+                  margin="normal"
+                  name="comentarios"
+                  defaultValue={asset.comentarios}
+                />
                 <InputLabel>Imagen: </InputLabel>
                 <Box>
                   <input
@@ -1526,7 +1658,7 @@ function EditAssetDialogButton(props: editProps) {
   );
 }
 
-function DeleteAssetButton(props: IDProps) {
+function DeleteAssetButton(props: DeleteProps) {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -1645,7 +1777,7 @@ function DeleteAssetButton(props: IDProps) {
   );
 }
 
-function ImportAssetButton(props: resetInterface) {
+function ImportAssetButton(props: AllProps) {
   const [open, setOpen] = React.useState(false);
   const [fileCSV, setFileCSV] = useState<File | undefined>();
   // const [fileName, setFileName] = useState<string>("");

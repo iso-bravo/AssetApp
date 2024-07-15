@@ -24,6 +24,7 @@ export interface Details {
   Number_Serie: string;
   Modelo: string;
   Description: string;
+  descripcion_ingles: string;
   Marca: string;
   ID_Categoria: string;
   Fecha_Registro: string;
@@ -33,8 +34,12 @@ export interface Details {
   ID_Usuario: string;
   ID_Area: string;
   ID_Estatus: string;
+  ID_Unidad_Medida: string;
+  ID_Estado_Pedimento: string;
   Imagen: string;
   noPedimento: string;
+  comentarios: string;
+  fecha_factura: string;
 }
 
 export interface PropsDetail {

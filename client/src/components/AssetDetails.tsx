@@ -122,6 +122,10 @@ export default function AssetDetails(props: PropsDetail) {
                             {props.asset.noPedimento}
                           </ListItem>
                           <ListItem>
+                            <b>Estado de pedimento:&nbsp;</b>{" "}
+                            {props.asset.ID_Estado_Pedimento}
+                          </ListItem>
+                          <ListItem>
                             <b>País de origen:&nbsp;</b>{" "}
                             {props.asset.pais_origen}
                           </ListItem>
@@ -132,10 +136,18 @@ export default function AssetDetails(props: PropsDetail) {
                             <b>Descripción:&nbsp;</b> {props.asset.Description}
                           </ListItem>
                           <ListItem>
+                            <b>Unidad de medida:&nbsp;</b>{" "}
+                            {props.asset.ID_Unidad_Medida}
+                          </ListItem>
+                          <ListItem>
                             <b>Marca:&nbsp;</b> {props.asset.Marca}
                           </ListItem>
                           <ListItem>
                             <b>Categoría:&nbsp;</b> {props.asset.ID_Categoria}
+                          </ListItem>
+                          <ListItem>
+                            <b>Fecha de factura:&nbsp;</b>{" "}
+                            {props.asset.fecha_factura}
                           </ListItem>
                           <ListItem>
                             <b>Fecha de registro:&nbsp;</b>{" "}
@@ -157,6 +169,10 @@ export default function AssetDetails(props: PropsDetail) {
                           </ListItem>
                           <ListItem>
                             <b>Estatus:&nbsp;</b> {props.asset.ID_Estatus}
+                          </ListItem>
+                          <ListItem>
+                            <b>Comentarios:&nbsp;</b>{" "}
+                            {props.asset.comentarios}
                           </ListItem>
                         </List>
                       </Grid>

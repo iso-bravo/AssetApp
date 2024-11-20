@@ -549,31 +549,39 @@ def asset_info_qr(request, id):
     categoria = Categorias.objects.filter(id=asset.id_categoria).first()
     estado = Estados.objects.filter(id=asset.id_estatus).first()
     area = Areas.objects.filter(id=asset.id_area).first()
+    estado_pedimento = EstadoPedimento.objects.filter(id=asset.estado_pedimento).first()
+    unidad_medida = UnidadMedida.objects.filter(id=asset.unidad_medida).first()
 
     # Establecer valores por defecto si no se encuentran los objetos
     categoria_nombre = categoria.categoria if categoria else "Sin asignar"
     estado_nombre = estado.estatus if estado else "Sin asignar"
     area_nombre = area.area if area else "Sin asignar"
+    estado_pedimento_nombre = estado_pedimento.estado_pedimento if estado_pedimento else "Sin asignar"
+    unidad_medida_nombre = unidad_medida.unidad_medida if unidad_medida else "Sin asignar"
+
     imageName = asset.imagen
-    image = 'api/assets_imgs/' + str(imageName) + '.jpg'
+    #image = '../api/files/' + str(imageName)
     
     context = {
         'Id': asset.id,
         'NoSerie': asset.numero_serie,
         'AssetModelNo': asset.modelo,
         'Description': asset.descripcion,
+        'descripcion_ingles': asset.descripcion_ingles,
         'Category': categoria_nombre,
         'UnitPrice': asset.tipo_compra,
         'Area': area_nombre,
         'AssetStatus': estado_nombre,
+        'register_date': asset.fecha_registro,
+        'factura_date': asset.fecha_factura,
+        'estado_pedimento': estado_pedimento_nombre,
+        'unidad_medida': unidad_medida_nombre,
         'NoPedimento': asset.noPedimento,
         'NoFactura': asset.noFactura,
         'Mark': asset.marca,
-        'Image':  image,
+        'Comments': asset.comentarios,
+        'Image':  imageName,
     }
-
-    # Depurar el contenido del contexto
-    print(context)
 
     return render(request, str(asset_info_html), context)
 

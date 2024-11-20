@@ -19,6 +19,10 @@
                         <div class="card-text"><h2>{{ Id }}</h2></div>
                     </div>
                     <div class="card-body">
+                        <div class="card-header"><h1>Fecha de Registro</h1></div>
+                        <div class="card-text"><h2>{{ register_date }}</h2></div>
+                    </div>
+                    <div class="card-body">
                         <div class="card-header"><h1>No.Serie</h1></div>
                         <div class="card-text"><h2>{{ NoSerie }}</h2></div>
                     </div>
@@ -29,6 +33,10 @@
                     <div class="card-body">
                         <div class="card-header"><h1>Descripción</h1></div>
                         <div class="card-text"><h2>{{ Description }}</h2></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-header"><h1>Descripción Inglés</h1></div>
+                        <div class="card-text"><h2>{{ descripcion_ingles }}</h2></div>
                     </div>
                     <div class="card-body">
                         <div class="card-header"><h1>Categoría</h1></div>
@@ -47,6 +55,10 @@
                         <div class="card-text"><h2>{{ AssetStatus }}</h2></div>
                     </div>
                     <div class="card-body">
+                        <div class="card-header"><h1>Estado de Pedimento</h1></div>
+                        <div class="card-text"><h2>{{ estado_pedimento }}</h2></div>
+                    </div>
+                    <div class="card-body">
                         <div class="card-header"><h1>No. Pedimento</h1></div>
                         <div class="card-text"><h2>{{ NoPedimento }}</h2></div>
                     </div>
@@ -55,11 +67,24 @@
                         <div class="card-text"><h2>{{ NoFactura }}</h2></div>
                     </div>
                     <div class="card-body">
+                        <div class="card-header"><h1>Fecha de Factura</h1></div>
+                        <div class="card-text"><h2>{{ factura_date }}</h2></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-header"><h1>Unidad de Medida</h1></div>
+                        <div class="card-text"><h2>{{ unidad_medida }}</h2></div>
+                    </div>
+                    <div class="card-body">
                         <div class="card-header"><h1>Marca</h1></div>
                         <div class="card-text"><h2>{{ Mark }}</h2></div>
                     </div>
                     <div class="card-body">
+                        <div class="card-header"><h1>Comentarios</h1></div>
+                        <div class="card-text"><h2>{{ Comments }}</h2></div>
+                    </div>
+                    <div class="card-body">
                         <div class="card-text"><h2>{{ Image }}</h2></div>
+                        <img src="http://localhost:8080/api/files/{{ Image }}">
                     </div>
                 </div>
             </div>
